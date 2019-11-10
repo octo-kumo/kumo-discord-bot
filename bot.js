@@ -23,10 +23,6 @@ client.on('message', async msg => {
     if (!msg.channel.type === "text") return;
     if (!msg.guild) return;
     if (msg.content.indexOf(prefix) !== 0) return;
-    if (msg.author.id === "456001047756800000") {
-        userCooldown.status[msg.author.id] = 0;
-        userCooldown.playerinfo[msg.author.id] = 0;
-    }
     const args = msg.content.slice(1).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
     if (msg.channel.id === "642988383626592286" || msg.channel.id === "642993162943725568") {
