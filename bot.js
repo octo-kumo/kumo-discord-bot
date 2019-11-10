@@ -6,6 +6,8 @@ const express = require('express')
 var port = process.env.PORT || 3000;
 const prefix = process.env.PREFIX;
 
+console.log('APP STARTING...');
+
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`);
