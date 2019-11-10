@@ -1,0 +1,26 @@
+{
+  "name": "nush-discord-bot",
+  "version": "1.0.0",
+  "description": "\"M2040X\" Discord (Utility) Bot",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node bot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LE0ZY/nush-discord-bot.git"
+  },
+  "author": "yun",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LE0ZY/nush-discord-bot/issues"
+  },
+  "homepage": "https://github.com/LE0ZY/nush-discord-bot#readme",
+  "dependencies": {
+    "discord.js": ">=11.5.1",
+    "express": ">=4.17.1",
+    "moment": ">=2.24.0",
+    "request": ">=2.88.0"
+  }
+}
