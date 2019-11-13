@@ -72,7 +72,8 @@ client.on('message', async msg => {
                     embed.addBlankField();
                     embed.addField("Required for Achievements", "\u200B");
                     let achievements = contents.querySelectorAll(".condition_assessment");
-                    for (var i = 0; i < achievements.length; i++) embed.addField((i + 1) + ")", achievements[i].innerHTML.replaceAll("<a.+>(.+)</a>(.+)", "**$1** $2"));
+                    if(achievements.length)
+                    for (var i = 0; i < achievements.length; i++) embed.addField((i + 1) + ")", achievements[i].rawText.replaceAll("<a.+>(.+)</a>(.+)", "**$1** $2"));
                     let files = [];
                     let linksInDiv = contents.querySelectorAll("div a");
                     for (var i = 0; i < linksInDiv.length; i++) {
