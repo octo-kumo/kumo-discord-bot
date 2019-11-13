@@ -2,8 +2,6 @@ const Discord = require('discord.js');
 const request = require('request');
 const moment = require('moment');
 const client = new Discord.Client();
-const express = require('express')
-var port = process.env.PORT || 3000;
 const prefix = process.env.PREFIX;
 
 const PING_EMBED = new Discord.RichEmbed().setTitle("機器雲的延時").setColor(0x21f8ff).addField("Latency", 0).addField("Discord API Latency", 0);
@@ -15,7 +13,7 @@ client.on('ready', () => {
     console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`);
     client.user.setPresence({
         game: {
-            name: 'ZY\'s bot'
+            name: 'ZY\'s Bot'
         },
         status: 'idle'
     }).then(console.log).catch(console.error);
@@ -41,6 +39,11 @@ client.on('message', async msg => {
             msg.channel.send("TESTING COMMAND.  Arguments: " + args.join(", "));
             console.log(`${msg.author.username} requested test!`);
             msg.delete();
+        }
+        if (command === "pokemon") {
+            request("https://pokeapi.co/api/v2/" + encodeURIComponent(args.join(" ")), function(error, response, body) {
+                console.log(body);
+            });
         }
     }
 });
