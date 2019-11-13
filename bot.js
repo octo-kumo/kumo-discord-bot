@@ -61,8 +61,8 @@ client.on('message', async msg => {
                     msg.channel.send("Coursemology Query Failed!");
                 } else {
                     let result = parse(body);
-                    let title = html.querySelector(".container-fluid .course-layout .course-assessment-assessments .page-header h1 span").text;
-                    let contents = html.querySelector("#assessment_" + args[1]);
+                    let title = result.querySelector(".container-fluid .course-layout .course-assessment-assessments .page-header h1 span").text;
+                    let contents = result.querySelector("#assessment_" + args[1]);
                     let desc = contents.querySelector(".well").text.replaceAll("<\\/.>", "\n").replace(/<[^>]+>/g, '');
                     let embed = new Discord.RichEmbed().setTitle(title);
                     embed.setDescription(desc);
