@@ -77,8 +77,9 @@ client.on('message', async msg => {
                     let linksInDiv = contents.querySelectorAll("div a");
                     for (var i = 0; i < linksInDiv.length; i++) {
                         if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) {
+                            console.log("Added File: " + "https://nushigh.coursemology.org" + linksInDiv[i].attributes.href);
                             files.push({
-                                attachment: "http://nushigh.coursemology.org" + linksInDiv[i].attributes.href,
+                                attachment: "https://nushigh.coursemology.org" + linksInDiv[i].attributes.href,
                                 name: linksInDiv[i].text
                             });
                         }
