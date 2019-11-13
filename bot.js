@@ -76,9 +76,9 @@ client.on('message', async msg => {
                     let files = [];
                     let linksInDiv = contents.querySelectorAll("div a");
                     for (var i = 0; i < linksInDiv.length; i++) {
-                        if (linksInDiv[i].atrributes["href"].match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) {
+                        if (linksInDiv[i].atrributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) {
                             files.push({
-                                attachment: "http://nushigh.coursemology.org" + linksInDiv[i].atrributes["href"],
+                                attachment: "http://nushigh.coursemology.org" + linksInDiv[i].atrributes.href,
                                 name: linksInDiv[i].text
                             });
                         }
