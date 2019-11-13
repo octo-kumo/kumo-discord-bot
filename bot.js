@@ -63,15 +63,13 @@ client.on('message', async msg => {
                     let result = parse(body);
                     let title = result.querySelector(".container-fluid .course-layout .course-assessment-assessments .page-header h1 span").text;
                     let contents = result.querySelector("#assessment_" + args[1]);
-                    let desc = "No Description";
-                    if (contents.querySelector(".well")) desc = contents.querySelector(".well").text.replace(/<[^>]+>/g, '');
                     let embed = new Discord.RichEmbed().setTitle(title);
-                    embed.setDescription(desc);
+                    if (contents.querySelector(".well")) embed.setDescription(contents.querySelector(".well").text.replace(/<[^>]+>/g, ''));
                     embed.addField("Type", contents.querySelector(".type td").text);
                     embed.addField("EXP", contents.querySelector(".base_exp td").text + " (" + contents.querySelector(".bonus_exp td").text + ")");
                     let achievements = contents.querySelectorAll(".condition_assessment");
                     let required = achievements.map(a => a.rawText.replace(/<a.+>(.+)<\/a>(.+)/, "**$1** $2")).join("\n");
-                    embed.addField("Required for Achievements", required, true);
+                    if (required) embed.addField("Required for Achievements", required, true);
                     let files = [];
                     let linksInDiv = contents.querySelectorAll("div a");
                     for (var i = 0; i < linksInDiv.length; i++)
