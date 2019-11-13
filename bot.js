@@ -74,7 +74,4 @@ client.on('message', async msg => {
         }
     }
 });
-
-function getCMLabDetails(var)
-
 client.login(process.env.TOKEN);
