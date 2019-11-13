@@ -66,7 +66,7 @@ client.on('message', async msg => {
                     embed.addField("Skippable", a.skippable);
                     embed.addField("Password Protected", a.passwordProtected);
                     embed.addField("Number of Questions", a.questionIds.length);
-                    for (var i = 0; i < a.files.length; i++) files.push(a.files[i].url);
+                    for (var i = 0; i < a.files.length; i++) files.push("http://nushigh.coursemology.org" + a.files[i].url);
                     embed.attachFiles(files);
                     embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
                     msg.channel.send(embed);
