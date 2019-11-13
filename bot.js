@@ -30,6 +30,7 @@ client.on('message', async msg => {
     if (msg.content.indexOf(prefix) !== 0) return;
     const args = msg.content.slice(1).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
+    console.log("Command " + command + " | Args [" + args.join(", ") + "] | Owner " + msg.author.username);
     if (msg.channel.id === "642988383626592286" || msg.channel.id === "642993162943725568") {
         if (command === "ping") {
             msg.delete();
