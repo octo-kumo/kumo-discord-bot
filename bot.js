@@ -67,8 +67,7 @@ client.on('message', async msg => {
                     let embed = new Discord.RichEmbed().setTitle(title);
                     embed.setDescription(desc);
                     embed.addField("Type", contents.querySelector(".type td").text);
-                    embed.addField("EXP", contents.querySelector(".base_exp td").text + " ("
-                        contents.querySelector(".bonus_exp td").text + ")");
+                    embed.addField("EXP", contents.querySelector(".base_exp td").text + " (" + contents.querySelector(".bonus_exp td").text + ")");
                     let achievements = contents.querySelectorAll(".condition_assessment");
                     let required = achievements.map(a => a.rawText.replace(/<a.+>(.+)<\/a>(.+)/, "**$1** $2")).join("\n");
                     embed.addField("Required for Achievements", required, true);
