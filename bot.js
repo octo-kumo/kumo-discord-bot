@@ -54,21 +54,20 @@ client.on('message', async msg => {
                 url: "https://nushigh.coursemology.org/courses/" + args[0] + "/assessments/" + args[1] + "/submissions/" + args[2] + "/edit?format=json",
                 jar: j
             }, function(error, response, body) {
-                console.log(body);
                 if (error || response.statusCode == 404) {
                     msg.channel.send("Coursemology Query Failed!");
                 } else {
                     body = JSON.parse(body);
                     let a = body.assessment;
                     let embed = new Discord.RichEmbed().setTitle(a.title);
+                    let files = [];
                     embed.setDescription(a.description);
                     embed.addField("Auto Graded", a.autograded);
                     embed.addField("Skippable", a.skippable);
                     embed.addField("Password Protected", a.passwordProtected);
                     embed.addField("Number of Questions", a.questionIds.length);
-                    for (var i = 0; i < a.files.length; i++) {
-                        embed.attachFile(a.files[i].url);
-                    }
+                    for (var i = 0; i < a.files.length; i++) files.push(a.files[i].url);
+                    embed.attachFiles(files);
                     embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
                     msg.channel.send(embed);
                 }
