@@ -69,21 +69,13 @@ client.on('message', async msg => {
                     embed.addField("Type", contents.querySelector(".type td").text);
                     embed.addField("Base EXP", contents.querySelector(".base_exp td").text);
                     embed.addField("Bonus EXP", contents.querySelector(".bonus_exp td").text);
-                    embed.addBlankField();
-                    embed.addField("Required for Achievements", "\u200B");
+                    embed.addField("Required for Achievements", "\u200B", true);
                     let achievements = contents.querySelectorAll(".condition_assessment");
                     for (var i = 0; i < achievements.length; i++) embed.addField((i + 1) + ")", achievements[i].rawText.replace(/<a.+>(.+)<\/a>(.+)/, "**$1** $2"));
                     let files = [];
                     let linksInDiv = contents.querySelectorAll("div a");
-                    for (var i = 0; i < linksInDiv.length; i++) {
-                        if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) {
-                            console.log("Added File: " + "https://nushigh.coursemology.org" + linksInDiv[i].attributes.href);
-                            files.push({
-                                attachment: "https://nushigh.coursemology.org" + linksInDiv[i].attributes.href,
-                                name: linksInDiv[i].text
-                            });
-                        }
-                    }
+                    for (var i = 0; i < linksInDiv.length; i++)
+                        if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) embed.addField(linksInDiv[i].text, "[Download](" + "https://nushigh.coursemology.org" + linksInDiv[i].attributes.href + ")");
                     embed.attachFiles(files);
                     embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
                     msg.channel.send(embed);
