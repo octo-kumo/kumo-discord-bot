@@ -1,7 +1,9 @@
 const Discord = require('discord.js');
 const request = require('request');
 const moment = require('moment');
-const html = require('node-html-parser');
+const {
+    parse
+} = require('node-html-parser');
 const client = new Discord.Client();
 const prefix = process.env.PREFIX;
 const USERTOKEN = process.env.CMTOKEN;
@@ -58,7 +60,7 @@ client.on('message', async msg => {
                 if (error || response.statusCode == 404) {
                     msg.channel.send("Coursemology Query Failed!");
                 } else {
-                    let result = html(body);
+                    let result = parse(body);
                     let title = html.querySelector(".container-fluid .course-layout .course-assessment-assessments .page-header h1 span").text;
                     let contents = html.querySelector("#assessment_" + args[1]);
                     let desc = contents.querySelector(".well").text.replaceAll("<\\/.>", "\n").replace(/<[^>]+>/g, '');
@@ -97,6 +99,9 @@ client.on('message', async msg => {
                     //     attachment: "http://nushigh.coursemology.org" + a.files[i].url,
                     //     name: a.files[i].name
                     // });
+                    // embed.attachFiles(files);
+                    // embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
+                    // msg.channel.send(embed);
                 }
             });
         }
