@@ -16,7 +16,7 @@ client.on('ready', () => {
             name: 'ZY\'s Bot'
         },
         status: 'idle'
-    }).then(console.log).catch(console.error);
+    });
 });
 
 client.on('message', async msg => {
@@ -42,7 +42,9 @@ client.on('message', async msg => {
         }
         if (command === "pokemon") {
             request("https://pokeapi.co/api/v2/" + encodeURIComponent(args.join(" ")), function(error, response, body) {
-                console.log(body);
+                console.log('error:', error); // Print the error if one occurred
+                console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+                console.log('body:', body); // Print the HTML for the Google homepage.
             });
         }
     }
