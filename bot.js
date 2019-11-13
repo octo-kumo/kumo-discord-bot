@@ -54,9 +54,11 @@ client.on('message', async msg => {
                 url: "https://nushigh.coursemology.org/courses/" + args[0] + "/assessments/" + args[1] + "/submissions/" + args[2] + "/edit?format=json",
                 jar: j
             }, function(error, response, body) {
+                console.log(body);
                 if (error || response.statusCode == 404) {
                     msg.channel.send("Coursemology Query Failed!");
                 } else {
+                    body = body.JSON.parse(body);
                     let a = body.assessment;
                     let embed = new Discord.RichEmbed().setTitle(a.title);
                     embed.setDescription(a.description);
