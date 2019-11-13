@@ -58,7 +58,7 @@ client.on('message', async msg => {
                 if (error || response.statusCode == 404) {
                     msg.channel.send("Coursemology Query Failed!");
                 } else {
-                    body = body.JSON.parse(body);
+                    body = JSON.parse(body);
                     let a = body.assessment;
                     let embed = new Discord.RichEmbed().setTitle(a.title);
                     embed.setDescription(a.description);
