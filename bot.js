@@ -3,8 +3,13 @@ const request = require('request');
 const moment = require('moment');
 const client = new Discord.Client();
 const prefix = process.env.PREFIX;
+const USERTOKEN = process.env.CMTOKEN;
+const j = request.jar();
+const cookie = request.cookie('remember_user_token=' + USERTOKEN);
+j.setCookie(cookie, "https://nushigh.coursemology.org");
 
 const PING_EMBED = new Discord.RichEmbed().setTitle("機器雲的延時").setColor(0x21f8ff).addField("Latency", 0).addField("Discord API Latency", 0);
+const CM_QUERY_EMBED = new Discord.RichEmbed().setTitle("Coursemology Query").addDescription("Coursemology Query Details").setColor(0x00bcd4).addField("Course", "null").addField("Assessments", "null").addField("Submission", "null");
 
 console.log('APP STARTING...');
 
@@ -40,14 +45,35 @@ client.on('message', async msg => {
             console.log(`${msg.author.username} requested test!`);
             msg.delete();
         }
-        if (command === "pokemon") {
-            request("https://pokeapi.co/api/v2/" + encodeURIComponent(args.join(" ")), function(error, response, body) {
-                console.log('error:', error); // Print the error if one occurred
-                console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-                console.log('body:', body); // Print the HTML for the Google homepage.
+        if (command === "coursemology") {
+            if (args.length != 3) return msg.channel.send("Please include 3 parameters!");
+            for (var a = 0; a < 3; a++) CM_QUERY_EMBED.fields[a].value = args[a];
+            msg.channel.send(CM_QUERY_EMBED);
+            request({
+                url: "https://nushigh.coursemology.org/courses/" + args[0] + "/assessments/" + args[1] + "/submissions/" + args[2] + "/edit?format=json",
+                jar: j
+            }, function(error, response, body) {
+                if (!error || response.statusCode == 404) {
+                    msg.channel.send("Coursemology Query Failed!");
+                } else {
+                    let a = body.assessment;
+                    let embed = new Discord.RichEmbed().setTitle(a.title);
+                    embed.setDescription(a.description);
+                    embed.addField("Auto Graded", a.autograded);
+                    embed.addField("Skippable", a.skippable);
+                    embed.addField("Password Protected", a.passwordProtected);
+                    embed.addField("Number of Questions", a.questionIds.length);
+                    for (var i = 0; i < a.files.length; i++) {
+                        embed.attachFile(a.files[i].url);
+                    }
+                    embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
+                    msg.channel.send(embed);
+                }
             });
         }
     }
 });
+
+function getCMLabDetails(var)
 
 client.login(process.env.TOKEN);
