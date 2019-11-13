@@ -63,7 +63,7 @@ client.on('message', async msg => {
                     let result = parse(body);
                     let title = result.querySelector(".container-fluid .course-layout .course-assessment-assessments .page-header h1 span").text;
                     let contents = result.querySelector("#assessment_" + args[1]);
-                    let desc = contents.querySelector(".well").text.replaceAll("<\\/.>", "\n").replace(/<[^>]+>/g, '');
+                    let desc = contents.querySelector(".well").text.replace(/<[^>]+>/g, '');
                     let embed = new Discord.RichEmbed().setTitle(title);
                     embed.setDescription(desc);
                     embed.addField("Type", contents.querySelector(".type td").text);
