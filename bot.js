@@ -67,11 +67,11 @@ client.on('message', async msg => {
                     let embed = new Discord.RichEmbed().setTitle(title);
                     embed.setDescription(desc);
                     embed.addField("Type", contents.querySelector(".type td").text);
-                    embed.addField("Base EXP", contents.querySelector(".base_exp td").text);
-                    embed.addField("Bonus EXP", contents.querySelector(".bonus_exp td").text);
-                    embed.addField("Required for Achievements", "\u200B", true);
+                    embed.addField("EXP", contents.querySelector(".base_exp td").text + " ("
+                        contents.querySelector(".bonus_exp td").text + ")");
                     let achievements = contents.querySelectorAll(".condition_assessment");
-                    for (var i = 0; i < achievements.length; i++) embed.addField((i + 1) + ")", achievements[i].rawText.replace(/<a.+>(.+)<\/a>(.+)/, "**$1** $2"));
+                    let required = achievements.map(a => a.rawText.replace(/<a.+>(.+)<\/a>(.+)/, "**$1** $2")).join("\n");
+                    embed.addField("Required for Achievements", required, true);
                     let files = [];
                     let linksInDiv = contents.querySelectorAll("div a");
                     for (var i = 0; i < linksInDiv.length; i++)
@@ -79,22 +79,6 @@ client.on('message', async msg => {
                     embed.attachFiles(files);
                     embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
                     msg.channel.send(embed);
-                    // body = JSON.parse(body);
-                    // let a = body.assessment;
-                    // let embed = new Discord.RichEmbed().setTitle(a.title);
-                    // let files = [];
-                    // embed.setDescription(a.description.replace(/<[^>]+>/g, ''));
-                    // embed.addField("Auto Graded", a.autograded);
-                    // embed.addField("Skippable", a.skippable);
-                    // embed.addField("Password Protected", a.passwordProtected);
-                    // embed.addField("Number of Questions", a.questionIds.length);
-                    // for (var i = 0; i < a.files.length; i++) files.push({
-                    //     attachment: "http://nushigh.coursemology.org" + a.files[i].url,
-                    //     name: a.files[i].name
-                    // });
-                    // embed.attachFiles(files);
-                    // embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
-                    // msg.channel.send(embed);
                 }
             });
         }
