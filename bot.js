@@ -9,7 +9,7 @@ const cookie = request.cookie('remember_user_token=' + USERTOKEN);
 j.setCookie(cookie, "https://nushigh.coursemology.org");
 
 const PING_EMBED = new Discord.RichEmbed().setTitle("機器雲的延時").setColor(0x21f8ff).addField("Latency", 0).addField("Discord API Latency", 0);
-const CM_QUERY_EMBED = new Discord.RichEmbed().setTitle("Coursemology Query").addDescription("Coursemology Query Details").setColor(0x00bcd4).addField("Course", "null").addField("Assessments", "null").addField("Submission", "null");
+const CM_QUERY_EMBED = new Discord.RichEmbed().setTitle("Coursemology Query").setDescription("Coursemology Query Details").setColor(0x00bcd4).addField("Course", "null").addField("Assessments", "null").addField("Submission", "null");
 
 console.log('APP STARTING...');
 
