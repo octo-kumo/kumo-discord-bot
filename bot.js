@@ -61,12 +61,15 @@ client.on('message', async msg => {
                     let a = body.assessment;
                     let embed = new Discord.RichEmbed().setTitle(a.title);
                     let files = [];
-                    embed.setDescription(a.description);
+                    embed.setDescription(a.description.replace(/<[^>]+>/g, ''));
                     embed.addField("Auto Graded", a.autograded);
                     embed.addField("Skippable", a.skippable);
                     embed.addField("Password Protected", a.passwordProtected);
                     embed.addField("Number of Questions", a.questionIds.length);
-                    for (var i = 0; i < a.files.length; i++) files.push("http://nushigh.coursemology.org" + a.files[i].url);
+                    for (var i = 0; i < a.files.length; i++) files.push({
+                        attachment: "http://nushigh.coursemology.org" + a.files[i].url,
+                        name: a.files[i].name
+                    });
                     embed.attachFiles(files);
                     embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
                     msg.channel.send(embed);
