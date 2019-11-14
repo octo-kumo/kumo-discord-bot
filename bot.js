@@ -140,7 +140,7 @@ function exeList(course, cat, tab, msg) {
 
 function exeLB(course, type, msg) {
     request({
-        url: `https://nushigh.coursemology.org/courses/${course}/assessments?category=${cat}&tab=${tab}`,
+        url: `https://nushigh.coursemology.org/courses/${course}/leaderboard`,
         jar: j
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
