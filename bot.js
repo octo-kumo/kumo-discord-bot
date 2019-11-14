@@ -123,10 +123,11 @@ function exeList(course, cat, tab, msg) {
             for (let i = 0; i < rows.length; i++) {
                 let row = rows[i];
                 let title = row.firstChild.firstChild;
-                let embed = new Discord.RichEmbed().setTitle(`[${title.text}](https://nushigh.coursemology.org${title.attributes.href})`);
+                let embed = new Discord.RichEmbed().setTitle(title.text);
+                embed.setURL(`https://nushigh.coursemology.org${title.attributes.href}`);
                 embed.setColor(0xa0fcff)
-                embed.addField("EXP", `${row.querySelector(".table-base-exp").text} (${row.querySelector(".table-time-bonus-exp").text})`);
-                embed.addField("Bonus Cut-Off", row.querySelector(".table-bonus-cut-off").text);
+                embed.addField("EXP", `${row.querySelector(".table-base-exp").text} (${row.querySelector(".table-time-bonus-exp").text})`, true);
+                embed.addField("Bonus Cut-Off", row.querySelector(".table-bonus-cut-off").text, true);
                 if (!row.attributes.class.includes("currently-active")) embed.setDescription("_Not Open_");
                 msg.channel.send(embed);
             }
