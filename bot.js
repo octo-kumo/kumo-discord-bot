@@ -7,7 +7,8 @@ const parse = require('node-html-parser').parse;
 const COURSES = [1706];
 const PREFIX = process.env.PREFIX;
 const USERTOKEN = process.env.CMTOKEN;
-const HOOK = new Discord.WebhookClient('644427303719403521', 'RFaX_k2dQRVTcwyHHCezuTKodVHzeIfPbDlaUN8-igaumtW-X9bBd-X2IpdZBRW-kkwc');
+const HOOK_TOKEN = process.env.HKTOKEN;
+const HOOK = new Discord.WebhookClient('644427303719403521', HOOK_TOKEN);
 const client = new Discord.Client();
 const JAR = request.jar();
 
