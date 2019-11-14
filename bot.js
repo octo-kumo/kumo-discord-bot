@@ -187,20 +187,20 @@ function exeLB(course, type, channel, author) {
             if (!contents) return hook.send(`DEBUG: Course-Do-Not-Exist? ${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
             let rows = contents.querySelectorAll("tr");
             let row1 = rows.shift();
-            let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text} _(${row1.querySelector(".user-profile").lastChild.text})_`);
+            let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text.trim()} _(${row1.querySelector(".user-profile").lastChild.text.trim()})_`);
             let thumbURL = row1.querySelector(".user-picture img").attributes.src;
             if (thumbURL.charAt(0) === "/") thumbURL = coursemology_base_url + thumbURL;
             console.log("Thumbnail URL: " + thumbURL);
             embed.setThumbnail(thumbURL);
             let desc = rows.map(row => {
-                let rank = row.firstChild.text;
+                let rank = row.firstChild.text.trim();
                 return {
-                    name: `#${row.firstChild.text}`,
-                    value: `[${row.querySelector(".user-profile div a").text}](${coursemology_base_url}${row1.querySelector(".user-profile div a").attributes.href}) _(${row1.querySelector(".user-profile").lastChild.text})_`
+                    name: `#${row.firstChild.text.trim()}`,
+                    value: `[${row.querySelector(".user-profile div a").text.trim()}](${coursemology_base_url}${row1.querySelector(".user-profile div a").attributes.href}) _(${row1.querySelector(".user-profile").lastChild.text.trim()})_`
                 };
             });
             embed.fields = desc;
-            embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
+            embed.setFooter("Requested By " + author.username.trim(), author.displayAvatarURL.trim());
             embed.setColor(0x21f8ff);
             channel.send(embed);
         }
@@ -222,11 +222,11 @@ function updateLB(courses) {
                 let rows = contents.querySelectorAll("tr");
                 let newLB = rows.map(row => {
                     return {
-                        id: row.attributes.id.replace("course_user_", ""),
-                        rank: row.firstChild.text,
-                        name: row.querySelector(".user-profile div a").text,
+                        id: row.attributes.id.replace("course_user_", "").trim(),
+                        rank: row.firstChild.text.trim(),
+                        name: row.querySelector(".user-profile div a").text.trim(),
                         image: `${coursemology_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
-                        level: row.querySelector(".user-profile").lastChild.text
+                        level: row.querySelector(".user-profile").lastChild.text.trim()
                     };
                 });
                 if (debug) hook.send("DEBUG: #1 on Leaderboard(#" + course + ") is " + newLB[0].name);
