@@ -241,9 +241,9 @@ function updateLB(courses) {
                     for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++) {
                         if (newLB[a].id !== oldLB[a].id) {
                             if (a == 0)
-                                hook.send(`**${newLB[a].name}** has taken the **#1** spot from **${oldLB[a].name}** on course ${course}!`);
+                                hook.send(`[Course#${course}] **${newLB[a].name}** has taken the **#1** spot from **${oldLB[a].name}**!`);
                             else
-                                hook.send(`The **#${oldLB[a].rank}** spot on course ${course}, is no longer held by **${oldLB[a].name}** but by **${newLB[a].name}**!`);
+                                hook.send(`[Course#${course}] The **#${oldLB[a].rank}** spot is no longer held by **${oldLB[a].name}** but by **${newLB[a].name}**!`);
                         }
                     }
                 }
