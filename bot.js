@@ -116,10 +116,9 @@ function exeInfo(course, id, channel, author) {
             channel.send("Coursemology Query Failed!");
         } else {
             let result = parse(body);
-            let title = result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text;
             let contents = result.querySelector("#assessment_" + id);
             if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
-            let embed = new Discord.RichEmbed().setTitle(title).setColor(0x21f8ff);
+            let embed = new Discord.RichEmbed().setTitle(result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text).setColor(0x21f8ff);
             if (contents.querySelector(".well")) embed.setDescription(contents.querySelector(".well").text.replace(/<[^>]+>/g, ''));
             embed.addField("Type", contents.querySelector(".type td").text);
             embed.addField("EXP", contents.querySelector(".base_exp td").text + " (" + contents.querySelector(".bonus_exp td").text + ")");
