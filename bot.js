@@ -122,8 +122,9 @@ function exeList(course, cat, tab, msg) {
                 let title = row.firstChild.firstChild;
                 let disabled = !row.attributes.class.includes("currently-active");
                 return {
-                    name: `[${disabled?"~~":"**"}${row.attributes.id.replace("assessment_", "")}${disabled?"~~":"**"}](https://nushigh.coursemology.org${title.attributes.href})`,
-                    value: title.text
+                    name: `${disabled?"~~":"**"}${row.attributes.id.replace("assessment_", "")}${disabled?"~~":"**"}`,
+                    value: `[${title.text}](https://nushigh.coursemology.org${title.attributes.href})`,
+                    inline: true
                 };
             });
             embed.fields = desc;
