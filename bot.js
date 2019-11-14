@@ -207,32 +207,36 @@ function updateLB(courses) {
             url: `${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
             jar: j
         }, function(error, response, body) {
-            let result = parse(body);
-            let contents = result.querySelector(".leaderboard-level tbody");
-            let rows = contents.querySelectorAll("tr");
-            let newLB = rows.map(row => {
-                return {
-                    id: row.attributes.id.replace("course_user_", ""),
-                    rank: row.firstChild.text,
-                    name: row.querySelector(".user-profile div a").text,
-                    image: `${coursemology_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
-                    level: row.querySelector(".user-profile").lastChild.text
-                };
-            });
-            if (debug) hook.send("DEBUG: #1 on Leaderboard(#" + course + ") is " + newLB[0].name);
-            if (!firstUpdate) {
-                let oldLB = leaderboard[course];
-                for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++) {
-                    if (newLB[a].id !== oldLB[a].id) {
-                        if (a == 0)
-                            hook.send(`**${newLB[a]}** has taken the **#1** spot from **${oldLB[a]}** on course ${course}!`);
-                        else
-                            hook.send(`The **#${oldLB[a].rank}** spot on course ${course}, is no longer held by **${oldLB[a].name}** but by **${newLB[a].name}**!`);
+            if (error || response.statusCode == 404) {
+                if (debug) hook.send(`DEBUG: UPDATE LOOP FAILED TO ACCESS ${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+            } else {
+                let result = parse(body);
+                let contents = result.querySelector(".leaderboard-level tbody");
+                let rows = contents.querySelectorAll("tr");
+                let newLB = rows.map(row => {
+                    return {
+                        id: row.attributes.id.replace("course_user_", ""),
+                        rank: row.firstChild.text,
+                        name: row.querySelector(".user-profile div a").text,
+                        image: `${coursemology_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
+                        level: row.querySelector(".user-profile").lastChild.text
+                    };
+                });
+                if (debug) hook.send("DEBUG: #1 on Leaderboard(#" + course + ") is " + newLB[0].name);
+                if (!firstUpdate) {
+                    let oldLB = leaderboard[course];
+                    for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++) {
+                        if (newLB[a].id !== oldLB[a].id) {
+                            if (a == 0)
+                                hook.send(`**${newLB[a]}** has taken the **#1** spot from **${oldLB[a]}** on course ${course}!`);
+                            else
+                                hook.send(`The **#${oldLB[a].rank}** spot on course ${course}, is no longer held by **${oldLB[a].name}** but by **${newLB[a].name}**!`);
+                        }
                     }
                 }
+                leaderboard[course] = newLB;
+                firstUpdate = false;
             }
-            leaderboard[course] = newLB;
-            firstUpdate = false;
         });
     });
 }
