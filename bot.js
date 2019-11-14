@@ -47,11 +47,11 @@ client.on('message', async msg => {
     if (!msg.channel.type === "text") return;
     if (!msg.guild) return;
     if (msg.content.indexOf(PREFIX) !== 0) return;
-    console.log(`\tmessage is a valid command.`);
+    console.log(`    message is a valid command.`);
 
     let args = msg.content.slice(1).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
-    console.log(`\trunning "${command}", args = [${args.join(", ")}]...`);
+    console.log(`    running "${command}", args = [${args.join(", ")}]...`);
 
     if (command === "help") msg.channel.send(HELP_EMBED);
     if (command === "ping") {
@@ -59,24 +59,24 @@ client.on('message', async msg => {
         PING_EMBED.fields[0].value = m.createdTimestamp - msg.createdTimestamp;
         PING_EMBED.fields[1].value = Math.round(client.ping);
         PING_EMBED.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
-        console.log(`\tPing results obtained. lat = ${m.createdTimestamp - msg.createdTimestamp}, discord lat = ${Math.round(client.ping)}`);
+        console.log(`    Ping results obtained. lat = ${m.createdTimestamp - msg.createdTimestamp}, discord lat = ${Math.round(client.ping)}`);
         m.edit(PING_EMBED);
     }
     if (command === "coursemology" || command === "cm") {
-        console.log("\trunning coursemology sub-system...")
+        console.log("    running coursemology sub-system...")
         if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard) [args]`");
         switch (args.shift()) {
             case "i":
             case "info":
                 if (args.length == 1) args = [1706, args[0]];
-                console.log("\t\tinfo subcommand, local args = [" + args.join(", ") + "]")
+                console.log("        info subcommand, local args = [" + args.join(", ") + "]")
                 if (args.length != 2) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology info [course id] assessment-id`");
                 exeInfo(args[0], args[1], msg.channel, msg.author);
                 break;
             case "l":
             case "list":
                 if (args.length == 2) args = [1706, args[0], args[1]];
-                console.log("\t\tlist subcommand, local args = [" + args.join(", ") + "]")
+                console.log("        list subcommand, local args = [" + args.join(", ") + "]")
                 if (args.length != 3) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology list [course id] category-id tab-id`")
                 exeList(args[0], args[1], args[2], msg.channel, msg.author);
                 break;
@@ -87,7 +87,7 @@ client.on('message', async msg => {
                     if (!isNaN(args[0])) args = [args[0], "level"];
                     else args = [1706, args[0]];
                 }
-                console.log("\t\tleaderboard subcommand, local args = [" + args.join(", ") + "]")
+                console.log("        leaderboard subcommand, local args = [" + args.join(", ") + "]")
                 if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology leaderboard [course id] [level|achievement]`")
                 exeLB(args[0], args[1], msg.channel, msg.author);
                 break;
@@ -95,12 +95,12 @@ client.on('message', async msg => {
     }
     if (command === "toggledebug" || command === "td") {
         debug = !debug;
-        console.log("\tDEBUG TOGGLED, debug = " + debug)
+        console.log("    DEBUG TOGGLED, debug = " + debug)
         msg.channel.send(`DEBUG: debug output has been turned ${debug?"on":"off"}!`);
     }
     if (msg.author.id === "456001047756800000" && (command === "changebase" || command === "cb")) {
         query_base_url = args[0];
-        console.log("\tDEBUG TOGGLED, debug = " + debug)
+        console.log("    DEBUG TOGGLED, debug = " + debug)
         msg.channel.send("Base URL changed to " + query_base_url);
     }
     console.log("======= Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
