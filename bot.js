@@ -103,7 +103,10 @@ client.on('message', async msg => {
         debug = !debug;
         msg.channel.send(`DEBUG: debug output has been turned ${debug?"on":"off"}!`);
     }
-    if (msg.author.id === "456001047756800000" && (command === "changebase" || command === "cb")) coursemology_base_url = args[0];
+    if (msg.author.id === "456001047756800000" && (command === "changebase" || command === "cb")) {
+        coursemology_base_url = args[0];
+        msg.channel.send("Base URL changed to " + coursemology_base_url);
+    }
 });
 
 function exeInfo(course, id, channel, author) {
