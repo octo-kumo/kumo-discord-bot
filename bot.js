@@ -45,7 +45,7 @@ client.on('message', async msg => {
     console.log(`=> Message "${msg.content}" received from ${msg.author.tag}.`);
 
     if (!msg.channel.type === "text") return;
-    if (!msg.guild) return;
+    //if (!msg.guild) return;
     if (msg.content.indexOf(PREFIX) !== 0) return;
     console.log(`====== Message is a valid command.`);
 
