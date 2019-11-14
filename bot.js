@@ -42,12 +42,12 @@ client.on('ready', () => {
 
 client.on('message', async msg => {
     let startTime = Date.now();
-    console.log(`===> Message(${msg.content}) received from ${msg.author.tag}.`);
+    console.log(`=> Message "${msg.content}" received from ${msg.author.tag}.`);
 
     if (!msg.channel.type === "text") return;
     if (!msg.guild) return;
     if (msg.content.indexOf(PREFIX) !== 0) return;
-    console.log(`    message is a valid command.`);
+    console.log(`====== Message is a valid command.`);
 
     let args = msg.content.slice(1).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
@@ -59,7 +59,7 @@ client.on('message', async msg => {
         PING_EMBED.fields[0].value = m.createdTimestamp - msg.createdTimestamp;
         PING_EMBED.fields[1].value = Math.round(client.ping);
         PING_EMBED.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
-        console.log(`    Ping results obtained. lat = ${m.createdTimestamp - msg.createdTimestamp}, discord lat = ${Math.round(client.ping)}`);
+        console.log(`    ping results obtained. lat = ${m.createdTimestamp - msg.createdTimestamp}, discord lat = ${Math.round(client.ping)}`);
         m.edit(PING_EMBED);
     }
     if (command === "coursemology" || command === "cm") {
@@ -103,7 +103,7 @@ client.on('message', async msg => {
         console.log("    DEBUG TOGGLED, debug = " + debug)
         msg.channel.send("Base URL changed to " + query_base_url);
     }
-    console.log("======= Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
+    console.log("====== Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
 });
 
 function exeInfo(course, id, channel, author) {
@@ -118,8 +118,7 @@ function exeInfo(course, id, channel, author) {
             let title = result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text;
             let contents = result.querySelector("#assessment_" + id);
             if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
-            let embed = new Discord.RichEmbed().setTitle(title);
-            embed.setColor(0x21f8ff)
+            let embed = new Discord.RichEmbed().setTitle(title).setColor(0x21f8ff);
             if (contents.querySelector(".well")) embed.setDescription(contents.querySelector(".well").text.replace(/<[^>]+>/g, ''));
             embed.addField("Type", contents.querySelector(".type td").text);
             embed.addField("EXP", contents.querySelector(".base_exp td").text + " (" + contents.querySelector(".bonus_exp td").text + ")");
@@ -179,8 +178,8 @@ function exeLB(course, type, channel, author) {
         if (error || response.statusCode == 404) {
             channel.send("Coursemology Query Failed!");
         } else {
-            let result = parse(body);
-            let contents = result.querySelector(".leaderboard-" + ["level", "achievement"][type] + " tbody");
+            console.log("        Parsing Leaderboard...");
+            let contents = parse(body).querySelector(".leaderboard-" + ["level", "achievement"][type] + " tbody");
             if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
             let rows = contents.querySelectorAll("tr");
             let row1 = rows.shift();
@@ -189,9 +188,10 @@ function exeLB(course, type, channel, author) {
             if (thumbURL.charAt(0) === "/") thumbURL = query_base_url + thumbURL;
             embed.setThumbnail(thumbURL);
             embed.fields = rows.map(row => {
+                console.log(`        #${row.firstChild.text.trim()} ${row.querySelector(".user-profile div a").text.trim()}`);
                 return {
                     name: `#${row.firstChild.text.trim()}`,
-                    value: `[${row.querySelector(".user-profile div a").text.trim()}](${query_base_url}${row1.querySelector(".user-profile div a").attributes.href}) _(${type==0?(row1.querySelector(".user-profile").lastChild.text.trim()):row1.querySelector(".user-profile").lastChild.childNodes.length+" achievements"})_`
+                    value: `[${row.querySelector(".user-profile div a").text.trim()}](${query_base_url}${row1.querySelector(".user-profile div a").attributes.href})${type==0?" _("+row1.querySelector(".user-profile").lastChild.text.trim()+")_":""}`
                 };
             });
             channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL).setColor(0x21f8ff));
@@ -200,41 +200,39 @@ function exeLB(course, type, channel, author) {
 }
 
 function updateLB() {
-    COURSES.forEach(course => {
-        request({
-            url: `${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
-            jar: JAR
-        }, function(error, response, body) {
-            if (error || response.statusCode == 404) {
-                if (debug) HOOK.send(`DEBUG: Failed to access ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
-            } else {
-                let contents = parse(body).querySelector(".leaderboard-level tbody");
-                if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
-                let rows = contents.querySelectorAll("tr");
-                let newLB = rows.map(row => {
-                    return {
-                        id: row.attributes.id.replace("course_user_", ""),
-                        rank: row.firstChild.text,
-                        name: row.querySelector(".user-profile div a").text,
-                        image: `${query_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
-                        level: row.querySelector(".user-profile").lastChild.text
-                    };
-                });
-                if (debug) HOOK.send(`[Course#${course}] DEBUG: #1 on leaderboard is ${newLB[0].name}`);
-                if (leaderboard[course]) {
-                    let oldLB = leaderboard[course];
-                    for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++)
-                        if (newLB[a].id !== oldLB[a].id)
-                            if (a == 0)
-                                HOOK.send(`[Course#${course}] **${newLB[a].name}** has taken the **#1** spot from **${oldLB[a].name}**!`);
-                            else
-                                HOOK.send(`[Course#${course}] **#${oldLB[a].rank} __${oldLB[a].name}__ :arrow_forward: __${newLB[a].name}__!`);
-                    dataAlreadyFetched = false;
-                }
-                leaderboard[course] = newLB;
+    COURSES.forEach(course => request({
+        url: `${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
+        jar: JAR
+    }, function(error, response, body) {
+        if (error || response.statusCode == 404) {
+            if (debug) HOOK.send(`DEBUG: Failed to access ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+        } else {
+            let contents = parse(body).querySelector(".leaderboard-level tbody");
+            if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+            let rows = contents.querySelectorAll("tr");
+            let newLB = rows.map(row => {
+                return {
+                    id: row.attributes.id.replace("course_user_", ""),
+                    rank: row.firstChild.text,
+                    name: row.querySelector(".user-profile div a").text,
+                    image: `${query_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
+                    level: row.querySelector(".user-profile").lastChild.text
+                };
+            });
+            if (debug) HOOK.send(`[Course#${course}] DEBUG: #1 on leaderboard is ${newLB[0].name}`);
+            if (leaderboard[course]) {
+                let oldLB = leaderboard[course];
+                for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++)
+                    if (newLB[a].id !== oldLB[a].id)
+                        if (a == 0)
+                            HOOK.send(`[Course#${course}] **${newLB[a].name}** has taken the **#1** spot from **${oldLB[a].name}**!`);
+                        else
+                            HOOK.send(`[Course#${course}] **#${oldLB[a].rank} __${oldLB[a].name}__ :arrow_forward: __${newLB[a].name}__!`);
+                dataAlreadyFetched = false;
             }
-        });
-    });
+            leaderboard[course] = newLB;
+        }
+    }));
 }
 
 client.login(process.env.TOKEN);
