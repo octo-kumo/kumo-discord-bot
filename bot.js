@@ -66,20 +66,20 @@ client.on('message', async msg => {
         m.edit(PING_EMBED);
     }
     if (command === "coursemology" || command === "cm") {
-        console.log("    running coursemology sub-system...")
+        console.log("running coursemology sub-system...")
         if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard) [args]`");
         switch (args.shift()) {
             case "i":
             case "info":
                 if (args.length == 1) args = [1706, args[0]];
-                console.log("        info subcommand, local args = [" + args.join(", ") + "]")
+                console.log("info subcommand, local args = [" + args.join(", ") + "]")
                 if (args.length != 2) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology info [course id] assessment-id`");
                 exeInfo(args[0], args[1], msg.channel, msg.author);
                 break;
             case "l":
             case "list":
                 if (args.length == 2) args = [1706, args[0], args[1]];
-                console.log("        list subcommand, local args = [" + args.join(", ") + "]")
+                console.log("list subcommand, local args = [" + args.join(", ") + "]")
                 if (args.length != 3) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology list [course id] category-id tab-id`")
                 exeList(args[0], args[1], args[2], msg.channel, msg.author);
                 break;
@@ -90,7 +90,7 @@ client.on('message', async msg => {
                     if (!isNaN(args[0])) args = [args[0], "level"];
                     else args = [1706, args[0]];
                 }
-                console.log("        leaderboard subcommand, local args = [" + args.join(", ") + "]")
+                console.log("leaderboard subcommand, local args = [" + args.join(", ") + "]")
                 if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology leaderboard [course id] [level|achievement]`")
                 exeLB(args[0], args[1], msg.channel, msg.author);
                 break;
@@ -98,29 +98,30 @@ client.on('message', async msg => {
     }
     if (command === "toggledebug" || command === "td") {
         debug = !debug;
-        console.log("    DEBUG TOGGLED, debug = " + debug)
+        console.log("DEBUG TOGGLED, debug = " + debug)
         msg.channel.send(`DEBUG: debug output has been turned ${debug?"on":"off"}!`);
     }
     if (command === "shouldisleep" || command === "sleep" || command === "sis" || command === "zzz") {
         var currentHour = new Date().getHours();
+        console.log("current hour = " + currentHour);
         if (currentHour < 6 || currentHour > 21) {
             let embed = new Discord.RichEmbed().setTitle("You should go to **sleep**!").setColor(0x21f8ff);
             embed.setDescription("It is so late right now, better go and sleep **" + msg.author.username + "**");
             if (currentHour < 6 && currentHour > 2) embed.setThumbnail(SLEEP_LATE[Math.floor(Math.random() * SLEEP_LATE.length)]);
             else embed.setThumbnail(SLEEP_IMAGES[Math.floor(Math.random() * SLEEP_IMAGES.length)]);
             msg.channel.send(embed);
-            console.log("    told " + msg.author.username + " to to goto sleep");
+            console.log("told " + msg.author.username + " to to goto sleep");
         } else {
             let embed = new Discord.RichEmbed().setTitle("Get some **coffee**!").setColor(0x6f4e37);
             embed.setDescription("There is so much to do, better go get a cup of coffee **" + msg.author.username + "**");
             embed.setThumbnail("https://res.cloudinary.com/chatboxzy/image/upload/v1573747645/coffee.png");
             msg.channel.send(embed);
-            console.log("    told " + msg.author.username + " to not to goto sleep");
+            console.log("told " + msg.author.username + " to not to goto sleep");
         }
     }
     if (msg.author.id === "456001047756800000" && (command === "changebase" || command === "cb")) {
         query_base_url = args[0];
-        console.log("    DEBUG TOGGLED, debug = " + debug)
+        console.log("DEBUG TOGGLED, debug = " + debug)
         msg.channel.send("Base URL changed to " + query_base_url);
     }
     console.log("====== Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
@@ -197,7 +198,7 @@ function exeLB(course, type, channel, author) {
         if (error || response.statusCode == 404) {
             channel.send("Coursemology Query Failed!");
         } else {
-            console.log("        Parsing Leaderboard...");
+            console.log("Parsing Leaderboard...");
             let contents = parse(body).querySelector(".leaderboard-" + ["level", "achievement"][type] + " tbody");
             if (!contents) return channel.send(`Query has failed as ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard is not valid!`);
             let rows = contents.querySelectorAll("tr");
