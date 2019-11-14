@@ -12,7 +12,6 @@ const cookie = request.cookie('remember_user_token=' + USERTOKEN);
 j.setCookie(cookie, "https://nushigh.coursemology.org");
 
 const PING_EMBED = new Discord.RichEmbed().setTitle("機器雲的延時").setColor(0x21f8ff).addField("Latency", 0).addField("Discord API Latency", 0);
-const CM_QUERY_EMBED = new Discord.RichEmbed().setTitle("Assessment Info").setDescription("Query Details").setColor(0x00bcd4).addField("Course", "null", true).addField("Assessments", "null", true);
 
 console.log('APP STARTING...');
 
@@ -50,14 +49,12 @@ client.on('message', async msg => {
             msg.delete();
         }
         if (command === "coursemology" || command === "cm") {
-            if (args.length < 1) return msg.channel.send("Correct Usage: `" + prefix + "coursemology (info|list|leaderboard) args`");
+            if (args.length < 1) return msg.channel.send("Correct Usage: `" + prefix + "coursemology (info|list|leaderboard) [args]`");
             switch (args.shift()) {
                 case "i":
                 case "info":
                     if (args.length == 1) args = [1706, args[0]];
                     if (args.length != 2) return msg.channel.send("Correct Usage: `" + prefix + "coursemology info [course id] assessment-id`");
-                    for (var a = 0; a < 2; a++) CM_QUERY_EMBED.fields[a].value = args[a];
-                    msg.channel.send(CM_QUERY_EMBED);
                     exeInfo(args[0], args[1], msg);
                     break;
                 case "l":
@@ -68,6 +65,12 @@ client.on('message', async msg => {
                     break;
                 case "lb":
                 case "leaderboard":
+                    if (args.length == 0) args = [1706];
+                    if (args.length == 1)
+                        if (!isNaN(args[0])) args = [args[0], "level"];
+                        else args = [1706, args[0]];
+                    if (args[1] !== "level" || args[1] !== "achievement" || args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + prefix + "coursemology leaderboard [course id] [level|achievement]`")
+                    exeLB(args[0], exeLB[1], msg);
                     break;
             }
 
@@ -129,6 +132,35 @@ function exeList(course, cat, tab, msg) {
             });
             embed.fields = desc;
             embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
+            msg.channel.send(embed);
+        }
+    });
+}
+
+function exeLB(course, type, msg) {
+    request({
+        url: `https://nushigh.coursemology.org/courses/${course}/assessments?category=${cat}&tab=${tab}`,
+        jar: j
+    }, function(error, response, body) {
+        if (error || response.statusCode == 404) {
+            msg.channel.send("Coursemology Query Failed!");
+        } else {
+            let result = parse(body);
+            let contents = result.querySelector(".leaderboard-" + type + " tbody");
+            let rows = contents.querySelectorAll("tr");
+            let row1 = rows.shift();
+            let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text} _(${row1.querySelector(".user-profile").lastChild.text})_`);
+            embed.setThumbnail(row1.querySelector(".user-picture img").attributes.src);
+            let desc = rows.map(row => {
+                let rank = row.firstChild.text;
+                return {
+                    name: `#${row.firstChild.text}`,
+                    value: `[${row.querySelector(".user-profile div a").text}](https://nushigh.coursemology.org${row1.querySelector(".user-profile div a").attributes.href})`
+                };
+            });
+            embed.fields = desc;
+            embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
+            embed.setColor(0x21f8ff);
             msg.channel.send(embed);
         }
     });
