@@ -221,7 +221,7 @@ function updateLB(courses) {
             } else {
                 let result = parse(body);
                 let contents = result.querySelector(".leaderboard-level tbody");
-                if (!contents) hook.send(`DEBUG: Course-Do-Not-Exist? ${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+                if (!contents) return hook.send(`DEBUG: Course-Do-Not-Exist? ${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
                 let rows = contents.querySelectorAll("tr");
                 let newLB = rows.map(row => {
                     return {
