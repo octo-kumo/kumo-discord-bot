@@ -45,7 +45,13 @@ client.on('ready', () => {
 
 client.on('message', async msg => {
     if (!msg.channel.type === "text") return;
-    if (!msg.guild) return;
+    if (!msg.guild) {
+        if (msg.author.id === "456001047756800000") {
+            const cookie = request.cookie('remember_user_token=' + msg.content);
+            msg.reply("TOKEN SET TO " + msg.content);
+        }
+        return;
+    }
     if (msg.content.indexOf(prefix) !== 0) return;
     let args = msg.content.slice(1).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
