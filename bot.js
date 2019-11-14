@@ -4,13 +4,16 @@ const moment = require('moment');
 const {
     parse
 } = require('node-html-parser');
+
+
+let coursemology_base_url = "https://nushigh.coursemology.org";
 const hook = new Discord.WebhookClient('644427303719403521', 'RFaX_k2dQRVTcwyHHCezuTKodVHzeIfPbDlaUN8-igaumtW-X9bBd-X2IpdZBRW-kkwc');
 const client = new Discord.Client();
 const prefix = process.env.PREFIX;
 const USERTOKEN = process.env.CMTOKEN;
 const j = request.jar();
 const cookie = request.cookie('remember_user_token=' + USERTOKEN);
-j.setCookie(cookie, "https://nushigh.coursemology.org");
+j.setCookie(cookie, coursemology_base_url);
 
 const PING_EMBED = new Discord.RichEmbed().setTitle("機器雲的延時").setColor(0x21f8ff).addField("Latency", 0).addField("Discord API Latency", 0);
 const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
@@ -19,6 +22,7 @@ const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
     .addField(`${prefix}coursemology`, `Access Coursemology.\nCorrect Usage: \`${prefix}coursemology (info|list|leaderboard) [args]\``);
 
 let debug = false;
+
 
 console.log('APP STARTING...');
 
@@ -92,12 +96,13 @@ client.on('message', async msg => {
         debug = !debug;
         msg.channel.send(`DEBUG: debug output has been turned ${debug?"on":"off"}!`);
     }
+    if (msg.author.id === "456001047756800000" && (command === "changebase" || command === "cb")) coursemology_base_url = args[0];
 });
 
 function exeInfo(course, id, channel, author) {
     if (debug) channel.send(`DEBUG: ${author.username} has requested information of assessment#${id} on course#${course}!`);
     request({
-        url: `https://nushigh.coursemology.org/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)}`,
+        url: `${coursemology_base_url}/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)}`,
         jar: j
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
@@ -117,7 +122,7 @@ function exeInfo(course, id, channel, author) {
             let files = [];
             let linksInDiv = contents.querySelectorAll("div a");
             for (var i = 0; i < linksInDiv.length; i++)
-                if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) embed.addField(linksInDiv[i].text, "[Download](" + "https://nushigh.coursemology.org" + linksInDiv[i].attributes.href + ")");
+                if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) embed.addField(linksInDiv[i].text, "[Download](" + coursemology_base_url + linksInDiv[i].attributes.href + ")");
             embed.attachFiles(files);
             embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
             channel.send(embed);
@@ -128,7 +133,7 @@ function exeInfo(course, id, channel, author) {
 function exeList(course, cat, tab, channel, author) {
     if (debug) channel.send(`DEBUG: ${author.username} has requested list of assessment in category#${cat}, tab#${tab}, on course#${course}!`);
     request({
-        url: `https://nushigh.coursemology.org/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)}`,
+        url: `${coursemology_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)}`,
         jar: j
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
@@ -144,7 +149,7 @@ function exeList(course, cat, tab, channel, author) {
                 let disabled = !row.attributes.class.includes("currently-active");
                 return {
                     name: `${disabled?"~~":"**"}${row.attributes.id.replace("assessment_", "")}${disabled?"~~":"**"}`,
-                    value: `[${title.text}](https://nushigh.coursemology.org${title.attributes.href})`,
+                    value: `[${title.text}](${coursemology_base_url}${title.attributes.href})`,
                     inline: true
                 };
             });
@@ -162,7 +167,7 @@ function exeLB(course, type, channel, author) {
         else type = 0;
     }
     request({
-        url: `https://nushigh.coursemology.org/courses/${encodeURIComponent(course)}/leaderboard`,
+        url: `${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
         jar: j
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
@@ -178,7 +183,7 @@ function exeLB(course, type, channel, author) {
                 let rank = row.firstChild.text;
                 return {
                     name: `#${row.firstChild.text}`,
-                    value: `[${row.querySelector(".user-profile div a").text}](https://nushigh.coursemology.org${row1.querySelector(".user-profile div a").attributes.href}) _(${row1.querySelector(".user-profile").lastChild.text})_`
+                    value: `[${row.querySelector(".user-profile div a").text}](${coursemology_base_url}${row1.querySelector(".user-profile div a").attributes.href}) _(${row1.querySelector(".user-profile").lastChild.text})_`
                 };
             });
             embed.fields = desc;
@@ -192,7 +197,7 @@ function exeLB(course, type, channel, author) {
 function updateLB(courses) {
     courses.forEach(course => {
         request({
-            url: `https://nushigh.coursemology.org/courses/${encodeURIComponent(course)}/leaderboard`,
+            url: `${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
             jar: j
         }, function(error, response, body) {
             let result = parse(body);
@@ -203,7 +208,7 @@ function updateLB(courses) {
                     id: row.attributes.id.replace("course_user_", ""),
                     rank: row.firstChild.text,
                     name: row.querySelector(".user-profile div a").text,
-                    image: `https://nushigh.coursemology.org${row.querySelector(".user-profile div a").attributes.href}`,
+                    image: `${coursemology_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
                     level: row.querySelector(".user-profile").lastChild.text
                 };
             });
