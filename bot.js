@@ -40,7 +40,7 @@ client.on('ready', () => {
         status: 'idle'
     });
     LB_UPDATE_CHANNEL = client.channels.get("644412450183053323");
-    setInterval(updateLB, 10000, [1706]);
+    setInterval(updateLB, 10000, [3, 1706]);
 });
 
 client.on('message', async msg => {
@@ -193,6 +193,7 @@ function exeLB(course, type, channel, author) {
             let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text.trim()} _(${row1.querySelector(".user-profile").lastChild.text.trim()})_`);
             let thumbURL = row1.querySelector(".user-picture img").attributes.src;
             if (thumbURL.charAt(0) === "/") thumbURL = coursemology_base_url + thumbURL;
+            embed.setURL(coursemology_base_url + row1.querySelector(".user-profile div a").attributes.href);
             console.log("Thumbnail URL: " + thumbURL);
             embed.setThumbnail(thumbURL);
             let desc = rows.map(row => {
