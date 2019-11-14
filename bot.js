@@ -117,7 +117,7 @@ function exeInfo(course, id, channel, author) {
         } else {
             let result = parse(body);
             let contents = result.querySelector("#assessment_" + id);
-            if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+            if (!contents) return channel.send(`Query has failed as ${query_base_url}/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)} is not valid!`);
             let embed = new Discord.RichEmbed().setTitle(result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text).setColor(0x21f8ff);
             if (contents.querySelector(".well")) embed.setDescription(contents.querySelector(".well").text.replace(/<[^>]+>/g, ''));
             embed.addField("Type", contents.querySelector(".type td").text);
@@ -147,7 +147,7 @@ function exeList(course, cat, tab, channel, author) {
         } else {
             let result = parse(body);
             let contents = result.querySelector(".assessments-list tbody");
-            if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+            if (!contents) return channel.send(`Query has failed as ${query_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)} is not valid!`);
             let embed = new Discord.RichEmbed().setTitle(result.querySelector(".page-header h1 span").text);
             embed.setColor(0x21f8ff);
             let rows = contents.querySelectorAll("tr");
@@ -180,7 +180,7 @@ function exeLB(course, type, channel, author) {
         } else {
             console.log("        Parsing Leaderboard...");
             let contents = parse(body).querySelector(".leaderboard-" + ["level", "achievement"][type] + " tbody");
-            if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+            if (!contents) return channel.send(`Query has failed as ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard is not valid!`);
             let rows = contents.querySelectorAll("tr");
             let row1 = rows.shift();
             let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text.trim()} _(${row1.querySelector(".user-profile").lastChild.text.trim()})_`);
