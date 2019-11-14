@@ -50,6 +50,7 @@ client.on('message', async msg => {
             const cookie = request.cookie('remember_user_token=' + msg.content);
             msg.reply("TOKEN SET TO " + msg.content);
             j.setCookie(cookie, coursemology_base_url);
+            firstUpdate = true;
         }
         return;
     }
@@ -106,6 +107,7 @@ client.on('message', async msg => {
     if (msg.author.id === "456001047756800000" && (command === "changebase" || command === "cb")) {
         coursemology_base_url = args[0];
         msg.channel.send("Base URL changed to " + coursemology_base_url);
+        firstUpdate = true;
     }
 });
 
