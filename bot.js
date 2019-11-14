@@ -70,7 +70,7 @@ client.on('message', async msg => {
                         if (!isNaN(args[0])) args = [args[0], "level"];
                         else args = [1706, args[0]];
                     }
-                    if ((args[1] !== "level" && args[1] !== "achievement") || args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + prefix + "coursemology leaderboard [course id] [level|achievement]`")
+                    if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + prefix + "coursemology leaderboard [course id] [level|achievement]`")
                     exeLB(args[0], exeLB[1], msg);
                     break;
             }
@@ -139,6 +139,10 @@ function exeList(course, cat, tab, msg) {
 }
 
 function exeLB(course, type, msg) {
+    if (isNaN(type)) {
+        if (type === "achievement") type = 1;
+        else type = 0;
+    }
     request({
         url: `https://nushigh.coursemology.org/courses/${course}/leaderboard`,
         jar: j
@@ -147,7 +151,7 @@ function exeLB(course, type, msg) {
             msg.channel.send("Coursemology Query Failed!");
         } else {
             let result = parse(body);
-            let contents = result.querySelector(".leaderboard-" + type + " tbody");
+            let contents = result.querySelector(".leaderboard-" + ["level", "achievement"][type] + " tbody");
             let rows = contents.querySelectorAll("tr");
             let row1 = rows.shift();
             let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text} _(${row1.querySelector(".user-profile").lastChild.text})_`);
