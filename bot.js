@@ -55,13 +55,13 @@ client.on('message', async msg => {
                 case "info":
                     if (args.length == 1) args = [1706, args[0]];
                     if (args.length != 2) return msg.channel.send("Correct Usage: `" + prefix + "coursemology info [course id] assessment-id`");
-                    exeInfo(args[0], args[1], msg);
+                    exeInfo(args[0], args[1], msg.channel);
                     break;
                 case "l":
                 case "list":
                     if (args.length == 2) args = [1706, args[0], args[1]];
                     if (args.length != 3) return msg.channel.send("Correct Usage: `" + prefix + "coursemology list [course id] category-id tab-id`")
-                    exeList(args[0], args[1], args[2], msg);
+                    exeList(args[0], args[1], args[2], msg.channel);
                     break;
                 case "lb":
                 case "leaderboard":
@@ -71,7 +71,7 @@ client.on('message', async msg => {
                         else args = [1706, args[0]];
                     }
                     if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + prefix + "coursemology leaderboard [course id] [level|achievement]`")
-                    exeLB(args[0], exeLB[1], msg);
+                    exeLB(args[0], exeLB[1], msg.channel);
                     break;
             }
 
@@ -79,13 +79,13 @@ client.on('message', async msg => {
     }
 });
 
-function exeInfo(course, id, msg) {
+function exeInfo(course, id, channel) {
     request({
-        url: `https://nushigh.coursemology.org/courses/${course}/assessments/${id}`,
+        url: `https://nushigh.coursemology.org/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)}`,
         jar: j
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
-            msg.channel.send("Coursemology Query Failed!");
+            channel.send("Coursemology Query Failed!");
         } else {
             let result = parse(body);
             let title = result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text;
@@ -104,18 +104,18 @@ function exeInfo(course, id, msg) {
                 if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) embed.addField(linksInDiv[i].text, "[Download](" + "https://nushigh.coursemology.org" + linksInDiv[i].attributes.href + ")");
             embed.attachFiles(files);
             embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
-            msg.channel.send(embed);
+            channel.send(embed);
         }
     });
 }
 
-function exeList(course, cat, tab, msg) {
+function exeList(course, cat, tab, channel) {
     request({
-        url: `https://nushigh.coursemology.org/courses/${course}/assessments?category=${cat}&tab=${tab}`,
+        url: `https://nushigh.coursemology.org/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)}`,
         jar: j
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
-            msg.channel.send("Coursemology Query Failed!");
+            channel.send("Coursemology Query Failed!");
         } else {
             let result = parse(body);
             let contents = result.querySelector(".assessments-list tbody");
@@ -133,22 +133,22 @@ function exeList(course, cat, tab, msg) {
             });
             embed.fields = desc;
             embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
-            msg.channel.send(embed);
+            channel.send(embed);
         }
     });
 }
 
-function exeLB(course, type, msg) {
+function exeLB(course, type, channel) {
     if (isNaN(type)) {
         if (type === "achievement") type = 1;
         else type = 0;
     }
     request({
-        url: `https://nushigh.coursemology.org/courses/${course}/leaderboard`,
+        url: `https://nushigh.coursemology.org/courses/${encodeURIComponent(course)}/leaderboard`,
         jar: j
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
-            msg.channel.send("Coursemology Query Failed!");
+            channel.send("Coursemology Query Failed!");
         } else {
             let result = parse(body);
             let contents = result.querySelector(".leaderboard-" + ["level", "achievement"][type] + " tbody");
@@ -160,13 +160,13 @@ function exeLB(course, type, msg) {
                 let rank = row.firstChild.text;
                 return {
                     name: `#${row.firstChild.text}`,
-                    value: `[${row.querySelector(".user-profile div a").text}](https://nushigh.coursemology.org${row1.querySelector(".user-profile div a").attributes.href})`
+                    value: `[${row.querySelector(".user-profile div a").text}](https://nushigh.coursemology.org${row1.querySelector(".user-profile div a").attributes.href}) _(${row1.querySelector(".user-profile").lastChild.text})_`
                 };
             });
             embed.fields = desc;
             embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
             embed.setColor(0x21f8ff);
-            msg.channel.send(embed);
+            channel.send(embed);
         }
     });
 }
