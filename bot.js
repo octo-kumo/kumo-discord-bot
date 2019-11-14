@@ -15,7 +15,9 @@ const PING_EMBED = new Discord.RichEmbed().setTitle("機器雲的延時").setCol
 
 console.log('APP STARTING...');
 
+let firstUpdate = true;
 let LB_UPDATE_CHANNEL;
+let leaderboard = {};
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -27,7 +29,7 @@ client.on('ready', () => {
         status: 'idle'
     });
     LB_UPDATE_CHANNEL = client.channels.get("644412450183053323");
-    LB_UPDATE_CHANNEL.send("TEST");
+    setInterval(updateLB, 10000);
 });
 
 client.on('message', async msg => {
@@ -37,48 +39,45 @@ client.on('message', async msg => {
     let args = msg.content.slice(1).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
     console.log("Command " + command + " | Args [" + args.join(", ") + "] | Owner " + msg.author.username);
-    if (msg.channel.id === "642988383626592286" || msg.channel.id === "642993162943725568") {
-        if (command === "ping") {
-            msg.delete();
-            console.log(`${msg.author.username} requested a ping!`);
-            const m = await msg.channel.send("Ping?");
-            PING_EMBED.fields[0].value = m.createdTimestamp - msg.createdTimestamp;
-            PING_EMBED.fields[1].value = Math.round(client.ping);
-            PING_EMBED.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
-            m.edit(PING_EMBED);
-        }
-        if (command === "test") {
-            msg.channel.send("TESTING COMMAND.  Arguments: " + args.join(", "));
-            console.log(`${msg.author.username} requested test!`);
-            msg.delete();
-        }
-        if (command === "coursemology" || command === "cm") {
-            if (args.length < 1) return msg.channel.send("Correct Usage: `" + prefix + "coursemology (info|list|leaderboard) [args]`");
-            switch (args.shift()) {
-                case "i":
-                case "info":
-                    if (args.length == 1) args = [1706, args[0]];
-                    if (args.length != 2) return msg.channel.send("Correct Usage: `" + prefix + "coursemology info [course id] assessment-id`");
-                    exeInfo(args[0], args[1], msg.channel);
-                    break;
-                case "l":
-                case "list":
-                    if (args.length == 2) args = [1706, args[0], args[1]];
-                    if (args.length != 3) return msg.channel.send("Correct Usage: `" + prefix + "coursemology list [course id] category-id tab-id`")
-                    exeList(args[0], args[1], args[2], msg.channel);
-                    break;
-                case "lb":
-                case "leaderboard":
-                    if (args.length == 0) args = [1706, "level"];
-                    if (args.length == 1) {
-                        if (!isNaN(args[0])) args = [args[0], "level"];
-                        else args = [1706, args[0]];
-                    }
-                    if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + prefix + "coursemology leaderboard [course id] [level|achievement]`")
-                    exeLB(args[0], exeLB[1], msg.channel);
-                    break;
-            }
-
+    if (command === "ping") {
+        msg.delete();
+        console.log(`${msg.author.username} requested a ping!`);
+        const m = await msg.channel.send("Ping?");
+        PING_EMBED.fields[0].value = m.createdTimestamp - msg.createdTimestamp;
+        PING_EMBED.fields[1].value = Math.round(client.ping);
+        PING_EMBED.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
+        m.edit(PING_EMBED);
+    }
+    if (command === "test") {
+        msg.channel.send("TESTING COMMAND.  Arguments: " + args.join(", "));
+        console.log(`${msg.author.username} requested test!`);
+        msg.delete();
+    }
+    if (command === "coursemology" || command === "cm") {
+        if (args.length < 1) return msg.channel.send("Correct Usage: `" + prefix + "coursemology (info|list|leaderboard) [args]`");
+        switch (args.shift()) {
+            case "i":
+            case "info":
+                if (args.length == 1) args = [1706, args[0]];
+                if (args.length != 2) return msg.channel.send("Correct Usage: `" + prefix + "coursemology info [course id] assessment-id`");
+                exeInfo(args[0], args[1], msg.channel);
+                break;
+            case "l":
+            case "list":
+                if (args.length == 2) args = [1706, args[0], args[1]];
+                if (args.length != 3) return msg.channel.send("Correct Usage: `" + prefix + "coursemology list [course id] category-id tab-id`")
+                exeList(args[0], args[1], args[2], msg.channel);
+                break;
+            case "lb":
+            case "leaderboard":
+                if (args.length == 0) args = [1706, "level"];
+                if (args.length == 1) {
+                    if (!isNaN(args[0])) args = [args[0], "level"];
+                    else args = [1706, args[0]];
+                }
+                if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + prefix + "coursemology leaderboard [course id] [level|achievement]`")
+                exeLB(args[0], exeLB[1], msg.channel);
+                break;
         }
     }
 });
@@ -172,6 +171,39 @@ function exeLB(course, type, channel) {
             embed.setColor(0x21f8ff);
             channel.send(embed);
         }
+    });
+}
+
+function updateLB(courses) {
+    course.forEach(course => {
+        request({
+            url: `https://nushigh.coursemology.org/courses/${encodeURIComponent(course)}/leaderboard`,
+            jar: j
+        }, function(error, response, body) {
+            let result = parse(body);
+            let contents = result.querySelector(".leaderboard-level tbody");
+            let rows = contents.querySelectorAll("tr");
+            let newLB = rows.map(row => {
+                id: row.attributes.id.replace("course_user_", ""),
+                rank: row.firstChild.text,
+                name: row.querySelector(".user-profile div a").text,
+                image: `https://nushigh.coursemology.org${row1.querySelector(".user-profile div a").attributes.href}`,
+                level: row1.querySelector(".user-profile").lastChild.text
+            });
+            if (!firstUpdate) {
+                let oldLB = leaderboard[course];
+                for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++) {
+                    if (newLB[a].id !== oldLB[a].id) {
+                        if (a == 0)
+                            LB_UPDATE_CHANNEL.send(`${newLB[a]} has taken the #1 spot from ${oldLB[a]}!`);
+                        else
+                            LB_UPDATE_CHANNEL.send(`The #${oldLB[a].rank} spot is no longer held by ${oldLB[a].name} but by ${newLB[a].name}!`);
+                    }
+                }
+            }
+            leaderboard[course] = newLB;
+            firstUpdate = false;
+        });
     });
 }
 
