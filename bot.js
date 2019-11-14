@@ -127,7 +127,7 @@ function exeList(course, cat, tab, msg) {
                 embed.setColor(0xa0fcff)
                 embed.addField("EXP", `${row.querySelector(".table-base-exp").text} (${row.querySelector(".table-time-bonus-exp").text})`);
                 embed.addField("Bonus Cut-Off", row.querySelector(".table-bonus-cut-off").text);
-                if (!row.attributes.class.contains("currently-active")) embed.setDescription("_Not Open_");
+                if (!row.attributes.class.includes("currently-active")) embed.setDescription("_Not Open_");
                 msg.channel.send(embed);
             }
         }
