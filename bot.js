@@ -188,6 +188,7 @@ function exeLB(course, type, channel, author) {
             let rows = contents.querySelectorAll("tr");
             let row1 = rows.shift();
             let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text} _(${row1.querySelector(".user-profile").lastChild.text})_`);
+            console.log("Thumbnail URL: " + coursemology_base_url + row1.querySelector(".user-picture img").attributes.src);
             embed.setThumbnail(coursemology_base_url + row1.querySelector(".user-picture img").attributes.src);
             let desc = rows.map(row => {
                 let rank = row.firstChild.text;
