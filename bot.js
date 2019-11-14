@@ -15,6 +15,8 @@ const PING_EMBED = new Discord.RichEmbed().setTitle("機器雲的延時").setCol
 
 console.log('APP STARTING...');
 
+let LB_UPDATE_CHANNEL;
+
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`);
@@ -24,6 +26,8 @@ client.on('ready', () => {
         },
         status: 'idle'
     });
+    LB_UPDATE_CHANNEL = client.channels.get("644412450183053323");
+    LB_UPDATE_CHANNEL.send("TEST");
 });
 
 client.on('message', async msg => {
