@@ -188,8 +188,8 @@ function updateLB(courses) {
                     id: row.attributes.id.replace("course_user_", ""),
                     rank: row.firstChild.text,
                     name: row.querySelector(".user-profile div a").text,
-                    image: `https://nushigh.coursemology.org${row1.querySelector(".user-profile div a").attributes.href}`,
-                    level: row1.querySelector(".user-profile").lastChild.text
+                    image: `https://nushigh.coursemology.org${row.querySelector(".user-profile div a").attributes.href}`,
+                    level: row.querySelector(".user-profile").lastChild.text
                 };
             });
             if (!firstUpdate) {
