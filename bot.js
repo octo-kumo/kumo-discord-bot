@@ -60,6 +60,7 @@ client.on('message', async msg => {
         console.log(`${msg.author.username} requested test!`);
         msg.delete();
     }
+    if (command === "help") msg.channel.send(HELP_EMBED);
     if (command === "coursemology" || command === "cm") {
         if (args.length < 1) return msg.channel.send("Correct Usage: `" + prefix + "coursemology (info|list|leaderboard) [args]`");
         switch (args.shift()) {
