@@ -65,11 +65,12 @@ client.on('message', async msg => {
                     break;
                 case "lb":
                 case "leaderboard":
-                    if (args.length == 0) args = [1706];
-                    if (args.length == 1)
+                    if (args.length == 0) args = [1706, "level"];
+                    if (args.length == 1) {
                         if (!isNaN(args[0])) args = [args[0], "level"];
                         else args = [1706, args[0]];
-                    if (args[1] !== "level" || args[1] !== "achievement" || args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + prefix + "coursemology leaderboard [course id] [level|achievement]`")
+                    }
+                    if ((args[1] !== "level" && args[1] !== "achievement") || args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + prefix + "coursemology leaderboard [course id] [level|achievement]`")
                     exeLB(args[0], exeLB[1], msg);
                     break;
             }
