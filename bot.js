@@ -15,8 +15,8 @@ j.setCookie(cookie, "https://nushigh.coursemology.org");
 const PING_EMBED = new Discord.RichEmbed().setTitle("機器雲的延時").setColor(0x21f8ff).addField("Latency", 0).addField("Discord API Latency", 0);
 const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
     .addField(`${prefix}ping`, "Get the bot's ping")
+    .addField(`${prefix}test`, "Debug Command")
     .addField(`${prefix}coursemology`, `Access Coursemology.\nCorrect Usage: \`${prefix}coursemology (info|list|leaderboard) [args]\``);
-.addField(`${prefix}coursemology`, `Access Coursemology.\nCorrect Usage: \`${prefix}coursemology (info|list|leaderboard) [args]\``);
 
 console.log('APP STARTING...');
 
