@@ -123,7 +123,7 @@ function exeList(course, cat, tab, msg) {
             for (let i = 0; i < rows.length; i++) {
                 let row = rows[i];
                 let title = row.firstChild.firstChild;
-                let embed = new Discord.RichEmbed().setTitle(title.text);
+                let embed = new Discord.RichEmbed().setTitle(title.text + " (" + row.attributes.id.replace("assessment_", "") + ")");
                 embed.setURL(`https://nushigh.coursemology.org${title.attributes.href}`);
                 embed.setColor(0xa0fcff)
                 embed.addField("EXP", `${row.querySelector(".table-base-exp").text} (${row.querySelector(".table-time-bonus-exp").text})`, true);
