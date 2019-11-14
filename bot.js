@@ -1,91 +1,83 @@
+// Required dependencies
 const Discord = require('discord.js');
 const request = require('request');
-const moment = require('moment');
-const {
-    parse
-} = require('node-html-parser');
+const parse = require('node-html-parser').parse;
 
-
-let coursemology_base_url = "https://nushigh.coursemology.org";
-const hook = new Discord.WebhookClient('644427303719403521', 'RFaX_k2dQRVTcwyHHCezuTKodVHzeIfPbDlaUN8-igaumtW-X9bBd-X2IpdZBRW-kkwc');
-const client = new Discord.Client();
-const prefix = process.env.PREFIX;
+// Constants
+const COURSES = [1706];
+const PREFIX = process.env.PREFIX;
 const USERTOKEN = process.env.CMTOKEN;
-const j = request.jar();
-const cookie = request.cookie('remember_user_token=' + USERTOKEN);
-j.setCookie(cookie, coursemology_base_url);
+const HOOK = new Discord.WebhookClient('644427303719403521', 'RFaX_k2dQRVTcwyHHCezuTKodVHzeIfPbDlaUN8-igaumtW-X9bBd-X2IpdZBRW-kkwc');
+const client = new Discord.Client();
+const JAR = request.jar();
 
-const PING_EMBED = new Discord.RichEmbed().setTitle("機器雲的延時").setColor(0x21f8ff).addField("Latency", 0).addField("Discord API Latency", 0);
-const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
-    .addField(`${prefix}ping`, "Get the bot's ping")
-    .addField(`${prefix}test`, "Debug Command")
-    .addField(`${prefix}coursemology`, `Access Coursemology.\nCorrect Usage: \`${prefix}coursemology (info|list|leaderboard) [args]\``);
-
+// Field Variables
+let query_base_url = "https://nushigh.coursemology.org";
 let debug = false;
-
-
-console.log('APP STARTING...');
-
-let firstUpdate = true;
-let LB_UPDATE_CHANNEL;
+let leaderboard_feed_channel;
 let leaderboard = {};
 
+JAR.setCookie(request.cookie('remember_user_token=' + USERTOKEN), query_base_url);
+
+// Embed Presets
+const PING_EMBED = new Discord.RichEmbed().setTitle("Ping Results").setColor(0x21f8ff).addField("Latency", 0).addField("Discord API Latency", 0);
+const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
+    .addField(`${PREFIX}ping`, "Get the bot's ping")
+    .addField(`${PREFIX}toggledebug`, "Toggle Debug Messages")
+    .addField(`${PREFIX}coursemology`, `Access Coursemology.\nCorrect Usage: \`${PREFIX}coursemology (info|list|leaderboard) [args]\``);
+
+console.log('====== ZY Discord Bot Started! ======');
+
 client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
-    console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`);
+    console.log("=> Bot Running!");
+    leaderboard_feed_channel = client.channels.get("644412450183053323");
     client.user.setPresence({
         game: {
-            name: 'ZY\'s Bot'
+            name: 'with the clouds. !help'
         },
         status: 'idle'
     });
-    LB_UPDATE_CHANNEL = client.channels.get("644412450183053323");
-    setInterval(updateLB, 10000, [3, 1706]);
+    setInterval(updateLB, 10000);
 });
 
 client.on('message', async msg => {
+    let startTime = Date.now();
+    console.log(`===> Message(${msg.content}) received from ${msg.author.tag}.`);
+
     if (!msg.channel.type === "text") return;
-    if (!msg.guild) {
-        if (msg.author.id === "456001047756800000") {
-            const cookie = request.cookie('remember_user_token=' + msg.content);
-            msg.reply("TOKEN SET TO " + msg.content);
-            j.setCookie(cookie, coursemology_base_url);
-            firstUpdate = true;
-        }
-        return;
-    }
-    if (msg.content.indexOf(prefix) !== 0) return;
+    if (!msg.guild) return;
+    if (msg.content.indexOf(PREFIX) !== 0) return;
+    console.log(`\tmessage is a valid command.`);
+
     let args = msg.content.slice(1).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
-    console.log("Command " + command + " | Args [" + args.join(", ") + "] | Owner " + msg.author.username);
+    console.log(`\trunning "${command}", args = [${args.join(", ")}]...`);
+
+    if (command === "help") msg.channel.send(HELP_EMBED);
     if (command === "ping") {
-        msg.delete();
-        console.log(`${msg.author.username} requested a ping!`);
         const m = await msg.channel.send("Ping?");
         PING_EMBED.fields[0].value = m.createdTimestamp - msg.createdTimestamp;
         PING_EMBED.fields[1].value = Math.round(client.ping);
         PING_EMBED.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
+        console.log(`\tPing results obtained. lat = ${m.createdTimestamp - msg.createdTimestamp}, discord lat = ${Math.round(client.ping)}`);
         m.edit(PING_EMBED);
     }
-    if (command === "test") {
-        msg.channel.send("TESTING COMMAND.  Arguments: " + args.join(", "));
-        console.log(`${msg.author.username} requested test!`);
-        msg.delete();
-    }
-    if (command === "help") msg.channel.send(HELP_EMBED);
     if (command === "coursemology" || command === "cm") {
-        if (args.length < 1) return msg.channel.send("Correct Usage: `" + prefix + "coursemology (info|list|leaderboard) [args]`");
+        console.log("\trunning coursemology sub-system...")
+        if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard) [args]`");
         switch (args.shift()) {
             case "i":
             case "info":
                 if (args.length == 1) args = [1706, args[0]];
-                if (args.length != 2) return msg.channel.send("Correct Usage: `" + prefix + "coursemology info [course id] assessment-id`");
+                console.log("\t\tinfo subcommand, local args = [" + args.join(", ") + "]")
+                if (args.length != 2) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology info [course id] assessment-id`");
                 exeInfo(args[0], args[1], msg.channel, msg.author);
                 break;
             case "l":
             case "list":
                 if (args.length == 2) args = [1706, args[0], args[1]];
-                if (args.length != 3) return msg.channel.send("Correct Usage: `" + prefix + "coursemology list [course id] category-id tab-id`")
+                console.log("\t\tlist subcommand, local args = [" + args.join(", ") + "]")
+                if (args.length != 3) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology list [course id] category-id tab-id`")
                 exeList(args[0], args[1], args[2], msg.channel, msg.author);
                 break;
             case "lb":
@@ -95,27 +87,29 @@ client.on('message', async msg => {
                     if (!isNaN(args[0])) args = [args[0], "level"];
                     else args = [1706, args[0]];
                 }
-                if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + prefix + "coursemology leaderboard [course id] [level|achievement]`")
+                console.log("\t\tleaderboard subcommand, local args = [" + args.join(", ") + "]")
+                if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology leaderboard [course id] [level|achievement]`")
                 exeLB(args[0], args[1], msg.channel, msg.author);
                 break;
         }
     }
     if (command === "toggledebug" || command === "td") {
         debug = !debug;
+        console.log("\tDEBUG TOGGLED, debug = " + debug)
         msg.channel.send(`DEBUG: debug output has been turned ${debug?"on":"off"}!`);
     }
     if (msg.author.id === "456001047756800000" && (command === "changebase" || command === "cb")) {
-        coursemology_base_url = args[0];
-        msg.channel.send("Base URL changed to " + coursemology_base_url);
-        firstUpdate = true;
+        query_base_url = args[0];
+        console.log("\tDEBUG TOGGLED, debug = " + debug)
+        msg.channel.send("Base URL changed to " + query_base_url);
     }
+    console.log("======= Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
 });
 
 function exeInfo(course, id, channel, author) {
-    if (debug) channel.send(`DEBUG: ${author.username} has requested information of assessment#${id} on course#${course}!`);
     request({
-        url: `${coursemology_base_url}/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)}`,
-        jar: j
+        url: `${query_base_url}/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)}`,
+        jar: JAR
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
             channel.send("Coursemology Query Failed!");
@@ -123,7 +117,7 @@ function exeInfo(course, id, channel, author) {
             let result = parse(body);
             let title = result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text;
             let contents = result.querySelector("#assessment_" + id);
-            if (!contents) return hook.send(`DEBUG: Course-Do-Not-Exist? ${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+            if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
             let embed = new Discord.RichEmbed().setTitle(title);
             embed.setColor(0x21f8ff)
             if (contents.querySelector(".well")) embed.setDescription(contents.querySelector(".well").text.replace(/<[^>]+>/g, ''));
@@ -135,7 +129,7 @@ function exeInfo(course, id, channel, author) {
             let files = [];
             let linksInDiv = contents.querySelectorAll("div a");
             for (var i = 0; i < linksInDiv.length; i++)
-                if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) embed.addField(linksInDiv[i].text, "[Download](" + coursemology_base_url + linksInDiv[i].attributes.href + ")");
+                if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) embed.addField(linksInDiv[i].text, "[Download](" + query_base_url + linksInDiv[i].attributes.href + ")");
             embed.attachFiles(files);
             embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
             channel.send(embed);
@@ -146,7 +140,7 @@ function exeInfo(course, id, channel, author) {
 function exeList(course, cat, tab, channel, author) {
     if (debug) channel.send(`DEBUG: ${author.username} has requested list of assessment in category#${cat}, tab#${tab}, on course#${course}!`);
     request({
-        url: `${coursemology_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)}`,
+        url: `${query_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)}`,
         jar: j
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
@@ -154,7 +148,7 @@ function exeList(course, cat, tab, channel, author) {
         } else {
             let result = parse(body);
             let contents = result.querySelector(".assessments-list tbody");
-            if (!contents) return hook.send(`DEBUG: Course-Do-Not-Exist? ${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+            if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
             let embed = new Discord.RichEmbed().setTitle(result.querySelector(".page-header h1 span").text);
             embed.setColor(0x21f8ff);
             let rows = contents.querySelectorAll("tr");
@@ -163,7 +157,7 @@ function exeList(course, cat, tab, channel, author) {
                 let disabled = !row.attributes.class.includes("currently-active");
                 return {
                     name: `${disabled?"~~":"**"}${row.attributes.id.replace("assessment_", "")}${disabled?"~~":"**"}`,
-                    value: `[${title.text}](${coursemology_base_url}${title.attributes.href})`,
+                    value: `[${title.text}](${query_base_url}${title.attributes.href})`,
                     inline: true
                 };
             });
@@ -175,80 +169,69 @@ function exeList(course, cat, tab, channel, author) {
 }
 
 function exeLB(course, type, channel, author) {
-    if (debug) channel.send(`DEBUG: ${author.username} has requested leaderboard of ${type} on course#${course}!`);
-    if (isNaN(type)) {
-        if (type === "achievement") type = 1;
+    if (isNaN(type))
+        if (isNaN(type) && type === "achievement") type = 1;
         else type = 0;
-    }
     request({
-        url: `${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
-        jar: j
+        url: `${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
+        jar: JAR
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
             channel.send("Coursemology Query Failed!");
         } else {
             let result = parse(body);
             let contents = result.querySelector(".leaderboard-" + ["level", "achievement"][type] + " tbody");
-            if (!contents) return hook.send(`DEBUG: Course-Do-Not-Exist? ${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+            if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
             let rows = contents.querySelectorAll("tr");
             let row1 = rows.shift();
             let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text.trim()} _(${row1.querySelector(".user-profile").lastChild.text.trim()})_`);
             let thumbURL = row1.querySelector(".user-picture img").attributes.src;
-            if (thumbURL.charAt(0) === "/") thumbURL = coursemology_base_url + thumbURL;
-            embed.setURL(coursemology_base_url + row1.querySelector(".user-profile div a").attributes.href);
-            console.log("Thumbnail URL: " + thumbURL);
+            if (thumbURL.charAt(0) === "/") thumbURL = query_base_url + thumbURL;
             embed.setThumbnail(thumbURL);
-            let desc = rows.map(row => {
-                let rank = row.firstChild.text.trim();
+            embed.fields = rows.map(row => {
                 return {
                     name: `#${row.firstChild.text.trim()}`,
-                    value: `[${row.querySelector(".user-profile div a").text.trim()}](${coursemology_base_url}${row1.querySelector(".user-profile div a").attributes.href}) _(${row1.querySelector(".user-profile").lastChild.text.trim()})_`
+                    value: `[${row.querySelector(".user-profile div a").text.trim()}](${query_base_url}${row1.querySelector(".user-profile div a").attributes.href}) _(${type==0?(row1.querySelector(".user-profile").lastChild.text.trim()):row1.querySelector(".user-profile").lastChild.childNodes.length+" achievements"})_`
                 };
             });
-            embed.fields = desc;
-            embed.setFooter("Requested By " + author.username.trim(), author.displayAvatarURL.trim());
-            embed.setColor(0x21f8ff);
-            channel.send(embed);
+            channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL).setColor(0x21f8ff));
         }
     });
 }
 
-function updateLB(courses) {
-    courses.forEach(course => {
+function updateLB() {
+    COURSES.forEach(course => {
         request({
-            url: `${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
-            jar: j
+            url: `${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
+            jar: JAR
         }, function(error, response, body) {
             if (error || response.statusCode == 404) {
-                if (debug) hook.send(`DEBUG: UPDATE LOOP FAILED TO ACCESS ${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+                if (debug) HOOK.send(`DEBUG: Failed to access ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
             } else {
-                let result = parse(body);
-                let contents = result.querySelector(".leaderboard-level tbody");
-                if (!contents) return hook.send(`DEBUG: Course-Do-Not-Exist? ${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+                let contents = parse(body).querySelector(".leaderboard-level tbody");
+                if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
                 let rows = contents.querySelectorAll("tr");
                 let newLB = rows.map(row => {
                     return {
-                        id: row.attributes.id.replace("course_user_", "").trim(),
-                        rank: row.firstChild.text.trim(),
-                        name: row.querySelector(".user-profile div a").text.trim(),
-                        image: `${coursemology_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
-                        level: row.querySelector(".user-profile").lastChild.text.trim()
+                        id: row.attributes.id.replace("course_user_", ""),
+                        rank: row.firstChild.text,
+                        name: row.querySelector(".user-profile div a").text,
+                        image: `${query_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
+                        level: row.querySelector(".user-profile").lastChild.text
                     };
                 });
-                if (debug) hook.send("DEBUG: #1 on Leaderboard(#" + course + ") is " + newLB[0].name);
-                if (!firstUpdate) {
+                if (debug) HOOK.send(`[Course#${course}] DEBUG: #1 on leaderboard is ${newLB[0].name}`);
+                if (leaderboard[course]) {
                     let oldLB = leaderboard[course];
-                    for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++) {
-                        if (newLB[a].id !== oldLB[a].id) {
+                    for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++)
+                        if (newLB[a].id !== oldLB[a].id)
                             if (a == 0)
-                                hook.send(`[Course#${course}] **${newLB[a].name}** has taken the **#1** spot from **${oldLB[a].name}**!`);
+                                HOOK.send(`[Course#${course}] **${newLB[a].name}** has taken the **#1** spot from **${oldLB[a].name}**!`);
                             else
-                                hook.send(`[Course#${course}] The **#${oldLB[a].rank}** spot is no longer held by **${oldLB[a].name}** but by **${newLB[a].name}**!`);
-                        }
-                    }
+                                HOOK.send(`[Course#${course}] **#${oldLB[a].rank} __${oldLB[a].name}__ :arrow_forward: __${newLB[a].name}__!`);
+                    dataAlreadyFetched = false;
                 }
                 leaderboard[course] = newLB;
-                firstUpdate = false;
             }
         });
     });
