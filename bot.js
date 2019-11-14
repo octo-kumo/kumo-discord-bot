@@ -84,7 +84,7 @@ client.on('message', async msg => {
                     else args = [1706, args[0]];
                 }
                 if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + prefix + "coursemology leaderboard [course id] [level|achievement]`")
-                exeLB(args[0], exeLB[1], msg.channel, msg.author);
+                exeLB(args[0], args[1], msg.channel, msg.author);
                 break;
         }
     }
