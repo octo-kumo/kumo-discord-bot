@@ -29,7 +29,7 @@ client.on('ready', () => {
         status: 'idle'
     });
     LB_UPDATE_CHANNEL = client.channels.get("644412450183053323");
-    setInterval(updateLB, 10000);
+    setInterval(updateLB, 10000, [1706]);
 });
 
 client.on('message', async msg => {
@@ -175,7 +175,7 @@ function exeLB(course, type, channel) {
 }
 
 function updateLB(courses) {
-    course.forEach(course => {
+    courses.forEach(course => {
         request({
             url: `https://nushigh.coursemology.org/courses/${encodeURIComponent(course)}/leaderboard`,
             jar: j
@@ -197,9 +197,9 @@ function updateLB(courses) {
                 for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++) {
                     if (newLB[a].id !== oldLB[a].id) {
                         if (a == 0)
-                            LB_UPDATE_CHANNEL.send(`${newLB[a]} has taken the #1 spot from ${oldLB[a]}!`);
+                            LB_UPDATE_CHANNEL.send(`**${newLB[a]}** has taken the **#1** spot from **${oldLB[a]}** on course ${course}!`);
                         else
-                            LB_UPDATE_CHANNEL.send(`The #${oldLB[a].rank} spot is no longer held by ${oldLB[a].name} but by ${newLB[a].name}!`);
+                            LB_UPDATE_CHANNEL.send(`The **#${oldLB[a].rank}** spot on course ${course}, is no longer held by **${oldLB[a].name}** but by **${newLB[a].name}**!`);
                     }
                 }
             }
