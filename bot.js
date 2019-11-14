@@ -118,6 +118,7 @@ function exeInfo(course, id, channel, author) {
             let result = parse(body);
             let title = result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text;
             let contents = result.querySelector("#assessment_" + id);
+            if (!contents) return hook.send(`DEBUG: Course-Do-Not-Exist? ${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
             let embed = new Discord.RichEmbed().setTitle(title);
             embed.setColor(0x21f8ff)
             if (contents.querySelector(".well")) embed.setDescription(contents.querySelector(".well").text.replace(/<[^>]+>/g, ''));
@@ -148,6 +149,7 @@ function exeList(course, cat, tab, channel, author) {
         } else {
             let result = parse(body);
             let contents = result.querySelector(".assessments-list tbody");
+            if (!contents) return hook.send(`DEBUG: Course-Do-Not-Exist? ${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
             let embed = new Discord.RichEmbed().setTitle(result.querySelector(".page-header h1 span").text);
             embed.setColor(0x21f8ff);
             let rows = contents.querySelectorAll("tr");
@@ -182,6 +184,7 @@ function exeLB(course, type, channel, author) {
         } else {
             let result = parse(body);
             let contents = result.querySelector(".leaderboard-" + ["level", "achievement"][type] + " tbody");
+            if (!contents) return hook.send(`DEBUG: Course-Do-Not-Exist? ${coursemology_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
             let rows = contents.querySelectorAll("tr");
             let row1 = rows.shift();
             let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text} _(${row1.querySelector(".user-profile").lastChild.text})_`);
