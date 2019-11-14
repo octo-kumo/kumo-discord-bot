@@ -50,7 +50,7 @@ client.on('message', async msg => {
             msg.delete();
         }
         if (command === "coursemology" || command === "cm") {
-            if (args.length < 2) return msg.channel.send("Correct Usage: `" + prefix + "coursemology (info|list|leaderboard) args`");
+            if (args.length < 1) return msg.channel.send("Correct Usage: `" + prefix + "coursemology (info|list|leaderboard) args`");
             switch (args.shift()) {
                 case "i":
                 case "info":
@@ -120,7 +120,7 @@ function exeList(course, cat, tab, msg) {
             embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
             msg.channel.send(embed);
             let rows = contents.querySelectorAll("tr");
-            for (let i = 0; i < allRows.length; i++) {
+            for (let i = 0; i < rows.length; i++) {
                 let row = rows[i];
                 let title = row.firstChild.firstChild;
                 let embed = new Discord.RichEmbed().setTitle(`[${title.text}](https://nushigh.coursemology.org${title.attributes.href})`);
