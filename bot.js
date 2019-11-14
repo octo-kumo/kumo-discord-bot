@@ -90,7 +90,7 @@ client.on('message', async msg => {
     }
     if (command === "toggledebug" || command === "td") {
         debug = !debug;
-        channel.send(`DEBUG: debug output has been turned ${debug?"on":"off"}!`);
+        msg.channel.send(`DEBUG: debug output has been turned ${debug?"on":"off"}!`);
     }
 });
 
