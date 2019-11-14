@@ -18,6 +18,8 @@ const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
     .addField(`${prefix}test`, "Debug Command")
     .addField(`${prefix}coursemology`, `Access Coursemology.\nCorrect Usage: \`${prefix}coursemology (info|list|leaderboard) [args]\``);
 
+let debug = false;
+
 console.log('APP STARTING...');
 
 let firstUpdate = true;
@@ -85,9 +87,14 @@ client.on('message', async msg => {
                 break;
         }
     }
+    if (command === "toggledebug" || command === "td") {
+        debug = !debug;
+        channel.send(`DEBUG: debug output has been turned ${debug?"on":"off"}!`);
+    }
 });
 
 function exeInfo(course, id, channel, author) {
+    if (debug) channel.send(`DEBUG: ${author.username} has requested information of assessment#${id} on course#${course}!`);
     request({
         url: `https://nushigh.coursemology.org/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)}`,
         jar: j
@@ -118,6 +125,7 @@ function exeInfo(course, id, channel, author) {
 }
 
 function exeList(course, cat, tab, channel, author) {
+    if (debug) channel.send(`DEBUG: ${author.username} has requested list of assessment in category#${cat}, tab#${tab}, on course#${course}!`);
     request({
         url: `https://nushigh.coursemology.org/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)}`,
         jar: j
@@ -147,6 +155,7 @@ function exeList(course, cat, tab, channel, author) {
 }
 
 function exeLB(course, type, channel, author) {
+    if (debug) channel.send(`DEBUG: ${author.username} has requested leaderboard of ${type} on course#${course}!`);
     if (isNaN(type)) {
         if (type === "achievement") type = 1;
         else type = 0;
@@ -197,7 +206,7 @@ function updateLB(courses) {
                     level: row.querySelector(".user-profile").lastChild.text
                 };
             });
-            hook.send("DEBUG: #1 on Leaderboard(#" + course + ") is " + newLB[0].name);
+            if (debug) hook.send("DEBUG: #1 on Leaderboard(#" + course + ") is " + newLB[0].name);
             if (!firstUpdate) {
                 let oldLB = leaderboard[course];
                 for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++) {
