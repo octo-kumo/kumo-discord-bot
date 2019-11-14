@@ -115,22 +115,20 @@ function exeList(course, cat, tab, msg) {
         } else {
             let result = parse(body);
             let contents = result.querySelector(".assessments-list tbody");
-            let embed = new Discord.RichEmbed().setTitle(result.querySelector(".page-header h1 span").text).setDescription("SPAM Alert");
-            embed.setColor(0x21f8ff)
+            let embed = new Discord.RichEmbed().setTitle(result.querySelector(".page-header h1 span").text);
+            embed.setColor(0x21f8ff);
+            let rows = contents.querySelectorAll("tr");
+            let desc = rows.map(row => {
+                let title = row.firstChild.firstChild;
+                let disabled = !row.attributes.class.includes("currently-active");
+                return {
+                    name: `[${disabled?"~~":"**"}${row.attributes.id.replace("assessment_", "")}${disabled?"~~":"**"}](https://nushigh.coursemology.org${title.attributes.href})`,
+                    value: title.text
+                };
+            });
+            embed.fields = desc;
             embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
             msg.channel.send(embed);
-            let rows = contents.querySelectorAll("tr");
-            for (let i = 0; i < rows.length; i++) {
-                let row = rows[i];
-                let title = row.firstChild.firstChild;
-                let embed = new Discord.RichEmbed().setTitle(title.text + " (" + row.attributes.id.replace("assessment_", "") + ")");
-                embed.setURL(`https://nushigh.coursemology.org${title.attributes.href}`);
-                embed.setColor(0xa0fcff)
-                embed.addField("EXP", `${row.querySelector(".table-base-exp").text} (${row.querySelector(".table-time-bonus-exp").text})`, true);
-                embed.addField("Bonus Cut-Off", row.querySelector(".table-bonus-cut-off").text, true);
-                if (!row.attributes.class.includes("currently-active")) embed.setDescription("_Not Open_");
-                msg.channel.send(embed);
-            }
         }
     });
 }
