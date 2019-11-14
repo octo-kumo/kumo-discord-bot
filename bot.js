@@ -50,7 +50,8 @@ client.on('message', async msg => {
             msg.delete();
         }
         if (command === "coursemology") {
-            if (args.length != 2) return msg.channel.send("Please include 2 parameters!");
+            if (args.length == 1) args = [1706, args[0]];
+            if (args.length != 2) return msg.channel.send("Please include 1/2 parameters!");
             for (var a = 0; a < 2; a++) CM_QUERY_EMBED.fields[a].value = args[a];
             msg.channel.send(CM_QUERY_EMBED);
             request({
