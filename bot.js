@@ -5,6 +5,8 @@ const parse = require('node-html-parser').parse;
 
 // Constants
 const COURSES = [1706];
+const SLEEP_IMAGES = ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747146/sleep_1.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_2.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_3.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_4.jpg"];
+const SLEEP_LATE = ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747132/sleep_late.jpg"];
 const PREFIX = process.env.PREFIX;
 const USERTOKEN = process.env.CMTOKEN;
 const HOOK_TOKEN = process.env.HKTOKEN;
@@ -98,6 +100,23 @@ client.on('message', async msg => {
         debug = !debug;
         console.log("    DEBUG TOGGLED, debug = " + debug)
         msg.channel.send(`DEBUG: debug output has been turned ${debug?"on":"off"}!`);
+    }
+    if (command === "shouldisleep" || command === "sleep" || command === "sis" || command === "zzz") {
+        var currentHour = new Date().getHours();
+        if (currentHour < 6 || currentHour > 21) {
+            let embed = new Discord.RichEmbed().setTitle("You should go to **sleep**!").setColor(0x21f8ff);
+            embed.setDescription("It is so late right now, better go and sleep **" + msg.author.username + "**");
+            if (currentHour < 6 && currentHour > 2) embed.setThumbnail(SLEEP_LATE[Math.floor(Math.random() * SLEEP_LATE.length)]);
+            else embed.setThumbnail(SLEEP_IMAGES[Math.floor(Math.random() * SLEEP_IMAGES.length)]);
+            msg.channel.send(embed);
+            console.log("    told " + msg.author.username + " to to goto sleep");
+        } else {
+            let embed = new Discord.RichEmbed().setTitle("Get some **coffee**!").setColor(0x6f4e37);
+            embed.setDescription("There is so much to do, better go get a cup of coffee **" + msg.author.username + "**");
+            embed.setThumbnail("https://res.cloudinary.com/chatboxzy/image/upload/v1573747645/coffee.png");
+            msg.channel.send(embed);
+            console.log("    told " + msg.author.username + " to not to goto sleep");
+        }
     }
     if (msg.author.id === "456001047756800000" && (command === "changebase" || command === "cb")) {
         query_base_url = args[0];
