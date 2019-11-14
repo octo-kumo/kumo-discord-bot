@@ -4,6 +4,7 @@ const moment = require('moment');
 const {
     parse
 } = require('node-html-parser');
+const hook = new Discord.WebhookClient('644427303719403521', 'RFaX_k2dQRVTcwyHHCezuTKodVHzeIfPbDlaUN8-igaumtW-X9bBd-X2IpdZBRW-kkwc');
 const client = new Discord.Client();
 const prefix = process.env.PREFIX;
 const USERTOKEN = process.env.CMTOKEN;
@@ -12,6 +13,10 @@ const cookie = request.cookie('remember_user_token=' + USERTOKEN);
 j.setCookie(cookie, "https://nushigh.coursemology.org");
 
 const PING_EMBED = new Discord.RichEmbed().setTitle("機器雲的延時").setColor(0x21f8ff).addField("Latency", 0).addField("Discord API Latency", 0);
+const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
+    .addField(`${prefix}ping`, "Get the bot's ping")
+    .addField(`${prefix}coursemology`, `Access Coursemology.\nCorrect Usage: \`${prefix}coursemology (info|list|leaderboard) [args]\``);
+.addField(`${prefix}coursemology`, `Access Coursemology.\nCorrect Usage: \`${prefix}coursemology (info|list|leaderboard) [args]\``);
 
 console.log('APP STARTING...');
 
@@ -192,14 +197,15 @@ function updateLB(courses) {
                     level: row.querySelector(".user-profile").lastChild.text
                 };
             });
+            hook.send("DEBUG: #1 on Leaderboard(#" + course + ") is " + newLB[0].name);
             if (!firstUpdate) {
                 let oldLB = leaderboard[course];
                 for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++) {
                     if (newLB[a].id !== oldLB[a].id) {
                         if (a == 0)
-                            LB_UPDATE_CHANNEL.send(`**${newLB[a]}** has taken the **#1** spot from **${oldLB[a]}** on course ${course}!`);
+                            hook.send(`**${newLB[a]}** has taken the **#1** spot from **${oldLB[a]}** on course ${course}!`);
                         else
-                            LB_UPDATE_CHANNEL.send(`The **#${oldLB[a].rank}** spot on course ${course}, is no longer held by **${oldLB[a].name}** but by **${newLB[a].name}**!`);
+                            hook.send(`The **#${oldLB[a].rank}** spot on course ${course}, is no longer held by **${oldLB[a].name}** but by **${newLB[a].name}**!`);
                     }
                 }
             }
