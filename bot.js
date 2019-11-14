@@ -102,7 +102,7 @@ client.on('message', async msg => {
         msg.channel.send(`DEBUG: debug output has been turned ${debug?"on":"off"}!`);
     }
     if (command === "shouldisleep" || command === "sleep" || command === "sis" || command === "zzz") {
-        var currentHour = new Date().getHours() + 8;
+        var currentHour = (new Date().getHours() + 8) % 24;
         console.log("current hour = " + currentHour);
         if (currentHour < 6 || currentHour > 21) {
             let embed = new Discord.RichEmbed().setTitle("You should go to **sleep**!").setColor(0x21f8ff);
