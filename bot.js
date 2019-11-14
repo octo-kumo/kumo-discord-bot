@@ -50,12 +50,12 @@ client.on('message', async msg => {
             msg.delete();
         }
         if (command === "coursemology" || command === "cm") {
-            if (args.length < 2) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard) args`");
+            if (args.length < 2) return msg.channel.send("Correct Usage: `" + prefix + "coursemology (info|list|leaderboard) args`");
             switch (args.shift()) {
                 case "i":
                 case "info":
                     if (args.length == 1) args = [1706, args[0]];
-                    if (args.length != 2) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology info [course id] assessment-id`");
+                    if (args.length != 2) return msg.channel.send("Correct Usage: `" + prefix + "coursemology info [course id] assessment-id`");
                     for (var a = 0; a < 2; a++) CM_QUERY_EMBED.fields[a].value = args[a];
                     msg.channel.send(CM_QUERY_EMBED);
                     exeInfo(args[0], args[1], msg);
@@ -63,7 +63,7 @@ client.on('message', async msg => {
                 case "l":
                 case "list":
                     if (args.length == 2) args = [1706, args[0], args[1]];
-                    if (args.length != 3) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology list [course id] category-id tab-id`")
+                    if (args.length != 3) return msg.channel.send("Correct Usage: `" + prefix + "coursemology list [course id] category-id tab-id`")
                     exeList(args[0], args[1], args[2], msg);
                     break;
                 case "lb":
