@@ -261,40 +261,44 @@ function updateUsers(course) {
     });
 }
 
-function updateLB() {
+function updateLB(course) {
+    request({
+        url: `${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
+        jar: config.JAR
+    }, function(error, response, body) {
+        if (error || response.statusCode == 404) {
+            if (debug) config.HOOK.send(`DEBUG: Failed to access ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+        } else {
+            let contents = parse(body).querySelector(".leaderboard-level tbody");
+            if (!contents) return config.HOOK.send(`DEBUG: Course-Do-Not-Exist? ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+            let rows = contents.querySelectorAll("tr");
+            let newLB = rows.map(row => {
+                return {
+                    id: row.attributes.id.replace("course_user_", ""),
+                    rank: row.firstChild.text,
+                    name: row.querySelector(".user-profile div a").text,
+                    image: `${config.query_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
+                    level: row.querySelector(".user-profile").lastChild.text
+                };
+            });
+            if (debug) config.HOOK.send(`[Course#${course}] DEBUG: #1 on leaderboard is ${newLB[0].name}`);
+            if (config.leaderboard[course]) {
+                let oldLB = config.leaderboard[course];
+                for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++)
+                    if (newLB[a].id !== oldLB[a].id)
+                        if (a == 0)
+                            config.HOOK.send(`[Course#${course}] **${newLB[a].name}** has taken the **#1** spot from **${oldLB[a].name}**!`);
+                        else
+                            config.HOOK.send(`[Course#${course}] **#${oldLB[a].rank} __${oldLB[a].name}__ :arrow_forward: __${newLB[a].name}__!`);
+            }
+            config.leaderboard[course] = newLB;
+        }
+    });
+}
+
+exports.update = new function() {
     config.COURSES.forEach(course => {
         updateUsers(course);
-        request({
-            url: `${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
-            jar: config.JAR
-        }, function(error, response, body) {
-            if (error || response.statusCode == 404) {
-                if (debug) config.HOOK.send(`DEBUG: Failed to access ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
-            } else {
-                let contents = parse(body).querySelector(".leaderboard-level tbody");
-                if (!contents) return config.HOOK.send(`DEBUG: Course-Do-Not-Exist? ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
-                let rows = contents.querySelectorAll("tr");
-                let newLB = rows.map(row => {
-                    return {
-                        id: row.attributes.id.replace("course_user_", ""),
-                        rank: row.firstChild.text,
-                        name: row.querySelector(".user-profile div a").text,
-                        image: `${config.query_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
-                        level: row.querySelector(".user-profile").lastChild.text
-                    };
-                });
-                if (debug) config.HOOK.send(`[Course#${course}] DEBUG: #1 on leaderboard is ${newLB[0].name}`);
-                if (config.leaderboard[course]) {
-                    let oldLB = config.leaderboard[course];
-                    for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++)
-                        if (newLB[a].id !== oldLB[a].id)
-                            if (a == 0)
-                                config.HOOK.send(`[Course#${course}] **${newLB[a].name}** has taken the **#1** spot from **${oldLB[a].name}**!`);
-                            else
-                                config.HOOK.send(`[Course#${course}] **#${oldLB[a].rank} __${oldLB[a].name}__ :arrow_forward: __${newLB[a].name}__!`);
-                }
-                config.leaderboard[course] = newLB;
-            }
-        });
+        updateLB(course);
     });
 }
