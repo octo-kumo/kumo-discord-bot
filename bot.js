@@ -332,10 +332,10 @@ function updateUsers(course) {
         jar: JAR
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
-            channel.send("Coursemology Query Failed!");
+            console.log("failed to query users (" + response.statusCode + "), error = " + JSON.stringify(error));
         } else {
             let contents = parse(body).querySelector(".course-users");
-            if (!contents) return channel.send(`Query has failed as ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard is not valid!`);
+            if (!contents) return console.log("failed to query users, contents = null");
             let users = contents.querySelectorAll(".course_user");
             USERS_CACHE[course] = {};
             users.forEach(user => {
