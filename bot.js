@@ -290,7 +290,6 @@ function updateUsers(course) {
             console.log("Title = " + contents.firstChild.firstChild.firstChild.text);
             USERS_CACHE[course] = {};
             users.forEach(user => {
-                console.log(`(${user.id.substring(12)}) ${user.querySelector(".user-name").text}`)
                 USERS_CACHE[course][user.id.substring(12)] = {
                     name: user.querySelector(".user-name").text,
                     icon: user.querySelector(".profile-picture img").attributes.src
