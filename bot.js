@@ -50,70 +50,7 @@ client.on('message', async msg => {
         m.edit(PING_EMBED);
     }
     if (command === "coursemology" || command === "cm") {
-        console.log("running coursemology sub-system...");
-        if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard|listusers|user) [args]`");
-        let json = false;
-        if (args[args.length - 1] === "--json") {
-            args.pop();
-            json = true;
-        }
-        switch (args.shift()) {
-            case "i":
-            case "info":
-                if (args.length == 1) args = [config.DEFAULT_COURSE, args[0]];
-                console.log("info subcommand, local args = [" + args.join(", ") + "]")
-                if (args.length != 2) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology info [course id] assessment-id`");
-                coursemology.exeInfo(args[0], args[1], json, msg.channel, msg.author);
-                break;
-            case "l":
-            case "list":
-                if (args.length == 2) args = [config.DEFAULT_COURSE, args[0], args[1]];
-                console.log("list subcommand, local args = [" + args.join(", ") + "]")
-                if (args.length != 3) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology list [course id] category-id tab-id`")
-                coursemology.exeList(args[0], args[1], args[2], json, msg.channel, msg.author);
-                break;
-            case "lb":
-            case "leaderboard":
-                if (args.length == 0) args = [config.DEFAULT_COURSE, "level"];
-                if (args.length == 1) {
-                    if (!isNaN(args[0])) args = [args[0], "level"];
-                    else args = [config.DEFAULT_COURSE, args[0]];
-                }
-                console.log("leaderboard subcommand, local args = [" + args.join(", ") + "]");
-                if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology leaderboard [course id] [level|achievement]`")
-                coursemology.exeLB(args[0], args[1], json, msg.channel, msg.author);
-                break;
-            case "listusers":
-            case "lu":
-            case "users":
-                if (args.length == 0) {
-                    console.log("users subcommand, no course, proceed to list users of DEFAULT_COURSE...");
-                    coursemology.exeLU(config.DEFAULT_COURSE, 1, json, msg.channel, msg.author);
-                } else if (args.length == 1) {
-                    if (args[0] === "help") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology listusers [course id] [page number]`");
-                    console.log("users subcommand, course provided, proceed to list users of specified course #" + args[0] + "...");
-                    coursemology.exeLU(args[0], 1, json, msg.channel, msg.author);
-                } else if (args.length == 2) {
-                    console.log("users subcommand, course and page provided, proceed to list users of specified course #" + args[0] + " on page #" + args[1] + "...");
-                    coursemology.exeLU(args[0], args[1], json, msg.channel, msg.author);
-                }
-                break;
-            case "u":
-            case "stalk":
-            case "user":
-                if (args.length == 1) {
-                    if (args[0] === "help") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology user [course id] [user id/name]`");
-                    console.log("user subcommand, only user provided, proceed to stalk that user...");
-                    coursemology.exeStalk(config.DEFAULT_COURSE, args[0], json, msg.channel, msg.author);
-                } else if (args.length == 2) {
-                    console.log("user subcommand, all args provided, proceed to stalk that user...");
-                    coursemology.exeStalk(args[0], args[1], json, msg.channel, msg.author);
-                } else {
-                    console.log("user subcommand, contains longer name, proceed to join args and search for user");
-                    coursemology.exeStalk(args[0], args.slice(1).join(" "), json, msg.channel, msg.author);
-                }
-                break;
-        }
+        
     }
     if (command === "toggledebug" || command === "td") {
         debug = !debug;
