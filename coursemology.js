@@ -231,7 +231,7 @@ function handleReaction(r) {
             listData[r.message.id].page = Math.min(Math.max(listData[r.message.id].page + (r.emoji.name === '⬅️' ? -1 : 1), 1), listData[r.message.id].maxPage);
             console.log(`Changing Page to ${listData[r.message.id].page}`);
             listData[r.message.id].embed.fields = exeLUField(listData[r.message.id].course, listData[r.message.id].users, listData[r.message.id].page, Object.keys(listData[r.message.id].users));
-            listData[r.message.id].embed.title = `Students of Course#${course} (${page}/${listData[r.message.id].maxPage})`;
+            listData[r.message.id].embed.title = `Students of Course#${listData[r.message.id].course} (${listData[r.message.id].page}/${listData[r.message.id].maxPage})`;
             console.log(`Changing Title to ${listData[r.message.id].embed.title}`);
             listData[r.message.id].message.edit(listData[r.message.id].embed);
             break;
