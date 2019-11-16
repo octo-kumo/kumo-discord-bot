@@ -5,7 +5,7 @@ const parse = require('node-html-parser').parse;
 
 // Constants
 const NUMBER_OF_USER_PER_PAGE = 8;
-const COURSES = [1706];
+const COURSES = [1706, 1389, 614, 1613];
 const SLEEP_IMAGES = ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747146/sleep_1.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_2.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_3.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_4.jpg"];
 const SLEEP_LATE = ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747132/sleep_late.jpg"];
 const PREFIX = process.env.PREFIX;
@@ -250,7 +250,7 @@ function exeLU(course, page, channel, author) {
     if (isNaN(page) || !users) return channel.send("Course/Page not supported!");
     let lines = [];
     let keys = Object.keys(users);
-    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page+1}/${keys.length/NUMBER_OF_USER_PER_PAGE+1})`).setColor(0x21f8ff);
+    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page+1}/${Math.ceil(eys.length/NUMBER_OF_USER_PER_PAGE)})`).setColor(0x21f8ff);
     for (let i = page * NUMBER_OF_USER_PER_PAGE; i < Math.min((page + 1) * NUMBER_OF_USER_PER_PAGE, keys.length); i++) {
         let key = keys[i];
         lines.push({
