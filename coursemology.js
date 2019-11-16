@@ -190,7 +190,8 @@ function exeLUField(course, users, page, keys) {
     return lines;
 }
 
-const filter = reaction => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name);
+const filter = (reaction, user) => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name) && user.id !== config.id;
+const listData = {};
 
 function exeLU(course, page, json, channel, author) {
     let users = config.USERS_CACHE[course];
@@ -204,11 +205,37 @@ function exeLU(course, page, json, channel, author) {
     embed.fields = exeLUField(course, users, page, keys);
     embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
     channel.send(embed).then(message => message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️')).then(() => {
+        listData[message.id] = {
+            course: course,
+            users: users,
+            page: page,
+            message: message,
+            embed: embed,
+            maxPage: Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE)
+        };
         const collector = message.createReactionCollector(filter, {
             time: 900000
         });
-        collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+        collector.on('collect', handleReaction);
     }));
+}
+
+function handleReaction(r) {
+    console.log(`Collected ${r.emoji.name}`);
+    switch (r.emoji.name) {
+        case '❎':
+            r.message.delete();
+            break;
+        case '⬅️':
+        case '➡️':
+            listData[r.message.id].page = Math.min(Math.max(listData[r.message.id].page + (r.emoji.name === '⬅️' ? -1 : 1), 1), listData[r.message.id].maxPage);
+            console.log(`Changing Page to ${listData[r.message.id].page}`);
+            listData[r.message.id].embed.fields = exeLUField(listData[r.message.id].course, listData[r.message.id].users, listData[r.message.id].page, Object.keys(users));
+            listData[r.message.id].embed.title = `Students of Course#${course} (${page}/${listData[r.message.id].maxPage})`;
+            console.log(`Changing Title to ${listData[r.message.id].embed.title}`);
+            listData[r.message.id].message.edit(listData[r.message.id].embed);
+            break;
+    }
 }
 
 function exeStalk(course, user_id, json, channel, author) {

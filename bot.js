@@ -27,6 +27,7 @@ client.on('ready', () => {
     let jar = request.jar();
     jar.setCookie(request.cookie('remember_user_token=' + process.env.CMTOKEN), config.query_base_url);
     config.JAR = jar;
+    config.id = client.user.id;
 });
 
 client.on('message', async msg => {
