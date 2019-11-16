@@ -4,6 +4,7 @@ const request = require('request');
 const parse = require('node-html-parser').parse;
 
 // Constants
+const DEFAULT_COURSE = 1706;
 const NUMBER_OF_USER_PER_PAGE = 8;
 const COURSES = [1706, 1389, 614, 1613];
 const SLEEP_IMAGES = ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747146/sleep_1.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_2.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_3.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_4.jpg"];
@@ -78,24 +79,24 @@ client.on('message', async msg => {
         switch (args.shift()) {
             case "i":
             case "info":
-                if (args.length == 1) args = [1706, args[0]];
+                if (args.length == 1) args = [DEFAULT_COURSE, args[0]];
                 console.log("info subcommand, local args = [" + args.join(", ") + "]")
                 if (args.length != 2) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology info [course id] assessment-id`");
                 exeInfo(args[0], args[1], json, msg.channel, msg.author);
                 break;
             case "l":
             case "list":
-                if (args.length == 2) args = [1706, args[0], args[1]];
+                if (args.length == 2) args = [DEFAULT_COURSE, args[0], args[1]];
                 console.log("list subcommand, local args = [" + args.join(", ") + "]")
                 if (args.length != 3) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology list [course id] category-id tab-id`")
                 exeList(args[0], args[1], args[2], json, msg.channel, msg.author);
                 break;
             case "lb":
             case "leaderboard":
-                if (args.length == 0) args = [1706, "level"];
+                if (args.length == 0) args = [DEFAULT_COURSE, "level"];
                 if (args.length == 1) {
                     if (!isNaN(args[0])) args = [args[0], "level"];
-                    else args = [1706, args[0]];
+                    else args = [DEFAULT_COURSE, args[0]];
                 }
                 console.log("leaderboard subcommand, local args = [" + args.join(", ") + "]");
                 if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology leaderboard [course id] [level|achievement]`")
@@ -106,10 +107,10 @@ client.on('message', async msg => {
             case "user":
                 if (args.length == 0) {
                     console.log("user subcommand, no course, proceed to list all users...");
-                    exeLU(1706, 1, json, msg.channel, msg.author);
+                    exeLU(DEFAULT_COURSE, 1, json, msg.channel, msg.author);
                 } else if (args.length == 1) {
                     console.log("user subcommand, only user provided, proceed to stalk that user...");
-                    exeStalk(1706, args[0], json, msg.channel, msg.author);
+                    exeStalk(DEFAULT_COURSE, args[0], json, msg.channel, msg.author);
                 } else if (args.length == 2) {
                     if (args[0] === "list") {
                         console.log("user subcommand, course provided, requested list, proceed to list all users...");
@@ -295,7 +296,7 @@ function exeStalk(course, user_id, json, channel, author) {
         Object.keys(users).forEach(key => {
             if (users[key].name.toUpperCase().includes(user_id.toUpperCase()) && limit >= 0) {
                 limit--;
-                exeStalk(course, key, channel, author);
+                exeStalk(course, key, json, channel, author);
             }
         });
         if (limit == 3) return channel.send("Didnt find anyone with **" + user_id + "** in their name.");
