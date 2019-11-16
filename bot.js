@@ -21,7 +21,7 @@ console.log('====== ZY Discord Bot Started! ======');
 client.on('ready', () => {
     console.log("=> Bot Running!");
     client.user.setPresence(config.PRESENCE);
-    setInterval(updateLB, 10000);
+    setInterval(coursemology.updateLB, 10000);
 
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     let jar = request.jar();
