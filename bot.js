@@ -267,6 +267,7 @@ function exeStalk(course, user_id, channel, author) {
         jar: JAR
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
+            console.log(`Failed ${course}, ${user_id}`);
             channel.send("Coursemology Query Failed!");
         } else {
             console.log("Parsing User Profile...");
