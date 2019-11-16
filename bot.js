@@ -179,7 +179,7 @@ function exeInfo(course, id, json, channel, author) {
             });
             let object = {
                 name: result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text,
-                description: contents.querySelector(".well") ? contents.querySelector(".well").text.replace("</p>", "\n").replace(/<\/h[1-9]>/g, "\n").replace(/<[^>]+>/g, '') : null,
+                description: contents.querySelector(".well") ? contents.querySelector(".well").childNodes.map(p => p.text).join("\n") : null,
                 type: contents.querySelector(".type td").text,
                 base_exp: contents.querySelector(".base_exp td").text,
                 bonus_exp: contents.querySelector(".bonus_exp td").text,
