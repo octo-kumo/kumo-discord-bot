@@ -176,8 +176,7 @@ function exeLB(course, type, json, channel, author) {
     });
 }
 
-function exeLUField(course, users, page) {
-    let keys = Object.keys(users);
+function exeLUField(course, users, page, keys) {
     let lines = [];
     if (page < 1 || page > Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE)) return `There are ${Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE)} pages, and you requested ${page}...`;
     console.log(`showing users from #${(page-1) * config.NUMBER_OF_USER_PER_PAGE} to #${Math.min(page * config.NUMBER_OF_USER_PER_PAGE, keys.length)}`);
@@ -199,9 +198,10 @@ function exeLU(course, page, json, channel, author) {
         console.log(`error, course = ${course}, page = ${page}, json = ${json}`);
         return channel.send("Course/Page not supported!");
     }
+    let keys = Object.keys(users);
     page = parseInt(page);
     let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page}/${Math.ceil(keys.length/config.NUMBER_OF_USER_PER_PAGE)})`).setColor(0x21f8ff);
-    embed.fields = exeLUField(course, users, page);
+    embed.fields = exeLUField(course, users, page, keys);
     embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
     channel.send(embed).then(message => message.react(':arrow_left:').then(() => message.react(':negative_squared_cross_mark:')).then(() => message.react(':arrow_right:')).then(() => {
         const collector = message.createReactionCollector(filter, {
