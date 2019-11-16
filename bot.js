@@ -4,6 +4,7 @@ const request = require('request');
 const parse = require('node-html-parser').parse;
 
 // Constants
+const NUMBER_OF_USER_PER_PAGE = 8;
 const COURSES = [1706];
 const SLEEP_IMAGES = ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747146/sleep_1.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_2.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_3.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_4.jpg"];
 const SLEEP_LATE = ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747132/sleep_late.jpg"];
@@ -100,18 +101,21 @@ client.on('message', async msg => {
             case "user":
                 if (args.length == 0) {
                     console.log("user subcommand, no course, proceed to list all users...");
-                    exeLU(1706, msg.channel, msg.author);
+                    exeLU(1706, 0, msg.channel, msg.author);
                 } else if (args.length == 1) {
                     console.log("user subcommand, only user provided, proceed to stalk that user...");
                     exeStalk(1706, args[0], msg.channel, msg.author);
                 } else if (args.length == 2) {
                     if (args[0] === "list") {
                         console.log("user subcommand, course provided, requested list, proceed to list all users...");
-                        exeLU(args[1], msg.channel, msg.author);
+                        exeLU(args[1], 0, msg.channel, msg.author);
                     } else {
                         console.log("user subcommand, all args provided, proceed to stalk that user...");
                         exeStalk(args[0], args[1], msg.channel, msg.author);
                     }
+                } else if (args.length == 3 && args[0] === "list") {
+                    console.log("user subcommand, course, page, provided, requested list, proceed to list all users...");
+                    exeLU(args[1], args[2], msg.channel, msg.author);
                 } else {
                     console.log("user subcommand, invalid args, proceed to warn the user...");
                     return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology stalk [list] [course id] [user id]`");
@@ -241,12 +245,20 @@ function exeLB(course, type, channel, author) {
     });
 }
 
-function exeLU(course, channel, author) {
+function exeLU(course, page, channel, author) {
     let users = USERS_CACHE[course];
-    let embed = new Discord.RichEmbed().setTitle("Students of Course#" + course).setColor(0x21f8ff);
+    if (isNaN(page) || !users) return channel.send("Course/Page not supported!");
     let lines = [];
-    Object.keys(users).forEach(key => lines.push(`[${key}] ${users[key].name}`));
-    embed.setDescription(lines.join("\n"));
+    let keys = Object.keys(users);
+    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page+1}/${keys.length/NUMBER_OF_USER_PER_PAGE+1})`).setColor(0x21f8ff);
+    for (let i = page * NUMBER_OF_USER_PER_PAGE; i < Math.min((page + 1) * NUMBER_OF_USER_PER_PAGE, keys.length); i++) {
+        let key = keys[i];
+        lines.push({
+            name: key,
+            value: users[key].name
+        });
+    }
+    embed.fields = lines;
     embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
     channel.send(embed);
 }
