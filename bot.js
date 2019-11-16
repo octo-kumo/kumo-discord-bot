@@ -25,7 +25,7 @@ client.on('ready', () => {
 
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     let jar = request.jar();
-    jar.setCookie(request.cookie('remember_user_token=' + process.env.CMTOKEN), query_base_url);
+    jar.setCookie(request.cookie('remember_user_token=' + process.env.CMTOKEN), config.query_base_url);
     config.JAR = jar;
 });
 
@@ -139,9 +139,9 @@ client.on('message', async msg => {
         }
     }
     if (msg.author.id === "456001047756800000" && (command === "changebase" || command === "cb")) {
-        query_base_url = args[0];
+        config.query_base_url = args[0];
         console.log("DEBUG TOGGLED, debug = " + debug)
-        msg.channel.send("Base URL changed to " + query_base_url);
+        msg.channel.send("Base URL changed to " + config.query_base_url);
     }
     console.log("====== Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
 });
