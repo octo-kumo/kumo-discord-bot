@@ -134,7 +134,7 @@ function exeList(course, cat, tab, json, channel, author) {
             let result = parse(body);
             let contents = result.querySelector(".assessments-list tbody");
             if (!contents) return channel.send(`Query has failed as ${config.query_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)} is not valid!`);
-            let embed = new Discord.RichEmbed().setTitle(result.querySelector(".page-header h1 span").text).setColor(0x21f8ff);
+            let embed = new Discord.RichEmbed().setTitle(`${result.querySelector(".page-header h1 span").text}${list_presets[course]?" ("+list_presets[course].name+")":""}`).setColor(0x21f8ff);
             let rows = contents.querySelectorAll("tr");
             let desc = rows.map(row => {
                 let title = row.firstChild.firstChild;

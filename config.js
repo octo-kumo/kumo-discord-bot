@@ -1,6 +1,7 @@
 exports.config = {
     list_presets: {
         "1706": {
+            name: "CS3233 Object Oriented Programming II AY2019",
             labs: {
                 cat: 1880,
                 tab: 3080
@@ -11,6 +12,7 @@ exports.config = {
             }
         },
         "1389": {
+            name: "CS3231 Object Oriented Programming I AY2019",
             labs: {
                 cat: 1662,
                 tab: 2638
@@ -21,6 +23,7 @@ exports.config = {
             }
         },
         "1613": {
+            name: "CS1131 Computational Thinking AY2017",
             labs: {
                 cat: 145,
                 tab: 217
