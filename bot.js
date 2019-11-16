@@ -193,11 +193,11 @@ function exeInfo(course, id, json, channel, author) {
                 embed.addField("Type", object.type, true);
                 embed.addField("EXP", `${object.base_exp} (${object.bonus_exp})`, true);
                 if (Object.keys(object.achievements).length > 0) embed.addField("Required for Achievements", Object.keys(object.achievements).map(a => `**${object.achievements[a].name}** ${object.achievements[a].description}`).join("\n"));
-                let files = [];
                 let linksInDiv = contents.querySelectorAll("div a");
+                let files = [];
                 for (var i = 0; i < linksInDiv.length; i++)
-                    if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) embed.addField(linksInDiv[i].text, "[Download](" + query_base_url + linksInDiv[i].attributes.href + ")");
-                embed.attachFiles(files);
+                    if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) files.push("[" + linksInDiv[i].text + "](" + query_base_url + linksInDiv[i].attributes.href + ")");
+                embed.addField("Attached Files", files.join("\n"));
                 embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
                 channel.send(embed);
             }
