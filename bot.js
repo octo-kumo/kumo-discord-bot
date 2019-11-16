@@ -290,6 +290,7 @@ function exeLU(course, page, json, channel, author) {
 function exeStalk(course, user_id, json, channel, author) {
     if (isNaN(user_id)) {
         let users = USERS_CACHE[course];
+        if (!users) return channel.send("Are you sure we have that course?");
         let limit = 3;
         Object.keys(users).forEach(key => {
             if (users[key].name.toUpperCase().includes(user_id.toUpperCase()) && limit > 0) {
