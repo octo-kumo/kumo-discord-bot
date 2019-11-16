@@ -249,9 +249,9 @@ function exeLU(course, page, channel, author) {
     let users = USERS_CACHE[course];
     if (isNaN(page) || !users) return channel.send("Course/Page not supported!");
     page = parseInt(page);
-    if (page < 1 || page > Math.ceil(keys.length / NUMBER_OF_USER_PER_PAGE)) return channel.send(`There are ${Math.ceil(keys.length / NUMBER_OF_USER_PER_PAGE)} pages, and you requested ${page}...`);
-    let lines = [];
     let keys = Object.keys(users);
+    let lines = [];
+    if (page < 1 || page > Math.ceil(keys.length / NUMBER_OF_USER_PER_PAGE)) return channel.send(`There are ${Math.ceil(keys.length / NUMBER_OF_USER_PER_PAGE)} pages, and you requested ${page}...`);
     let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page}/${Math.ceil(keys.length/NUMBER_OF_USER_PER_PAGE)})`).setColor(0x21f8ff);
     console.log(`showing users from #${(page-1) * NUMBER_OF_USER_PER_PAGE} to #${Math.min(page * NUMBER_OF_USER_PER_PAGE, keys.length)}`);
     for (let i = (page - 1) * NUMBER_OF_USER_PER_PAGE; i < Math.min(page * NUMBER_OF_USER_PER_PAGE, keys.length); i++) {
@@ -276,6 +276,7 @@ function exeStalk(course, user_id, channel, author) {
                 exeStalk(course, key, channel, author);
             }
         });
+        if (limit == 3) return channel.send("Didnt find anyone with **" + user_id + "** in their name.");
     } else {
         request({
             url: `${query_base_url}/courses/${encodeURIComponent(course)}/users/${encodeURIComponent(user_id)}`,
