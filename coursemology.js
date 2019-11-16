@@ -176,13 +176,10 @@ function exeLB(course, type, json, channel, author) {
     });
 }
 
-function exeLU(course, page, json, channel, author) {
-    let users = config.USERS_CACHE[course];
-    if (isNaN(page) || !users) return channel.send("Course/Page not supported!");
-    page = parseInt(page);
+function generateExeLUEmbed(course, users, page) {
     let keys = Object.keys(users);
     let lines = [];
-    if (page < 1 || page > Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE)) return channel.send(`There are ${Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE)} pages, and you requested ${page}...`);
+    if (page < 1 || page > Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE)) return `There are ${Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE)} pages, and you requested ${page}...`;
     let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page}/${Math.ceil(keys.length/config.NUMBER_OF_USER_PER_PAGE)})`).setColor(0x21f8ff);
     console.log(`showing users from #${(page-1) * config.NUMBER_OF_USER_PER_PAGE} to #${Math.min(page * config.NUMBER_OF_USER_PER_PAGE, keys.length)}`);
     for (let i = (page - 1) * config.NUMBER_OF_USER_PER_PAGE; i < Math.min(page * config.NUMBER_OF_USER_PER_PAGE, keys.length); i++) {
@@ -192,9 +189,26 @@ function exeLU(course, page, json, channel, author) {
             value: users[key].name
         });
     }
-    embed.fields = lines;
+    return lines;
+}
+
+const filter = reaction => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name);
+
+function exeLU(course, page, json, channel, author) {
+    let users = config.USERS_CACHE[course];
+    if (isNaN(page) || !users) {
+        console.log(`error, course = ${course}, page = ${page}, json = ${json}`);
+        return channel.send("Course/Page not supported!");
+    }
+    page = parseInt(page);
+    embed.fields = generateExeLUEmbed(course, users, page);
     embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
-    channel.send(embed);
+    channel.send(embed).then(message => message.react(':arrow_left:').then(() => message.react(':negative_squared_cross_mark:')).then(() => message.react(':arrow_right:')).then(() => {
+        const collector = message.createReactionCollector(filter, {
+            time: 900000
+        });
+        collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+    }));
 }
 
 function exeStalk(course, user_id, json, channel, author) {
