@@ -19,6 +19,7 @@ let query_base_url = "https://nushigh.coursemology.org";
 let debug = false;
 let leaderboard_feed_channel;
 let leaderboard = {};
+let USERS_CACHE = {};
 
 JAR.setCookie(request.cookie('remember_user_token=' + USERTOKEN), query_base_url);
 
@@ -90,9 +91,31 @@ client.on('message', async msg => {
                     if (!isNaN(args[0])) args = [args[0], "level"];
                     else args = [1706, args[0]];
                 }
-                console.log("leaderboard subcommand, local args = [" + args.join(", ") + "]")
+                console.log("leaderboard subcommand, local args = [" + args.join(", ") + "]");
                 if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology leaderboard [course id] [level|achievement]`")
                 exeLB(args[0], args[1], msg.channel, msg.author);
+                break;
+            case "u":
+            case "stalk":
+            case "user":
+                if (args.length == 0) {
+                    console.log("user subcommand, no course, proceed to list all users...");
+                    exeLU(1706, msg.channel, msg.author);
+                } else if (args.length == 1) {
+                    console.log("user subcommand, only user provided, proceed to stalk that user...");
+                    exeStalk(1706, args[0]);
+                } else if (args.length == 2) {
+                    if (args[0] === "list") {
+                        console.log("user subcommand, course provided, requested list, proceed to list all users...");
+                        exeLU(args[1], msg.channel, msg.author);
+                    } else {
+                        console.log("user subcommand, all args provided, proceed to stalk that user...");
+                        exeStalk(args[0], args[1]);
+                    }
+                } else {
+                    console.log("user subcommand, invalid args, proceed to warn the user...");
+                    return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology stalk [list] [course id] [user id]`");
+                }
                 break;
         }
     }
@@ -168,8 +191,7 @@ function exeList(course, cat, tab, channel, author) {
             let result = parse(body);
             let contents = result.querySelector(".assessments-list tbody");
             if (!contents) return channel.send(`Query has failed as ${query_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)} is not valid!`);
-            let embed = new Discord.RichEmbed().setTitle(result.querySelector(".page-header h1 span").text);
-            embed.setColor(0x21f8ff);
+            let embed = new Discord.RichEmbed().setTitle(result.querySelector(".page-header h1 span").text).setColor(0x21f8ff);
             let rows = contents.querySelectorAll("tr");
             let desc = rows.map(row => {
                 let title = row.firstChild.firstChild;
@@ -203,7 +225,7 @@ function exeLB(course, type, channel, author) {
             if (!contents) return channel.send(`Query has failed as ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard is not valid!`);
             let rows = contents.querySelectorAll("tr");
             let row1 = rows.shift();
-            let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text.trim()} _(${row1.querySelector(".user-profile").lastChild.text.trim()})_`);
+            let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text.trim()} _(${row1.querySelector(".user-profile").lastChild.text.trim()})_`).setColor(0x21f8ff);
             let thumbURL = row1.querySelector(".user-picture img").attributes.src;
             if (thumbURL.charAt(0) === "/") thumbURL = query_base_url + thumbURL;
             embed.setThumbnail(thumbURL);
@@ -214,45 +236,107 @@ function exeLB(course, type, channel, author) {
                     value: `[${row.querySelector(".user-profile div a").text.trim()}](${query_base_url}${row1.querySelector(".user-profile div a").attributes.href})${type==0?" _("+row1.querySelector(".user-profile").lastChild.text.trim()+")_":""}`
                 };
             });
-            channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL).setColor(0x21f8ff));
+            channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
+        }
+    });
+}
+
+function exeLU(course, channel, author) {
+    let users = USERS_CACHE[course];
+    let embed = new Discord.RichEmbed().setTitle("Students of Course#" + course).setColor(0x21f8ff);
+    let lines = [];
+    Object.keys(users).forEach(key => lines.push(`[${key}] ${users[key].name}`));
+    embed.setDescription(lines.join("\n"));
+    embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
+    channel.send(embed);
+}
+
+function exeStalk(course, user_id, channel, author) {
+    request({
+        url: `${query_base_url}/courses/${encodeURIComponent(course)}/users/${encodeURIComponent(user_id)}`,
+        jar: JAR
+    }, function(error, response, body) {
+        if (error || response.statusCode == 404) {
+            channel.send("Coursemology Query Failed!");
+        } else {
+            console.log("Parsing User Profile...");
+            let contents = parse(body).querySelector(".course-users");
+            if (!contents) return channel.send(`Query Failed! why are you even using this feature?`);
+            let user_info = contents.querySelector(".row").lastChild;
+            let name = user_info.querySelector("h2").text;
+            let embed = new Discord.RichEmbed().setTitle("Profile of " + name).setColor(0x21f8ff);
+            embed.addField("Email", user_info.querySelector("p").text).setThumbnail(contents.querySelector(".profile-box .image img").attributes.src)
+                .setDescription(`Achievements (${contents.lastChild.childNodes.length}):\n` + contents.lastChild.childNodes.map(ach => `[${ach.querySelector("h6").text}](${query_base_url}${ach.firstChild.attributes.href})`));
+            channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
+        }
+    });
+}
+
+//update functions
+//TODO: to be expanded
+
+function updateUsers(course) {
+    request({
+        url: `https://nushigh.coursemology.org/courses/${course}/users`,
+        jar: JAR
+    }, function(error, response, body) {
+        if (error || response.statusCode == 404) {
+            channel.send("Coursemology Query Failed!");
+        } else {
+            console.log("Parsing User List...");
+            let contents = parse(body).querySelector(".course-users");
+            if (!contents) return channel.send(`Query has failed as ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard is not valid!`);
+            let users = contents.querySelectorAll(".course_user");
+            console.log("Title = " + contents.firstChild.firstChild.firstChild.text);
+            USERS_CACHE[course] = {};
+            users.forEach(user => {
+                console.log(`(${user.id.substring(12)}) ${user.querySelector(".user-name").text}`)
+                USER_CACHE[course][user.id.substring(12)] = {
+                    name: user.querySelector(".user-name").text,
+                    icon: user.querySelector(".profile-picture img").attributes.src
+                };
+            });
         }
     });
 }
 
 function updateLB() {
-    COURSES.forEach(course => request({
-        url: `${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
-        jar: JAR
-    }, function(error, response, body) {
-        if (error || response.statusCode == 404) {
-            if (debug) HOOK.send(`DEBUG: Failed to access ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
-        } else {
-            let contents = parse(body).querySelector(".leaderboard-level tbody");
-            if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
-            let rows = contents.querySelectorAll("tr");
-            let newLB = rows.map(row => {
-                return {
-                    id: row.attributes.id.replace("course_user_", ""),
-                    rank: row.firstChild.text,
-                    name: row.querySelector(".user-profile div a").text,
-                    image: `${query_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
-                    level: row.querySelector(".user-profile").lastChild.text
-                };
-            });
-            if (debug) HOOK.send(`[Course#${course}] DEBUG: #1 on leaderboard is ${newLB[0].name}`);
-            if (leaderboard[course]) {
-                let oldLB = leaderboard[course];
-                for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++)
-                    if (newLB[a].id !== oldLB[a].id)
-                        if (a == 0)
-                            HOOK.send(`[Course#${course}] **${newLB[a].name}** has taken the **#1** spot from **${oldLB[a].name}**!`);
-                        else
-                            HOOK.send(`[Course#${course}] **#${oldLB[a].rank} __${oldLB[a].name}__ :arrow_forward: __${newLB[a].name}__!`);
-                dataAlreadyFetched = false;
+    COURSES.forEach(course => {
+        updateUsers(course);
+        request({
+            url: `${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
+            jar: JAR
+        }, function(error, response, body) {
+            if (error || response.statusCode == 404) {
+                if (debug) HOOK.send(`DEBUG: Failed to access ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+            } else {
+                let contents = parse(body).querySelector(".leaderboard-level tbody");
+                if (!contents) return HOOK.send(`DEBUG: Course-Do-Not-Exist? ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+                let rows = contents.querySelectorAll("tr");
+                let newLB = rows.map(row => {
+                    return {
+                        id: row.attributes.id.replace("course_user_", ""),
+                        rank: row.firstChild.text,
+                        name: row.querySelector(".user-profile div a").text,
+                        image: `${query_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
+                        level: row.querySelector(".user-profile").lastChild.text
+                    };
+                });
+                if (debug) HOOK.send(`[Course#${course}] DEBUG: #1 on leaderboard is ${newLB[0].name}`);
+                if (leaderboard[course]) {
+                    let oldLB = leaderboard[course];
+                    for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++)
+                        if (newLB[a].id !== oldLB[a].id)
+                            if (a == 0)
+                                HOOK.send(`[Course#${course}] **${newLB[a].name}** has taken the **#1** spot from **${oldLB[a].name}**!`);
+                            else
+                                HOOK.send(`[Course#${course}] **#${oldLB[a].rank} __${oldLB[a].name}__ :arrow_forward: __${newLB[a].name}__!`);
+                    dataAlreadyFetched = false;
+                }
+                leaderboard[course] = newLB;
             }
-            leaderboard[course] = newLB;
-        }
-    }));
+        });
+    });
 }
 
 client.login(process.env.TOKEN);
