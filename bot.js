@@ -318,6 +318,7 @@ function exeStalk(course, user_id, json, channel, author) {
                 let desc = `Achievements (${contents.lastChild.childNodes.length}):\n` + contents.lastChild.childNodes.map(ach => `[${ach.querySelector("h6").text}](${query_base_url}${ach.firstChild.attributes.href})`).join(", ");
                 let image = contents.querySelector(".profile-box .image img").attributes.src;
                 if (!image.endsWith("svg")) embed.setThumbnail(image);
+                console.log("DESC = " + desc);
                 embed.addField("Email", user_info.querySelector("p").text).setDescription(desc);
                 channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
             }
