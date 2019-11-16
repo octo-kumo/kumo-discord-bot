@@ -256,31 +256,32 @@ function exeStalk(course, user_id, channel, author) {
         let users = USERS_CACHE[course];
         let limit = 3;
         Object.keys(users).forEach(key => {
-            if (users[key].name.toUpperCase().includes(user_id) && limit > 0) {
+            if (users[key].name.toUpperCase().includes(user_id.toUpperCase()) && limit > 0) {
                 limit--;
                 exeStalk(course, key, channel, author);
             }
         });
+    } else {
+        request({
+            url: `${query_base_url}/courses/${encodeURIComponent(course)}/users/${encodeURIComponent(user_id)}`,
+            jar: JAR
+        }, function(error, response, body) {
+            if (error || response.statusCode == 404) {
+                console.log(`Failed ${course}, ${user_id}`);
+                channel.send("Coursemology Query Failed!");
+            } else {
+                console.log("Parsing User Profile...");
+                let contents = parse(body).querySelector(".course-users");
+                if (!contents) return channel.send(`Query Failed! why are you even using this feature?`);
+                let user_info = contents.querySelector(".row").lastChild;
+                let name = user_info.querySelector("h2").text;
+                let embed = new Discord.RichEmbed().setTitle("Profile of " + name).setColor(0x21f8ff);
+                embed.addField("Email", user_info.querySelector("p").text).setThumbnail(contents.querySelector(".profile-box .image img").attributes.src)
+                    .setDescription(`Achievements (${contents.lastChild.childNodes.length}):\n` + contents.lastChild.childNodes.map(ach => `[${ach.querySelector("h6").text}](${query_base_url}${ach.firstChild.attributes.href})`).join(", "));
+                channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
+            }
+        });
     }
-    request({
-        url: `${query_base_url}/courses/${encodeURIComponent(course)}/users/${encodeURIComponent(user_id)}`,
-        jar: JAR
-    }, function(error, response, body) {
-        if (error || response.statusCode == 404) {
-            console.log(`Failed ${course}, ${user_id}`);
-            channel.send("Coursemology Query Failed!");
-        } else {
-            console.log("Parsing User Profile...");
-            let contents = parse(body).querySelector(".course-users");
-            if (!contents) return channel.send(`Query Failed! why are you even using this feature?`);
-            let user_info = contents.querySelector(".row").lastChild;
-            let name = user_info.querySelector("h2").text;
-            let embed = new Discord.RichEmbed().setTitle("Profile of " + name).setColor(0x21f8ff);
-            embed.addField("Email", user_info.querySelector("p").text).setThumbnail(contents.querySelector(".profile-box .image img").attributes.src)
-                .setDescription(`Achievements (${contents.lastChild.childNodes.length}):\n` + contents.lastChild.childNodes.map(ach => `[${ach.querySelector("h6").text}](${query_base_url}${ach.firstChild.attributes.href})`).join(", "));
-            channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
-        }
-    });
 }
 
 //update functions
