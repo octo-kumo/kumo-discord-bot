@@ -317,8 +317,8 @@ function exeStalk(course, user_id, json, channel, author) {
                 let embed = new Discord.RichEmbed().setTitle("Profile of " + name).setColor(0x21f8ff);
                 let desc = `Achievements (${contents.lastChild.childNodes.length}):\n` + contents.lastChild.childNodes.map(ach => `[${ach.querySelector("h6").text}](${query_base_url}${ach.firstChild.attributes.href})`).join(", ");
                 let image = contents.querySelector(".profile-box .image img").attributes.src;
-                if (image.endsWith("svg")) image = "https://res.cloudinary.com/chatboxzy/image/upload/v1573894537/5ab5c9ea15ce36d354a0798533f33a87e850b1db.png";
-                embed.addField("Email", user_info.querySelector("p").text).setThumbnail(image).setDescription(desc);
+                if (!image.endsWith("svg")) embed.setThumbnail(image);
+                embed.addField("Email", user_info.querySelector("p").text).setDescription(desc);
                 channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
             }
         });
