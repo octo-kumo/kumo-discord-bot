@@ -179,7 +179,7 @@ function exeInfo(course, id, json, channel, author) {
             });
             let object = {
                 name: result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text,
-                description: contents.querySelector(".well") ? contents.querySelector(".well").childNodes.map(p => p.text).join("\n") : null,
+                description: contents.querySelector(".well") ? contents.querySelector(".well").text : null,
                 type: contents.querySelector(".type td").text,
                 base_exp: contents.querySelector(".base_exp td").text,
                 bonus_exp: contents.querySelector(".bonus_exp td").text,
@@ -192,7 +192,7 @@ function exeInfo(course, id, json, channel, author) {
                 if (object.description) embed.setDescription(object.description);
                 embed.addField("Type", object.type, true);
                 embed.addField("EXP", `${object.base_exp} (${object.bonus_exp})`, true);
-                if (Object.keys(object.achievements).length > 0) embed.addField("Required for Achievements", Object.keys(object.achievements).map(a => `**${object.achievements[a].name}** ${object.achievements[a].description}`).join("\n").replace(/\n+/g, "\n"));
+                if (Object.keys(object.achievements).length > 0) embed.addField("Required for Achievements", Object.keys(object.achievements).map(a => `**${object.achievements[a].name}** ${object.achievements[a].description}`).join("\n"));
                 let files = [];
                 let linksInDiv = contents.querySelectorAll("div a");
                 for (var i = 0; i < linksInDiv.length; i++)
