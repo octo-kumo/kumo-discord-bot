@@ -117,7 +117,7 @@ function exeInfo(course, id, json, channel, author) {
 }
 
 function exeList(course, cat, tab, json, channel, author) {
-    if (debug) channel.send(`DEBUG: ${author.username} has requested list of assessment in category#${cat}, tab#${tab}, on course#${course}!`);
+    if (config.debug) channel.send(`DEBUG: ${author.username} has requested list of assessment in category#${cat}, tab#${tab}, on course#${course}!`);
     request({
         url: `${config.query_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)}`,
         jar: config.JAR
@@ -267,7 +267,7 @@ function updateLB(course) {
         jar: config.JAR
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
-            if (debug) config.HOOK.send(`DEBUG: Failed to access ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+            if (config.debug) config.HOOK.send(`DEBUG: Failed to access ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
         } else {
             let contents = parse(body).querySelector(".leaderboard-level tbody");
             if (!contents) return config.HOOK.send(`DEBUG: Course-Do-Not-Exist? ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
@@ -281,7 +281,7 @@ function updateLB(course) {
                     level: row.querySelector(".user-profile").lastChild.text
                 };
             });
-            if (debug) config.HOOK.send(`[Course#${course}] DEBUG: #1 on leaderboard is ${newLB[0].name}`);
+            if (config.debug) config.HOOK.send(`[Course#${course}] DEBUG: #1 on leaderboard is ${newLB[0].name}`);
             if (config.leaderboard[course]) {
                 let oldLB = config.leaderboard[course];
                 for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++)

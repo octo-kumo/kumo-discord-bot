@@ -51,9 +51,9 @@ client.on('message', async msg => {
     }
     if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg, PREFIX);
     if (command === "toggledebug" || command === "td") {
-        debug = !debug;
-        console.log("DEBUG TOGGLED, debug = " + debug)
-        msg.channel.send(`DEBUG: debug output has been turned ${debug?"on":"off"}!`);
+        config.debug = !config.debug;
+        console.log("DEBUG TOGGLED, debug = " + config.debug)
+        msg.channel.send(`DEBUG: debug output has been turned ${config.debug?"on":"off"}!`);
     }
     if (command === "shouldisleep" || command === "sleep" || command === "sis" || command === "zzz") {
         var currentHour = (new Date().getHours() + 8) % 24;
@@ -75,7 +75,7 @@ client.on('message', async msg => {
     }
     if (msg.author.id === "456001047756800000" && (command === "changebase" || command === "cb")) {
         config.query_base_url = args[0];
-        console.log("DEBUG TOGGLED, debug = " + debug)
+        console.log("Base Changed, query_base_url = " + config.query_base_url)
         msg.channel.send("Base URL changed to " + config.query_base_url);
     }
     console.log("====== Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
