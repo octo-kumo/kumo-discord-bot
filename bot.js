@@ -251,7 +251,7 @@ function exeLU(course, page, channel, author) {
     page = parseInt(page);
     let lines = [];
     let keys = Object.keys(users);
-    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page+1}/${Math.ceil(keys.length/NUMBER_OF_USER_PER_PAGE)+1})`).setColor(0x21f8ff);
+    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page}/${Math.ceil(keys.length/NUMBER_OF_USER_PER_PAGE)+1})`).setColor(0x21f8ff);
     console.log(`showing users from #${(page-1) * NUMBER_OF_USER_PER_PAGE} to #${Math.min(page * NUMBER_OF_USER_PER_PAGE, keys.length)}`);
     for (let i = (page - 1) * NUMBER_OF_USER_PER_PAGE; i < Math.min(page * NUMBER_OF_USER_PER_PAGE, keys.length); i++) {
         let key = keys[i];
