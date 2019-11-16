@@ -296,7 +296,7 @@ function updateLB(course) {
     });
 }
 
-exports.update = new function() {
+exports.update = function() {
     config.COURSES.forEach(course => {
         updateUsers(course);
         updateLB(course);
