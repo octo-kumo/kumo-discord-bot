@@ -283,11 +283,9 @@ function updateUsers(course) {
         if (error || response.statusCode == 404) {
             channel.send("Coursemology Query Failed!");
         } else {
-            console.log("Parsing User List...");
             let contents = parse(body).querySelector(".course-users");
             if (!contents) return channel.send(`Query has failed as ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard is not valid!`);
             let users = contents.querySelectorAll(".course_user");
-            console.log("Title = " + contents.firstChild.firstChild.firstChild.text);
             USERS_CACHE[course] = {};
             users.forEach(user => {
                 USERS_CACHE[course][user.id.substring(12)] = {
