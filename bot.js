@@ -315,8 +315,8 @@ function exeStalk(course, user_id, json, channel, author) {
                 let user_info = contents.querySelector(".row").lastChild;
                 let name = user_info.querySelector("h2").text;
                 let embed = new Discord.RichEmbed().setTitle("Profile of " + name).setColor(0x21f8ff);
-                embed.addField("Email", user_info.querySelector("p").text).setThumbnail(contents.querySelector(".profile-box .image img").attributes.src)
-                    .setDescription(`Achievements (${contents.lastChild.childNodes.length}):\n` + contents.lastChild.childNodes.map(ach => `[${ach.querySelector("h6").text}](${query_base_url}${ach.firstChild.attributes.href})`).join(", "));
+                let desc = `Achievements (${contents.lastChild.childNodes.length}):\n` + contents.lastChild.childNodes.map(ach => `[${ach.querySelector("h6").text}](${query_base_url}${ach.firstChild.attributes.href})`).join(", ");
+                embed.addField("Email", user_info.querySelector("p").text).setThumbnail(contents.querySelector(".profile-box .image img").attributes.src).setDescription(desc);
                 channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
             }
         });
