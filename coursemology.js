@@ -3,7 +3,7 @@ const parse = require('node-html-parser').parse;
 const config = require('./config.js').config;
 const Discord = require('discord.js');
 
-function exeInfo(course, id, json, channel, author) {
+exports.exeInfo = function(course, id, json, channel, author) {
     request({
         url: `${config.query_base_url}/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)}`,
         jar: config.JAR
@@ -49,7 +49,7 @@ function exeInfo(course, id, json, channel, author) {
     });
 }
 
-function exeList(course, cat, tab, json, channel, author) {
+exports.exeList = function(course, cat, tab, json, channel, author) {
     if (debug) channel.send(`DEBUG: ${author.username} has requested list of assessment in category#${cat}, tab#${tab}, on course#${course}!`);
     request({
         url: `${config.query_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)}`,
@@ -79,7 +79,7 @@ function exeList(course, cat, tab, json, channel, author) {
     });
 }
 
-function exeLB(course, type, json, channel, author) {
+exports.exeLB = function(course, type, json, channel, author) {
     if (isNaN(type))
         if (isNaN(type) && type === "achievement") type = 1;
         else type = 0;
@@ -109,7 +109,7 @@ function exeLB(course, type, json, channel, author) {
     });
 }
 
-function exeLU(course, page, json, channel, author) {
+exports.exeLU = function(course, page, json, channel, author) {
     let users = config.USERS_CACHE[course];
     if (isNaN(page) || !users) return channel.send("Course/Page not supported!");
     page = parseInt(page);
@@ -130,7 +130,7 @@ function exeLU(course, page, json, channel, author) {
     channel.send(embed);
 }
 
-function exeStalk(course, user_id, json, channel, author) {
+exports.exeStalk = function(course, user_id, json, channel, author) {
     if (isNaN(user_id)) {
         let users = config.USERS_CACHE[course];
         if (!users) return channel.send("Are you sure we have that course?");
@@ -172,7 +172,7 @@ function exeStalk(course, user_id, json, channel, author) {
 //update functions
 //TODO: to be expanded
 
-function updateUsers(course) {
+exports.updateUsers = function(course) {
     request({
         url: `https://nushigh.coursemology.org/courses/${course}/users`,
         jar: config.JAR
@@ -194,7 +194,7 @@ function updateUsers(course) {
     });
 }
 
-function updateLB() {
+exports.updateLB = function() {
     config.COURSES.forEach(course => {
         updateUsers(course);
         request({
