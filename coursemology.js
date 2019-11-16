@@ -203,7 +203,7 @@ function exeLU(course, page, json, channel, author) {
     let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page}/${Math.ceil(keys.length/config.NUMBER_OF_USER_PER_PAGE)})`).setColor(0x21f8ff);
     embed.fields = exeLUField(course, users, page, keys);
     embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
-    channel.send(embed).then(message => message.react(':arrow_left:').then(() => message.react(':negative_squared_cross_mark:')).then(() => message.react(':arrow_right:')).then(() => {
+    channel.send(embed).then(message => message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️')).then(() => {
         const collector = message.createReactionCollector(filter, {
             time: 900000
         });
