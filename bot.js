@@ -68,22 +68,27 @@ client.on('message', async msg => {
         m.edit(PING_EMBED);
     }
     if (command === "coursemology" || command === "cm") {
-        console.log("running coursemology sub-system...")
+        console.log("running coursemology sub-system...");
         if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard|user) [args]`");
+        let json = false;
+        if (args[args.length - 1] === "--json") {
+            args.pop();
+            json = true;
+        }
         switch (args.shift()) {
             case "i":
             case "info":
                 if (args.length == 1) args = [1706, args[0]];
                 console.log("info subcommand, local args = [" + args.join(", ") + "]")
                 if (args.length != 2) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology info [course id] assessment-id`");
-                exeInfo(args[0], args[1], msg.channel, msg.author);
+                exeInfo(args[0], args[1], json, msg.channel, msg.author);
                 break;
             case "l":
             case "list":
                 if (args.length == 2) args = [1706, args[0], args[1]];
                 console.log("list subcommand, local args = [" + args.join(", ") + "]")
                 if (args.length != 3) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology list [course id] category-id tab-id`")
-                exeList(args[0], args[1], args[2], msg.channel, msg.author);
+                exeList(args[0], args[1], args[2], json, msg.channel, msg.author);
                 break;
             case "lb":
             case "leaderboard":
@@ -94,28 +99,28 @@ client.on('message', async msg => {
                 }
                 console.log("leaderboard subcommand, local args = [" + args.join(", ") + "]");
                 if (args[0] === "help" || args[0] === "h") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology leaderboard [course id] [level|achievement]`")
-                exeLB(args[0], args[1], msg.channel, msg.author);
+                exeLB(args[0], args[1], json, msg.channel, msg.author);
                 break;
             case "u":
             case "stalk":
             case "user":
                 if (args.length == 0) {
                     console.log("user subcommand, no course, proceed to list all users...");
-                    exeLU(1706, 1, msg.channel, msg.author);
+                    exeLU(1706, 1, json, msg.channel, msg.author);
                 } else if (args.length == 1) {
                     console.log("user subcommand, only user provided, proceed to stalk that user...");
-                    exeStalk(1706, args[0], msg.channel, msg.author);
+                    exeStalk(1706, args[0], json, msg.channel, msg.author);
                 } else if (args.length == 2) {
                     if (args[0] === "list") {
                         console.log("user subcommand, course provided, requested list, proceed to list all users...");
-                        exeLU(args[1], 1, msg.channel, msg.author);
+                        exeLU(args[1], 1, json, msg.channel, msg.author);
                     } else {
                         console.log("user subcommand, all args provided, proceed to stalk that user...");
-                        exeStalk(args[0], args[1], msg.channel, msg.author);
+                        exeStalk(args[0], args[1], json, msg.channel, msg.author);
                     }
                 } else if (args.length == 3 && args[0] === "list") {
                     console.log("user subcommand, course, page, provided, requested list, proceed to list all users...");
-                    exeLU(args[1], args[2], msg.channel, msg.author);
+                    exeLU(args[1], args[2], json, msg.channel, msg.author);
                 } else {
                     console.log("user subcommand, invalid args, proceed to warn the user...");
                     return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology stalk [list] [course id] [user id]`");
@@ -154,7 +159,7 @@ client.on('message', async msg => {
     console.log("====== Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
 });
 
-function exeInfo(course, id, channel, author) {
+function exeInfo(course, id, json, channel, author) {
     request({
         url: `${query_base_url}/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)}`,
         jar: JAR
@@ -165,25 +170,42 @@ function exeInfo(course, id, channel, author) {
             let result = parse(body);
             let contents = result.querySelector("#assessment_" + id);
             if (!contents) return channel.send(`Query has failed as ${query_base_url}/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)} is not valid!`);
-            let embed = new Discord.RichEmbed().setTitle(result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text).setColor(0x21f8ff);
-            if (contents.querySelector(".well")) embed.setDescription(contents.querySelector(".well").text.replace(/<[^>]+>/g, ''));
-            embed.addField("Type", contents.querySelector(".type td").text);
-            embed.addField("EXP", contents.querySelector(".base_exp td").text + " (" + contents.querySelector(".bonus_exp td").text + ")");
-            let achievements = contents.querySelectorAll(".condition_assessment");
-            let required = achievements.map(a => a.rawText.replace(/<a.+>(.+)<\/a>(.+)/, "**$1** $2")).join("\n");
-            if (required) embed.addField("Required for Achievements", required, true);
-            let files = [];
-            let linksInDiv = contents.querySelectorAll("div a");
-            for (var i = 0; i < linksInDiv.length; i++)
-                if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) embed.addField(linksInDiv[i].text, "[Download](" + query_base_url + linksInDiv[i].attributes.href + ")");
-            embed.attachFiles(files);
-            embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
-            channel.send(embed);
+            let achievements = {};
+            contents.querySelectorAll(".condition_assessment").forEach(a => {
+                achievements[a.id.substring(21)] = {
+                    name: a.firstChild.text,
+                    description: a.lastChild.text
+                };
+            });
+            let object = {
+                name: result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text,
+                description: ccontents.querySelector(".well") ? ontents.querySelector(".well").text.replace(/<[^>]+>/g, '') : null,
+                type: contents.querySelector(".type td").text,
+                base_exp: contents.querySelector(".base_exp td").text,
+                bonus_exp: contents.querySelector(".bonus_exp td").text,
+                achievements: achievements
+            };
+            if (json) {
+                channel.send("```json\n" + JSON.stringify(object) + "\n```");
+            } else {
+                let embed = new Discord.RichEmbed().setTitle(object.title).setColor(0x21f8ff);
+                if (object.description) embed.setDescription(object.description);
+                embed.addField("Type", object.type, true);
+                embed.addField("EXP", `${object.base_exp} (${object.bonus_exp})`, true);
+                if (Object.keys(achievements).length > 0) embed.addField("Required for Achievements", Object.keys(achievements).map(a => `**${a.name}** ${a.description}`).join("\n"));
+                let files = [];
+                let linksInDiv = contents.querySelectorAll("div a");
+                for (var i = 0; i < linksInDiv.length; i++)
+                    if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) embed.addField(linksInDiv[i].text, "[Download](" + query_base_url + linksInDiv[i].attributes.href + ")");
+                embed.attachFiles(files);
+                embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
+                channel.send(embed);
+            }
         }
     });
 }
 
-function exeList(course, cat, tab, channel, author) {
+function exeList(course, cat, tab, json, channel, author) {
     if (debug) channel.send(`DEBUG: ${author.username} has requested list of assessment in category#${cat}, tab#${tab}, on course#${course}!`);
     request({
         url: `${query_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)}`,
@@ -213,7 +235,7 @@ function exeList(course, cat, tab, channel, author) {
     });
 }
 
-function exeLB(course, type, channel, author) {
+function exeLB(course, type, json, channel, author) {
     if (isNaN(type))
         if (isNaN(type) && type === "achievement") type = 1;
         else type = 0;
@@ -245,7 +267,7 @@ function exeLB(course, type, channel, author) {
     });
 }
 
-function exeLU(course, page, channel, author) {
+function exeLU(course, page, json, channel, author) {
     let users = USERS_CACHE[course];
     if (isNaN(page) || !users) return channel.send("Course/Page not supported!");
     page = parseInt(page);
@@ -266,7 +288,7 @@ function exeLU(course, page, channel, author) {
     channel.send(embed);
 }
 
-function exeStalk(course, user_id, channel, author) {
+function exeStalk(course, user_id, json, channel, author) {
     if (isNaN(user_id)) {
         let users = USERS_CACHE[course];
         let limit = 3;
