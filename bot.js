@@ -250,7 +250,8 @@ function exeLU(course, page, channel, author) {
     if (isNaN(page) || !users) return channel.send("Course/Page not supported!");
     let lines = [];
     let keys = Object.keys(users);
-    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page+1}/${Math.ceil(keys.length/NUMBER_OF_USER_PER_PAGE)})`).setColor(0x21f8ff);
+    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${(page+1)}/${Math.ceil(keys.length/NUMBER_OF_USER_PER_PAGE)})`).setColor(0x21f8ff);
+    console.log(`showing users from #${page * NUMBER_OF_USER_PER_PAGE} to #${Math.min((page + 1) * NUMBER_OF_USER_PER_PAGE, keys.length)}`);
     for (let i = page * NUMBER_OF_USER_PER_PAGE; i < Math.min((page + 1) * NUMBER_OF_USER_PER_PAGE, keys.length); i++) {
         let key = keys[i];
         lines.push({
