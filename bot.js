@@ -49,9 +49,7 @@ client.on('message', async msg => {
         console.log(` ping results obtained. lat = ${m.createdTimestamp - msg.createdTimestamp}, discord lat = ${Math.round(client.ping)}`);
         m.edit(PING_EMBED);
     }
-    if (command === "coursemology" || command === "cm") {
-        
-    }
+    if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg, PREFIX);
     if (command === "toggledebug" || command === "td") {
         debug = !debug;
         console.log("DEBUG TOGGLED, debug = " + debug)
