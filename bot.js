@@ -252,6 +252,16 @@ function exeLU(course, channel, author) {
 }
 
 function exeStalk(course, user_id, channel, author) {
+    if (isNaN(user_id)) {
+        let users = USERS_CACHE[course];
+        let limit = 3;
+        Object.keys(users).forEach(key => {
+            if (users[key].name.toUpperCase().includes(user_id) && limit > 0) {
+                limit--;
+                exeStalk(course, key, channel, author);
+            }
+        });
+    }
     request({
         url: `${query_base_url}/courses/${encodeURIComponent(course)}/users/${encodeURIComponent(user_id)}`,
         jar: JAR
