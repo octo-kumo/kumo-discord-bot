@@ -252,7 +252,8 @@ function exeLB(course, type, json, channel, author) {
             if (!contents) return channel.send(`Query has failed as ${query_base_url}/courses/${encodeURIComponent(course)}/leaderboard is not valid!`);
             let rows = contents.querySelectorAll("tr");
             let row1 = rows.shift();
-            let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text.trim()} _(${row1.querySelector(".user-profile").lastChild.text.trim()})_`).setColor(0x21f8ff);
+            let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text.trim()}${type==0?" _("+row1.querySelector(".user-profile").lastChild.text.trim()+")_":""}`).setColor(0x21f8ff);
+            embed.setURL(query_base_url + row1.querySelector(".user-profile div a").attributes.href)
             let thumbURL = row1.querySelector(".user-picture img").attributes.src;
             if (thumbURL.charAt(0) === "/") thumbURL = query_base_url + thumbURL;
             embed.setThumbnail(thumbURL);
@@ -260,7 +261,7 @@ function exeLB(course, type, json, channel, author) {
                 console.log(`        #${row.firstChild.text.trim()} ${row.querySelector(".user-profile div a").text.trim()}`);
                 return {
                     name: `#${row.firstChild.text.trim()}`,
-                    value: `[${row.querySelector(".user-profile div a").text.trim()}](${query_base_url}${row1.querySelector(".user-profile div a").attributes.href})${type==0?" _("+row1.querySelector(".user-profile").lastChild.text.trim()+")_":""}`
+                    value: `[${row.querySelector(".user-profile div a").text.trim()}](${query_base_url}${row.querySelector(".user-profile div a").attributes.href})${type==0?" _("+row.querySelector(".user-profile").lastChild.text.trim()+")_":""}`
                 };
             });
             channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
@@ -315,11 +316,12 @@ function exeStalk(course, user_id, json, channel, author) {
                 let user_info = contents.querySelector(".row").lastChild;
                 let name = user_info.querySelector("h2").text;
                 let embed = new Discord.RichEmbed().setTitle("Profile of " + name).setColor(0x21f8ff);
-                let desc = `Achievements (${contents.lastChild.childNodes.length}):\n` + contents.lastChild.childNodes.map(ach => `[${ach.querySelector("h6").text}](${query_base_url}${ach.firstChild.attributes.href})`).join(", ");
+                embed.setURL(`${query_base_url}/courses/${encodeURIComponent(course)}/users/${encodeURIComponent(user_id)}`);
+                let desc = `**Achievements (${contents.lastChild.childNodes.length}):**\n` + contents.lastChild.childNodes.map(ach => ach.querySelector("h6").text).join(", ");
                 let image = contents.querySelector(".profile-box .image img").attributes.src;
                 if (!image.endsWith("svg")) embed.setThumbnail(image);
                 console.log("DESC = " + desc);
-                embed.addField("Email", user_info.querySelector("p").text).setDescription(desc);
+                embed.addField("Email", user_info.querySelector("p").text, true).addField("ID", user_id, true).setDescription(desc);
                 channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
             }
         });
