@@ -28,7 +28,7 @@ const PING_EMBED = new Discord.RichEmbed().setTitle("Ping Results").setColor(0x2
 const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
     .addField(`${PREFIX}ping`, "Get the bot's ping")
     .addField(`${PREFIX}toggledebug`, "Toggle Debug Messages")
-    .addField(`${PREFIX}coursemology`, `Access Coursemology.\nCorrect Usage: \`${PREFIX}coursemology (info|list|leaderboard) [args]\``);
+    .addField(`${PREFIX}coursemology`, `Access Coursemology.\nUsage: \`${PREFIX}coursemology (info|list|leaderboard|user) [args]\``);
 
 console.log('====== ZY Discord Bot Started! ======');
 
@@ -68,7 +68,7 @@ client.on('message', async msg => {
     }
     if (command === "coursemology" || command === "cm") {
         console.log("running coursemology sub-system...")
-        if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard) [args]`");
+        if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard|user) [args]`");
         switch (args.shift()) {
             case "i":
             case "info":
