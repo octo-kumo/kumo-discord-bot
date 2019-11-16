@@ -248,11 +248,12 @@ function exeLB(course, type, channel, author) {
 function exeLU(course, page, channel, author) {
     let users = USERS_CACHE[course];
     if (isNaN(page) || !users) return channel.send("Course/Page not supported!");
+    page = parseInt(page);
     let lines = [];
     let keys = Object.keys(users);
-    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${(page+1)}/${Math.ceil(keys.length/NUMBER_OF_USER_PER_PAGE)})`).setColor(0x21f8ff);
-    console.log(`showing users from #${page * NUMBER_OF_USER_PER_PAGE} to #${Math.min((page + 1) * NUMBER_OF_USER_PER_PAGE, keys.length)}`);
-    for (let i = page * NUMBER_OF_USER_PER_PAGE; i < Math.min((page + 1) * NUMBER_OF_USER_PER_PAGE, keys.length); i++) {
+    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page+1}/${Math.ceil(keys.length/NUMBER_OF_USER_PER_PAGE)+1})`).setColor(0x21f8ff);
+    console.log(`showing users from #${(page-1) * NUMBER_OF_USER_PER_PAGE} to #${Math.min(page * NUMBER_OF_USER_PER_PAGE, keys.length)}`);
+    for (let i = (page - 1) * NUMBER_OF_USER_PER_PAGE; i < Math.min(page * NUMBER_OF_USER_PER_PAGE, keys.length); i++) {
         let key = keys[i];
         lines.push({
             name: key,
