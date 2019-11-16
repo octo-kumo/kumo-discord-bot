@@ -225,6 +225,7 @@ function handleReaction(r) {
     switch (r.emoji.name) {
         case '❎':
             r.message.delete();
+            delete listData[r.message.id];
             break;
         case '⬅️':
         case '➡️':
