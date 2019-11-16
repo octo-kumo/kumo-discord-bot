@@ -101,14 +101,14 @@ client.on('message', async msg => {
             case "user":
                 if (args.length == 0) {
                     console.log("user subcommand, no course, proceed to list all users...");
-                    exeLU(1706, 0, msg.channel, msg.author);
+                    exeLU(1706, 1, msg.channel, msg.author);
                 } else if (args.length == 1) {
                     console.log("user subcommand, only user provided, proceed to stalk that user...");
                     exeStalk(1706, args[0], msg.channel, msg.author);
                 } else if (args.length == 2) {
                     if (args[0] === "list") {
                         console.log("user subcommand, course provided, requested list, proceed to list all users...");
-                        exeLU(args[1], 0, msg.channel, msg.author);
+                        exeLU(args[1], 1, msg.channel, msg.author);
                     } else {
                         console.log("user subcommand, all args provided, proceed to stalk that user...");
                         exeStalk(args[0], args[1], msg.channel, msg.author);
