@@ -256,7 +256,7 @@ function exeStalk(course, user_id, channel, author) {
         let users = USERS_CACHE[course];
         let limit = 3;
         Object.keys(users).forEach(key => {
-            if (users[key].name.toUpperCase().includes(user_id.toUpperCase()) && limit > 0) {
+            if (users[key].name.toUpperCase().includes(user_id.toUpperCase()) && limit >= 0) {
                 limit--;
                 exeStalk(course, key, channel, author);
             }
