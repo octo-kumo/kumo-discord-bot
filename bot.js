@@ -179,7 +179,7 @@ function exeInfo(course, id, json, channel, author) {
             });
             let object = {
                 name: result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text,
-                description: contents.querySelector(".well") ? contents.querySelector(".well").text.replace(/<[^>]+>/g, '') : null,
+                description: contents.querySelector(".well") ? contents.querySelector(".well").text.replace(/<\/(h[1-9]|p)>/g, "\n").replace(/<[^>]+>/g, '') : null,
                 type: contents.querySelector(".type td").text,
                 base_exp: contents.querySelector(".base_exp td").text,
                 bonus_exp: contents.querySelector(".bonus_exp td").text,
@@ -188,11 +188,11 @@ function exeInfo(course, id, json, channel, author) {
             if (json) {
                 channel.send("```json\n" + JSON.stringify(object) + "\n```");
             } else {
-                let embed = new Discord.RichEmbed().setTitle(object.title).setColor(0x21f8ff);
+                let embed = new Discord.RichEmbed().setTitle(object.name).setColor(0x21f8ff);
                 if (object.description) embed.setDescription(object.description);
                 embed.addField("Type", object.type, true);
                 embed.addField("EXP", `${object.base_exp} (${object.bonus_exp})`, true);
-                if (Object.keys(achievements).length > 0) embed.addField("Required for Achievements", Object.keys(achievements).map(a => `**${a.name}** ${a.description}`).join("\n"));
+                if (Object.keys(object.achievements).length > 0) embed.addField("Required for Achievements", Object.keys(object.achievements).map(a => `**${a.name}** ${a.description}`).join("\n"));
                 let files = [];
                 let linksInDiv = contents.querySelectorAll("div a");
                 for (var i = 0; i < linksInDiv.length; i++)
