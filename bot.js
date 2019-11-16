@@ -192,7 +192,7 @@ function exeInfo(course, id, json, channel, author) {
                 if (object.description) embed.setDescription(object.description);
                 embed.addField("Type", object.type, true);
                 embed.addField("EXP", `${object.base_exp} (${object.bonus_exp})`, true);
-                if (Object.keys(object.achievements).length > 0) embed.addField("Required for Achievements", Object.keys(object.achievements).map(a => `**${object.achievements[a].name}** ${object.achievements[a].description}`).join("\n").replace(/[\n]+/g, "\n"));
+                if (Object.keys(object.achievements).length > 0) embed.addField("Required for Achievements", Object.keys(object.achievements).map(a => `**${object.achievements[a].name}** ${object.achievements[a].description}`).join("\n").replace(/\n+/g, "\n"));
                 let files = [];
                 let linksInDiv = contents.querySelectorAll("div a");
                 for (var i = 0; i < linksInDiv.length; i++)
