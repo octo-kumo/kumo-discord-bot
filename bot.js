@@ -257,13 +257,10 @@ function exeLB(course, type, json, channel, author) {
             let thumbURL = row1.querySelector(".user-picture img").attributes.src;
             if (thumbURL.charAt(0) === "/") thumbURL = query_base_url + thumbURL;
             embed.setThumbnail(thumbURL);
-            embed.fields = rows.map(row => {
+            embed.setDescription(rows.map(row => {
                 console.log(`        #${row.firstChild.text.trim()} ${row.querySelector(".user-profile div a").text.trim()}`);
-                return {
-                    name: `#${row.firstChild.text.trim()}`,
-                    value: `[${row.querySelector(".user-profile div a").text.trim()}](${query_base_url}${row.querySelector(".user-profile div a").attributes.href})${type==0?" _("+row.querySelector(".user-profile").lastChild.text.trim()+")_":""}`
-                };
-            });
+                return `#${row.firstChild.text.trim()} [${row.querySelector(".user-profile div a").text.trim()}](${query_base_url}${row.querySelector(".user-profile div a").attributes.href})${type==0?" _("+row.querySelector(".user-profile").lastChild.text.trim()+")_":""}`;
+            }).join("\n"));
             channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
         }
     });
