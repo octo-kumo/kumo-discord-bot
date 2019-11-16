@@ -1,4 +1,36 @@
 exports.config = {
+    list_presets: {
+        "1706": {
+            labs: {
+                cat: 1880,
+                tab: 3080
+            },
+            reviews: {
+                cat: 1880,
+                tab: 3081
+            }
+        },
+        "1389": {
+            labs: {
+                cat: 1662,
+                tab: 2638
+            },
+            reviews: {
+                cat: 1662,
+                tab: 2706
+            }
+        },
+        "1613": {
+            labs: {
+                cat: 145,
+                tab: 217
+            },
+            reviews: {
+                cat: 145,
+                tab: 218
+            }
+        }
+    },
     query_base_url: "https://nushigh.coursemology.org",
     debug: false,
     leaderboard: {},
