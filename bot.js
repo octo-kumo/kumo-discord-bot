@@ -62,8 +62,8 @@ client.on('message', async msg => {
         if (currentHour < 6 || currentHour > 21) {
             let embed = new Discord.RichEmbed().setTitle("You should go to **sleep**!").setColor(0x21f8ff);
             embed.setDescription("It is so late right now, better go and sleep **" + msg.author.username + "**");
-            if (currentHour < 6 && currentHour > 2) embed.setThumbnail(SLEEP_LATE[Math.floor(Math.random() * SLEEP_LATE.length)]);
-            else embed.setThumbnail(SLEEP_IMAGES[Math.floor(Math.random() * SLEEP_IMAGES.length)]);
+            if (currentHour < 6 && currentHour > 2) embed.setThumbnail(config.SLEEP_LATE[Math.floor(Math.random() * config.SLEEP_LATE.length)]);
+            else embed.setThumbnail(config.SLEEP_IMAGES[Math.floor(Math.random() * config.SLEEP_IMAGES.length)]);
             msg.channel.send(embed);
             console.log("told " + msg.author.username + " to to goto sleep");
         } else {
