@@ -253,7 +253,9 @@ function exeLU(course, page, json, nameFilter, channel, author) {
                     break;
                 case '⬅️':
                 case '➡️':
+                    let oldPage = listData[r.message.id].page;
                     listData[r.message.id].page = Math.min(Math.max(listData[r.message.id].page + (r.emoji.name === '⬅️' ? -1 : 1), 1), listData[r.message.id].maxPage);
+                    if (oldPage == listData[r.message.id].page) break;
                     console.log(`Changing Page to ${listData[r.message.id].page}`);
                     listData[r.message.id].embed.fields = exeLUField(listData[r.message.id].course, listData[r.message.id].users, listData[r.message.id].page, Object.keys(listData[r.message.id].users));
                     listData[r.message.id].embed.title = `Students of Course#${listData[r.message.id].course} (${listData[r.message.id].page}/${listData[r.message.id].maxPage})`;
