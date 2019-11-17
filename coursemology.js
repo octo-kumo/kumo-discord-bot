@@ -51,14 +51,17 @@ exports.handleCommand = function(args, msg, PREFIX) {
         case "users":
             if (args.length == 0) {
                 console.log("users subcommand, no course, proceed to list users of DEFAULT_COURSE...");
-                exeLU(config.DEFAULT_COURSE, 1, json, msg.channel, msg.author);
+                exeLU(config.DEFAULT_COURSE, 1, json, "", msg.channel, msg.author);
             } else if (args.length == 1) {
                 if (args[0] === "help") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology listusers [course id] [page number]`");
                 console.log("users subcommand, course provided, proceed to list users of specified course #" + args[0] + "...");
-                exeLU(args[0], 1, json, msg.channel, msg.author);
+                exeLU(args[0], 1, json, "", msg.channel, msg.author);
             } else if (args.length == 2) {
                 console.log("users subcommand, course and page provided, proceed to list users of specified course #" + args[0] + " on page #" + args[1] + "...");
-                exeLU(args[0], args[1], json, msg.channel, msg.author);
+                exeLU(args[0], args[1], json, "", msg.channel, msg.author);
+            } else if (args.length == 3) {
+                console.log("users subcommand, course and page provided, even filter is provided, proceed to list users of specified course #" + args[0] + " on page #" + args[1] + "...");
+                exeLU(args[0], args[1], json, "", msg.channel, msg.author);
             }
             break;
         case "u":
@@ -204,12 +207,13 @@ function exeLUField(course, users, page, keys) {
     return lines;
 }
 
-function exeLU(course, page, json, channel, author) {
+function exeLU(course, page, json, filter, channel, author) {
     let users = config.USERS_CACHE[course];
     if (isNaN(page) || !users) {
         console.log(`error, course = ${course}, page = ${page}, json = ${json}`);
         return channel.send("Course/Page not supported!");
     }
+    if (filter) users = users.filter(user => user.name.toUpperCase().includes(filter.toUpperCase()));
     let keys = Object.keys(users);
     page = parseInt(page);
     let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page}/${Math.ceil(keys.length/config.NUMBER_OF_USER_PER_PAGE)})`).setColor(0x21f8ff);
