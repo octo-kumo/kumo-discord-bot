@@ -229,44 +229,46 @@ function exeLU(course, page, json, nameFilter, channel, author) {
     if (nameFilter) users = filterObject(users, user => user.name.toUpperCase().includes(nameFilter.toUpperCase()));
     let keys = Object.keys(users);
     page = parseInt(page);
-    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page}/${Math.ceil(keys.length/config.NUMBER_OF_USER_PER_PAGE)})`).setColor(0x21f8ff);
+    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course}${Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE)>1?` (${page}/${Math.ceil(keys.length/config.NUMBER_OF_USER_PER_PAGE)}`:""}`).setColor(0x21f8ff);
     embed.fields = exeLUField(course, users, page, keys);
     embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
-    channel.send(embed).then(message => message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️')).then(() => {
-        listData[message.id] = {
-            course: course,
-            users: users,
-            page: page,
-            message: message,
-            embed: embed,
-            maxPage: Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE)
-        };
-        const collector = message.createReactionCollector(filter, {
-            time: 900000
+    channel.send(embed).then(message => {
+        if (Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE) > 1) message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️')).then(() => {
+            listData[message.id] = {
+                course: course,
+                users: users,
+                page: page,
+                message: message,
+                embed: embed,
+                maxPage: Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE)
+            };
+            const collector = message.createReactionCollector(filter, {
+                time: 900000
+            });
+            collector.on('collect', r => {
+                console.log(`Collected ${r.emoji.name}`);
+                switch (r.emoji.name) {
+                    case '❎':
+                        r.message.delete();
+                        delete listData[r.message.id];
+                        break;
+                    case '⬅️':
+                    case '➡️':
+                        let oldPage = listData[r.message.id].page;
+                        listData[r.message.id].page = Math.min(Math.max(listData[r.message.id].page + (r.emoji.name === '⬅️' ? -1 : 1), 1), listData[r.message.id].maxPage);
+                        if (oldPage == listData[r.message.id].page) break;
+                        console.log(`Changing Page to ${listData[r.message.id].page}`);
+                        listData[r.message.id].embed.fields = exeLUField(listData[r.message.id].course, listData[r.message.id].users, listData[r.message.id].page, Object.keys(listData[r.message.id].users));
+                        listData[r.message.id].embed.title = `Students of Course#${listData[r.message.id].course} (${listData[r.message.id].page}/${listData[r.message.id].maxPage})`;
+                        console.log(`Changing Title to ${listData[r.message.id].embed.title}`);
+                        listData[r.message.id].message.edit(listData[r.message.id].embed);
+                        message.clearReactions().then(() => message.react('⬅️')).then(() => message.react('❎')).then(() => message.react('➡️'));
+                        break;
+                }
+            });
+            collector.on('end', message.delete);
         });
-        collector.on('collect', r => {
-            console.log(`Collected ${r.emoji.name}`);
-            switch (r.emoji.name) {
-                case '❎':
-                    r.message.delete();
-                    delete listData[r.message.id];
-                    break;
-                case '⬅️':
-                case '➡️':
-                    let oldPage = listData[r.message.id].page;
-                    listData[r.message.id].page = Math.min(Math.max(listData[r.message.id].page + (r.emoji.name === '⬅️' ? -1 : 1), 1), listData[r.message.id].maxPage);
-                    if (oldPage == listData[r.message.id].page) break;
-                    console.log(`Changing Page to ${listData[r.message.id].page}`);
-                    listData[r.message.id].embed.fields = exeLUField(listData[r.message.id].course, listData[r.message.id].users, listData[r.message.id].page, Object.keys(listData[r.message.id].users));
-                    listData[r.message.id].embed.title = `Students of Course#${listData[r.message.id].course} (${listData[r.message.id].page}/${listData[r.message.id].maxPage})`;
-                    console.log(`Changing Title to ${listData[r.message.id].embed.title}`);
-                    listData[r.message.id].message.edit(listData[r.message.id].embed);
-                    message.clearReactions().then(() => message.react('⬅️')).then(() => message.react('❎')).then(() => message.react('➡️'));
-                    break;
-            }
-        });
-        collector.on('end', message.delete);
-    }));
+    });
 }
 
 function exeStalk(course, user_id, json, channel, author) {
