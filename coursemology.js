@@ -68,7 +68,7 @@ exports.handleCommand = function(args, msg, PREFIX) {
                 if (args[0] === "help") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology user [course id] [user id/name]`");
                 console.log("user subcommand, only user provided, proceed to stalk that user...");
                 exeStalk(config.DEFAULT_COURSE, args[0], json, msg.channel, msg.author);
-            } else if (args.length == 2) {
+            } else if (args.length == 2 && !isNaN(args[0])) {
                 console.log("user subcommand, all args provided, proceed to stalk that user...");
                 exeStalk(args[0], args[1], json, msg.channel, msg.author);
             } else {
