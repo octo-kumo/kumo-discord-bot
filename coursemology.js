@@ -226,7 +226,7 @@ function exeLU(course, page, json, nameFilter, channel, author) {
         console.log(`error, course = ${course}, page = ${page}, json = ${json}`);
         return channel.send("Course/Page not supported!");
     }
-    if (nameFilter) users = users.filter(user => user.name.toUpperCase().includes(nameFilter.toUpperCase()));
+    if (nameFilter) users = filter(users, user => user.name.toUpperCase().includes(nameFilter.toUpperCase()));
     let keys = Object.keys(users);
     page = parseInt(page);
     let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page}/${Math.ceil(keys.length/config.NUMBER_OF_USER_PER_PAGE)})`).setColor(0x21f8ff);
@@ -369,4 +369,15 @@ exports.update = function() {
         updateUsers(course);
         updateLB(course);
     });
+}
+
+function filter(obj, predicate) {
+    var result = {};
+    var key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key) && predicate(obj[key])) {
+            result[key] = obj[key];
+        }
+    }
+    return result;
 }
