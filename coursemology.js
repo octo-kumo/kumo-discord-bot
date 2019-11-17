@@ -229,7 +229,7 @@ function exeLU(course, page, json, nameFilter, channel, author) {
     if (nameFilter) users = filterObject(users, user => user.name.toUpperCase().includes(nameFilter.toUpperCase()));
     let keys = Object.keys(users);
     page = parseInt(page);
-    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course}${Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE)>1?` (${page}/${Math.ceil(keys.length/config.NUMBER_OF_USER_PER_PAGE)}`:""}`).setColor(0x21f8ff);
+    let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course}${Math.ceil(keys.length / config.NUMBER_OF_USER_PER_PAGE)>1?` (${page}/${Math.ceil(keys.length/config.NUMBER_OF_USER_PER_PAGE)})`:""}`).setColor(0x21f8ff);
     embed.fields = exeLUField(course, users, page, keys);
     embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
     channel.send(embed).then(message => {
