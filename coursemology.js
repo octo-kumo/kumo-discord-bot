@@ -214,7 +214,7 @@ function exeLUField(course, users, page, keys) {
         let key = keys[i];
         lines.push({
             name: key,
-            value: users[key].name
+            value: `[${users[key].name}](${config.query_base_url}/courses/${encodeURIComponent(course)}/users/${encodeURIComponent(key)})`
         });
     }
     return lines;
@@ -299,11 +299,9 @@ function exeStalk(course, user_id, json, channel, author) {
                 let name = user_info.querySelector("h2").text;
                 let embed = new Discord.RichEmbed().setTitle("Profile of " + name).setColor(0x21f8ff);
                 embed.setURL(`${config.query_base_url}/courses/${encodeURIComponent(course)}/users/${encodeURIComponent(user_id)}`);
-                let desc = `**Achievements (${contents.lastChild.childNodes.length}):**\n` + contents.lastChild.childNodes.map(ach => ach.querySelector("h6").text).join(", ");
                 let image = contents.querySelector(".profile-box .image img").attributes.src;
                 if (!image.endsWith("svg")) embed.setThumbnail(image);
-                console.log("DESC = " + desc);
-                embed.addField("Email", user_info.querySelector("p").text, true).addField("ID", user_id, true).setDescription(desc);
+                embed.addField("ID", user_id, true).addField("Email", user_info.querySelector("p").text, true).addField(`Achievements (${contents.lastChild.childNodes.length})`, contents.lastChild.childNodes.map(ach => ach.querySelector("h6").text).join(", "));
                 channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
             }
         });
