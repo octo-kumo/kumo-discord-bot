@@ -3,6 +3,9 @@ const parse = require('node-html-parser').parse;
 const config = require('./config.js').config;
 const Discord = require('discord.js');
 
+const filter = (reaction, user) => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name) && user.id !== config.id;
+const listData = {};
+
 exports.handleCommand = function(args, msg, PREFIX) {
     console.log("running coursemology sub-system...");
     if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard|listusers|user) [args]`");
@@ -195,9 +198,6 @@ function exeLUField(course, users, page, keys) {
     }
     return lines;
 }
-
-const filter = (reaction, user) => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name) && user.id !== config.id;
-const listData = {};
 
 function exeLU(course, page, json, channel, author) {
     let users = config.USERS_CACHE[course];

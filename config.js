@@ -50,6 +50,44 @@ exports.config = {
     DEFAULT_COURSE: 1706,
     NUMBER_OF_USER_PER_PAGE: 8,
     COURSES: [1706, 1389, 614, 1613],
-    SLEEP_IMAGES: ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747146/sleep_1.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_2.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_3.jpg", "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_4.jpg"],
+    SLEEP_IMAGES: [
+        "https://res.cloudinary.com/chatboxzy/image/upload/v1573747146/sleep_1.jpg",
+        "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_2.jpg",
+        "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_3.jpg",
+        "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_4.jpg",
+        "https://res.cloudinary.com/chatboxzy/image/upload/v1573975487/sleep_5.jpg",
+        "https://res.cloudinary.com/chatboxzy/image/upload/v1573975487/sleep_6.jpg",
+        "https://res.cloudinary.com/chatboxzy/image/upload/v1573975487/sleep_7.jpg",
+        "https://res.cloudinary.com/chatboxzy/image/upload/v1573975640/sleep_8.jpg",
+        "https://res.cloudinary.com/chatboxzy/image/upload/v1573976437/sleep_9.jpg"
+    ],
+    SLEEP_MESSAGES: [{
+        title: "It is late",
+        body: "It is so late in the night.\nIn fact if you sleep now, you will wake up feeling less miserable ${username}."
+    }, {
+        title: "**Ernest Hemingway** once said",
+        body: "_I love sleep. My life has the tendency to fall apart when I'm awake, you know._\nDon't you agree, ${username}?"
+    }, {
+        title: "Just ***Sleep***",
+        body: "When you go to sleep, you die. And the next morning, when you wake up, you are reborn!\nJust go and kill yourself ${username}"
+    }, {
+        title: "Sleep = Isekai?",
+        body: "SLEEP NOW YOU WEEB"
+    }, {
+        title: "Wanna hear a joke?",
+        body: "**Sleep**\n**${username}**: wat\nLol, in fact, I dont get it either."
+    }, {
+        title: "Sleeping is ***easy***",
+        body: "Sleeping is so easy an average man can do it with his **eyes closed**."
+    }, {
+        title: "Are you impatient?",
+        body: "You are not even sleeping, and yet you already can't wait for tomorrow.\nGuess the world is not fair making ${username}'s days so great."
+    }, {
+        title: "Are you sleeping?",
+        body: "Nah you are just resting your eyes. I know you are, ${username}."
+    }, {
+        title: "Don't give up on your dreams!",
+        body: "Go on and sleep!\nDon't you have dreams, ${username}?"
+    }],
     SLEEP_LATE: ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747132/sleep_late.jpg"]
 }

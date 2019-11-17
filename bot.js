@@ -14,7 +14,8 @@ const PING_EMBED = new Discord.RichEmbed().setTitle("Ping Results").setColor(0x2
 const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
     .addField(`${PREFIX}ping`, "Get the bot's ping")
     .addField(`${PREFIX}toggledebug`, "Toggle Debug Messages")
-    .addField(`${PREFIX}coursemology`, `Access Coursemology.\nUsage: \`${PREFIX}coursemology (info|list|leaderboard|listusers|user) [args]\``);
+    .addField(`${PREFIX}coursemology`, `Access Coursemology.\nUsage: \`${PREFIX}coursemology (info|list|leaderboard|listusers|user) [args]\``)
+    .addField(`${PREFIX}sleep`, "Tell you whether or not you should sleep.")
 
 console.log('====== ZY Discord Bot Started! ======');
 
@@ -60,8 +61,9 @@ client.on('message', async msg => {
         var currentHour = (new Date().getHours() + 8) % 24;
         console.log("current hour = " + currentHour);
         if (currentHour < 6 || currentHour > 21) {
-            let embed = new Discord.RichEmbed().setTitle("You should go to **sleep**!").setColor(0x21f8ff);
-            embed.setDescription("It is so late right now, better go and sleep **" + msg.author.username + "**");
+            let preset = config.SLEEP_MESSAGES[Math.floor(Math.random() * config.SLEEP_MESSAGES.length)];
+            let embed = new Discord.RichEmbed().setTitle(preset.title.replace("${username}", msg.author.username)).setColor(0x21f8ff);
+            embed.setDescription(preset.body.replace("${username}", msg.author.username));
             if (currentHour < 6 && currentHour > 2) embed.setThumbnail(config.SLEEP_LATE[Math.floor(Math.random() * config.SLEEP_LATE.length)]);
             else embed.setThumbnail(config.SLEEP_IMAGES[Math.floor(Math.random() * config.SLEEP_IMAGES.length)]);
             msg.channel.send(embed);
@@ -79,6 +81,7 @@ client.on('message', async msg => {
         console.log("Base Changed, query_base_url = " + config.query_base_url)
         msg.channel.send("Base URL changed to " + config.query_base_url);
     }
+
     console.log("====== Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
 });
 
