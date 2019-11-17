@@ -27,8 +27,11 @@ exports.handleCommand = function(args, msg, PREFIX) {
             if (args.length == 1) args = [config.DEFAULT_COURSE, args[0]];
             if (args.length == 2) {
                 if (isNaN(args[1])) {
-                    let preset = config.list_presets[args[0]][args[1]];
-                    if (preset) args = [args[0], preset.cat, preset.tab];
+                    let course = config.list_presets[args[0]];
+                    if (course) {
+                        let preset = course[args[1]];
+                        if (preset) args = [args[0], preset.cat, preset.tab];
+                    }
                 } else args = [config.DEFAULT_COURSE, args[0], args[1]];
             }
             console.log("list subcommand, local args = [" + args.join(", ") + "]")
