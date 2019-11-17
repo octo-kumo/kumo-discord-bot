@@ -220,13 +220,13 @@ function exeLUField(course, users, page, keys) {
     return lines;
 }
 
-function exeLU(course, page, json, filter, channel, author) {
+function exeLU(course, page, json, nameFilter, channel, author) {
     let users = config.USERS_CACHE[course];
     if (isNaN(page) || !users) {
         console.log(`error, course = ${course}, page = ${page}, json = ${json}`);
         return channel.send("Course/Page not supported!");
     }
-    if (filter) users = users.filter(user => user.name.toUpperCase().includes(filter.toUpperCase()));
+    if (nameFilter) users = users.filter(user => user.name.toUpperCase().includes(nameFilter.toUpperCase()));
     let keys = Object.keys(users);
     page = parseInt(page);
     let embed = new Discord.RichEmbed().setTitle(`Students of Course#${course} (${page}/${Math.ceil(keys.length/config.NUMBER_OF_USER_PER_PAGE)})`).setColor(0x21f8ff);
