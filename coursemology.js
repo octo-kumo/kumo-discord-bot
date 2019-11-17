@@ -50,18 +50,28 @@ exports.handleCommand = function(args, msg, PREFIX) {
         case "lu":
         case "users":
             if (args.length == 0) {
-                console.log("users subcommand, no course, proceed to list users of DEFAULT_COURSE...");
+                console.log("users subcommand, no course/filter, proceed to list users of DEFAULT_COURSE...");
                 exeLU(config.DEFAULT_COURSE, 1, json, "", msg.channel, msg.author);
             } else if (args.length == 1) {
                 if (args[0] === "help") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology listusers [course id] [page number]`");
-                console.log("users subcommand, course provided, proceed to list users of specified course #" + args[0] + "...");
-                exeLU(args[0], 1, json, "", msg.channel, msg.author);
+                if (isNaN(args[0])) {
+                    console.log("users subcommand, filter provided, proceed to list users of filter \"" + filter + "\"...");
+                    exeLU(config.DEFAULT_COURSE, 1, json, args[0], msg.channel, msg.author);
+                } else {
+                    console.log("users subcommand, course provided, proceed to list users of specified course #" + args[0] + "...");
+                    exeLU(args[0], 1, json, "", msg.channel, msg.author);
+                }
             } else if (args.length == 2) {
-                console.log("users subcommand, course and page provided, proceed to list users of specified course #" + args[0] + " on page #" + args[1] + "...");
-                exeLU(args[0], args[1], json, "", msg.channel, msg.author);
-            } else if (args.length == 3) {
+                if (isNaN(args[1])) {
+                    console.log("users subcommand, course and filter provided, proceed to list users of specified course #" + args[0] + " and filter \"" + args[1] + "\"...");
+                    exeLU(args[0], 1, json, args[1], msg.channel, msg.author);
+                } else {
+                    console.log("users subcommand, course and page provided, proceed to list users of specified course #" + args[0] + " on page #" + args[1] + "...");
+                    exeLU(args[0], args[1], json, "", msg.channel, msg.author);
+                }
+            } else {
                 console.log("users subcommand, course and page provided, even filter is provided, proceed to list users of specified course #" + args[0] + " on page #" + args[1] + "...");
-                exeLU(args[0], args[1], json, "", msg.channel, msg.author);
+                exeLU(args[0], args[1], json, args.slice(2).join(" "), msg.channel, msg.author);
             }
             break;
         case "u":
