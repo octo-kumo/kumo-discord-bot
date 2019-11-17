@@ -259,9 +259,12 @@ function exeLU(course, page, json, nameFilter, channel, author) {
                     listData[r.message.id].embed.title = `Students of Course#${listData[r.message.id].course} (${listData[r.message.id].page}/${listData[r.message.id].maxPage})`;
                     console.log(`Changing Title to ${listData[r.message.id].embed.title}`);
                     listData[r.message.id].message.edit(listData[r.message.id].embed);
+                    message.clearReactions();
+                    message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️'));
                     break;
             }
         });
+        collector.on('end', message.delete);
     }));
 }
 
