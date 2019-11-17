@@ -72,8 +72,13 @@ exports.handleCommand = function(args, msg, PREFIX) {
                 console.log("user subcommand, all args provided, proceed to stalk that user...");
                 exeStalk(args[0], args[1], json, msg.channel, msg.author);
             } else {
-                console.log("user subcommand, contains longer name, proceed to join args and search for user");
-                exeStalk(args[0], args.slice(1).join(" "), json, msg.channel, msg.author);
+                if (isNaN(args[0])) {
+                    console.log("user subcommand, no course, contains longer name, proceed to join args and search for user");
+                    exeStalk(config.DEFAULT_COURSE, args.join(" "), json, msg.channel, msg.author);
+                } else {
+                    console.log("user subcommand, course provided, contains longer name, proceed to join args and search for user");
+                    exeStalk(args[0], args.slice(1).join(" "), json, msg.channel, msg.author);
+                }
             }
             break;
     }
