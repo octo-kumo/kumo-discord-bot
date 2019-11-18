@@ -53,7 +53,7 @@ client.on('message', async msg => {
         m.edit(PING_EMBED);
     }
     if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg, PREFIX);
-    if (command === "azurlane" || command === "al") azurlane.handleCommnd(args, msg, PREFIX);
+    if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommnd(args, msg, PREFIX);
     if (msg.author.id === "456001047756800000" && (command === "toggledebug" || command === "td")) {
         config.debug = !config.debug;
         console.log("DEBUG TOGGLED, debug = " + config.debug)
