@@ -297,7 +297,8 @@ function exeLU(course, page, json, nameFilter, channel, author) {
                         listData[r.message.id].embed.title = `Students of Course#${listData[r.message.id].course} (${listData[r.message.id].page}/${listData[r.message.id].maxPage})`;
                         console.log(`Changing Title to ${listData[r.message.id].embed.title}`);
                         listData[r.message.id].message.edit(listData[r.message.id].embed);
-                        message.reactions.forEach(reaction => reaction.users.filter((id, user) => id !== config.id).forEach((id, user) => reaction.remove(user)));
+
+                        message.reactions.forEach(reaction => reaction.users.filter(user => user.id !== config.id).forEach((id, user) => reaction.remove(user)));
                         break;
                 }
             });
