@@ -50,6 +50,7 @@ exports.config = {
     DEFAULT_COURSE: 1706,
     NUMBER_OF_USER_PER_PAGE: 8,
     COURSES: [1706, 1389, 614, 1613],
+    COURSE_NAMES: ["CS3233 Object Oriented Programming II AY2019", "CS3231 Object Oriented Programming I AY2019", "CS2231 Introduction to Programming AY2018S1", "CS1131 Computational Thinking AY2017"],
     SLEEP_IMAGES: [
         "https://res.cloudinary.com/chatboxzy/image/upload/v1573747146/sleep_1.jpg",
         "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_2.jpg",

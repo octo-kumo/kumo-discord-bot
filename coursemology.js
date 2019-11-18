@@ -97,6 +97,14 @@ exports.handleCommand = function(args, msg, PREFIX) {
                 }
             }
             break;
+        case "courses":
+        case "cs":
+        case "listcourse":
+            let embed = new Discord.RichEmbed("Avaliable Courses");
+            for (let i = 0; i < config.COURSES.length; i++) embed.addField(config.COURSES[i], config.COURSE_NAMES[i]);
+            embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
+            msg.channel.send(embed);
+            break;
     }
 }
 
