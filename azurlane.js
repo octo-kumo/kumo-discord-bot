@@ -55,7 +55,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                 embed.setDescription("_All stats shown below are lv120 stats._");
                 msg.channel.send(embed);
             } catch (err) {
-                console.log(`ship subcommand, err code = ${err.statusCode}, args = ${args}`);
+                console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
                 msg.channel.send("Invalid ship name.");
             }
             break;
