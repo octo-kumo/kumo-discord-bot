@@ -58,14 +58,18 @@ exports.handleCommand = function(args, msg, PREFIX) {
             } else if (args.length == 1) {
                 if (args[0] === "help") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology listusers [course id] [page number]`");
                 if (isNaN(args[0])) {
-                    console.log("users subcommand, filter provided, proceed to list users of filter \"" + filter + "\"...");
+                    console.log("users subcommand, filter provided, proceed to list users of filter \"" + args[0] + "\"...");
                     exeLU(config.DEFAULT_COURSE, 1, json, args[0], msg.channel, msg.author);
                 } else {
                     console.log("users subcommand, course provided, proceed to list users of specified course #" + args[0] + "...");
                     exeLU(args[0], 1, json, "", msg.channel, msg.author);
                 }
             } else if (args.length == 2) {
-                if (isNaN(args[1])) {
+                if (isNaN(args[0])) {
+                    let filter = args.join(" ");
+                    console.log("users subcommand, filter provided, proceed to list users of filter \"" + filter + "\"...");
+                    exeLU(config.DEFAULT_COURSE, 1, json, filter, msg.channel, msg.author);
+                } else if (isNaN(args[1])) {
                     console.log("users subcommand, course and filter provided, proceed to list users of specified course #" + args[0] + " and filter \"" + args[1] + "\"...");
                     exeLU(args[0], 1, json, args[1], msg.channel, msg.author);
                 } else {
