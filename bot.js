@@ -4,6 +4,7 @@ const request = require('request');
 const parse = require('node-html-parser').parse;
 const config = require('./config.js').config;
 const coursemology = require('./coursemology.js');
+const azurlane = require('./azurlane.js');
 
 // Constants
 const PREFIX = process.env.PREFIX;
@@ -52,7 +53,8 @@ client.on('message', async msg => {
         m.edit(PING_EMBED);
     }
     if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg, PREFIX);
-    if (command === "toggledebug" || command === "td") {
+    if (command === "azurlane" || command === "al") azurlane.handleCommnd(args, msg, PREFIX);
+    if (msg.author.id === "456001047756800000" && (command === "toggledebug" || command === "td")) {
         config.debug = !config.debug;
         console.log("DEBUG TOGGLED, debug = " + config.debug)
         msg.channel.send(`DEBUG: debug output has been turned ${config.debug?"on":"off"}!`);
@@ -76,12 +78,6 @@ client.on('message', async msg => {
             console.log("told " + msg.author.username + " to not to goto sleep");
         }
     }
-    if (msg.author.id === "456001047756800000" && (command === "changebase" || command === "cb")) {
-        config.query_base_url = args[0];
-        console.log("Base Changed, query_base_url = " + config.query_base_url)
-        msg.channel.send("Base URL changed to " + config.query_base_url);
-    }
-
     console.log("====== Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
 });
 

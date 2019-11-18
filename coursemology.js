@@ -6,7 +6,7 @@ const Discord = require('discord.js');
 const filter = (reaction, user) => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name) && user.id !== config.id;
 const listData = {};
 
-exports.handleCommand = function(args, msg, PREFIX) {
+exports.handleCommnd = function(args, msg, PREFIX) {
     console.log("running coursemology sub-system...");
     if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard|listusers|user) [args]`");
     let json = false;
