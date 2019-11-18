@@ -62,7 +62,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
         case "skin":
         case "sk":
         case "vs":
-            if (args.length < 2) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane skin ship-name skin-name`");
+            if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane skin ship-name|skin-name`");
             try {
                 let newArgs = args.join(" ").split(/ *\| */g);
                 const ship = await azurlane.getShipByName(newArgs[0]);
