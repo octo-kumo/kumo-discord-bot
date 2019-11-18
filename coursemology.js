@@ -289,6 +289,7 @@ function exeLU(course, page, json, nameFilter, channel, author) {
                         break;
                     case '⬅️':
                     case '➡️':
+                        message.reactions.forEach(reaction => reaction.users.filter(user => user.id !== config.id).forEach((id, user) => reaction.remove(user)));
                         let oldPage = listData[r.message.id].page;
                         listData[r.message.id].page = Math.min(Math.max(listData[r.message.id].page + (r.emoji.name === '⬅️' ? -1 : 1), 1), listData[r.message.id].maxPage);
                         if (oldPage == listData[r.message.id].page) break;
@@ -297,8 +298,6 @@ function exeLU(course, page, json, nameFilter, channel, author) {
                         listData[r.message.id].embed.title = `Students of Course#${listData[r.message.id].course} (${listData[r.message.id].page}/${listData[r.message.id].maxPage})`;
                         console.log(`Changing Title to ${listData[r.message.id].embed.title}`);
                         listData[r.message.id].message.edit(listData[r.message.id].embed);
-
-                        message.reactions.forEach(reaction => reaction.users.filter(user => user.id !== config.id).forEach((id, user) => reaction.remove(user)));
                         break;
                 }
             });
