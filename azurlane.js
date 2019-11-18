@@ -19,7 +19,7 @@ const DATA = {};
 
 exports.handleCommnd = async function(args, msg, PREFIX) {
     console.log("running azurlane sub-system...");
-    if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane (ship|ships) [args]`");
+    if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane (ship|skin) [args]`");
     let lang = "en";
     if (["--en", "--jp", "--cn"].includes(args[args.length - 1])) {
         console.log("user specified language " + args[args.length - 1]);
@@ -58,25 +58,22 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                 msg.channel.send("Invalid ship name.");
             }
             break;
-        case "ships":
-        case "ss":
-        case "ls":
-        case "fs":
-            if (args.length < 2) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane ships (rarity|type|affiliation) filter`");
-            try {
-                const ships = await azurlane.getShips(args[0], args.slice(1).join(" "));
-                for (let i = 0; i < ships.length; i++) {
-                    console.log(`[${ships[i].id}] = ${ships[i].name}`); // [036] = San Diego
-                }
-            } catch (err) {
-                console.log(`ships subcommand, err code = ${err.statusCode}, args = ${args}`);
-                msg.channel.send("Invalid ships category/type.");
-            }
-            break;
         case "viewskin":
         case "skin":
         case "sk":
         case "vs":
+            if (args.length < 2) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane skin ship-name skin-name`");
+            try {
+                const ship = await azurlane.getShipByName(args.slice(0, args.length - 1).join(" "));
+                let skin = ship.skins.filter(skin => skin.title === args[args.length - 1])[0];
+                let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}** (${skin.title})`).setColor(COLOR[ship.rarity]).setThumbnail(skin.chibi).setURL(ship.wikiUrl);
+                embed.addField("Avaliable Skins", ship.skins.map(lskin => lskin.title === skin.title ? "**" + skin.title + "**" : skin.title).join("\n"));
+                embed.setImage(skin.image);
+                msg.channel.send(embed);
+            } catch (err) {
+                console.log(`ship subcommand, err code = ${err.statusCode}, args = ${args}`);
+                msg.channel.send("Invalid ship name/skin name.");
+            }
             break;
     }
 }
