@@ -68,7 +68,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                 let newArgs = args.join(" ").split(/ *\| */g);
                 if (newArgs.length == 1) newArgs = [newArgs[0], "Default"];
                 const ship = await azurlane.getShipByName(newArgs[0]);
-                let skin = ship.skins.filter(skin => skin.title.includes(newArgs[1]))[0];
+                let skin = ship.skins.filter(skin => skin.title.toUpperCase().includes(newArgs[1].toUpperCase()))[0];
                 let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}** (${skin.title})`).setColor(COLOR[ship.rarity]).setThumbnail(skin.chibi).setURL(ship.wikiUrl);
                 embed.addField("Avaliable Skins", ship.skins.map(lskin => lskin.title === skin.title ? "**" + lskin.title + "**" : lskin.title).join("\n"));
                 embed.setImage(skin.image);
