@@ -12,7 +12,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
     let lang = "en";
     if (["--en", "--jp", "--cn"].includes(args[args.length - 1])) {
         console.log("user specified language " + args[args.length - 1]);
-        lang = args[args.length - 1].substring(2);
+        lang = args.pop().substring(2);
     }
     switch (args.shift()) {
         case "ship":
