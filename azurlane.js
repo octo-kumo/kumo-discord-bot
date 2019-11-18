@@ -6,7 +6,7 @@ const azurlane = new AzurLane();
 const Discord = require('discord.js');
 const config = require('./config.js').config;
 
-exports.handleCommnd = function(args, msg, PREFIX) {
+exports.handleCommnd = async function(args, msg, PREFIX) {
     console.log("running azurlane sub-system...");
     if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane (ship|ships) [args]`");
     let lang = "en";
