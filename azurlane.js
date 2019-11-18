@@ -11,6 +11,7 @@ const COLOR = {
     "Rare": 0xb0e0e6,
     "Elite": 0xdda0dd,
     "Super Rare": 0xeee8aa,
+    "Priority": 0xeee8aa,
     "Unreleased": 0x000000,
     "Decisive": 0xffffff
 };
