@@ -38,6 +38,7 @@ exports.config = {
     debug: false,
     leaderboard: {},
     leaderboard_feed_channel: null,
+    id: "",
     PRESENCE: {
         game: {
             name: 'with the clouds. !help'
