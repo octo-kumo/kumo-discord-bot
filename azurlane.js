@@ -35,7 +35,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                 const ship = await azurlane.getShipByName(args.join(" "));
                 let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}**`).setColor(COLOR[ship.rarity]).setThumbnail(ship.thumbnail).setURL(ship.wikiUrl);
                 let stats = ship.stats.level120;
-                embed.addField("**ID**", ship.id, true)
+                embed.addField("**ID**", (ship.id) ? ship.id : "**not yet decided**", true)
                     .addField("**Stars**", ship.stars.value, true)
                     .addField("**Rarity**", ship.rarity, true)
                     .addField("**Type**", ship.hullType, true)
