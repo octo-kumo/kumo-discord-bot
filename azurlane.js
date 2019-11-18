@@ -31,6 +31,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
         case "info":
         case "i":
             try {
+                console.log("Getting Ship " + args.join(" "));
                 const ship = await azurlane.getShipByName(args.join(" "));
                 let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}**`).setColor(COLOR[ship.rarity]).setThumbnail(ship.thumbnail).setURL(ship.wikiUrl);
                 let stats = ship.stats.level120;
