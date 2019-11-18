@@ -21,24 +21,22 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
         case "i":
             try {
                 const ship = await azurlane.getShipByName(args.join(" "));
-                let embed = new Discord.RichEmbed().setTitle(ship.names[lang]);
-                embed.setThumbnail(ship.thumbnail);
-                embed.setURL(ship.wikiUrl);
-                embed.addField("ID", ship.id, true)
+                let embed = new Discord.RichEmbed().setTitle(ship.names[lang]).setColor(0xedb426).setThumbnail(ship.thumbnail).setURL(ship.wikiUrl);
+                embed.addField("**ID**", ship.id, true)
                     .addField("**Stars**", ship.stars.value, true)
                     .addField("**Rarity**", ship.rarity, true)
                     .addField("**Type**", ship.hullType, true)
                     .addField("**Class**", ship.class, true)
-                    .addField("**Nationalit**", ship.nationality, true)
+                    .addField("**Nationalit**", ship.nationality)
                     .addField("Health", ship.stats.base[0].value)
-                    .addField("Armor", ship.stats.base[1].value)
-                    .addField("Reload", ship.stats.base[2].value)
-                    .addField("Luck", ship.stats.base[3].value)
-                    .addField("Firepower", ship.stats.base[4].value)
-                    .addField("Evasion", ship.stats.base[6].value)
-                    .addField("Anti-air", ship.stats.base[8].value)
-                    .addField("Aviation", ship.stats.base[9].value)
-                    .addField("Oil Usage", ship.stats.base[10].value)
+                    .addField("Armor", ship.stats.base[1].value, true)
+                    .addField("Reload", ship.stats.base[2].value, true)
+                    .addField("Luck", ship.stats.base[3].value, true)
+                    .addField("Firepower", ship.stats.base[4].value, true)
+                    .addField("Evasion", ship.stats.base[6].value, true)
+                    .addField("Anti-air", ship.stats.base[8].value, true)
+                    .addField("Aviation", ship.stats.base[9].value, true)
+                    .addField("Oil Usage", ship.stats.base[10].value, true)
                     .addField("Designed by", ship.miscellaneous.artist.name)
                     .addField("Avaliable Skins", ship.skins.map(skin => skin.title).join("\n"));
                 embed.setDescription("All stats shown are base stats");
