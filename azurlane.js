@@ -6,6 +6,14 @@ const azurlane = new AzurLane();
 const Discord = require('discord.js');
 const config = require('./config.js').config;
 
+const COLOR = {
+    "Normal": 0xdcdcdc,
+    "Rare": 0xb0e0e6,
+    "Elite": 0xdda0dd,
+    "Super Rare": 0xeee8aa,
+    "Unreleased": 0x000000
+}
+
 exports.handleCommnd = async function(args, msg, PREFIX) {
     console.log("running azurlane sub-system...");
     if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane (ship|ships) [args]`");
@@ -21,14 +29,14 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
         case "i":
             try {
                 const ship = await azurlane.getShipByName(args.join(" "));
-                let embed = new Discord.RichEmbed().setTitle(ship.names[lang]).setColor(0xedb426).setThumbnail(ship.thumbnail).setURL(ship.wikiUrl);
+                let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}**`).setColor(COLOR[ship.rarity]).setThumbnail(ship.thumbnail).setURL(ship.wikiUrl);
                 embed.addField("**ID**", ship.id, true)
                     .addField("**Stars**", ship.stars.value, true)
                     .addField("**Rarity**", ship.rarity, true)
                     .addField("**Type**", ship.hullType, true)
                     .addField("**Class**", ship.class, true)
-                    .addField("**Nationalit**", ship.nationality)
-                    .addField("Health", ship.stats.base[0].value)
+                    .addField("**Nationality**", ship.nationality, true)
+                    .addField("Health", ship.stats.base[0].value, true)
                     .addField("Armor", ship.stats.base[1].value, true)
                     .addField("Reload", ship.stats.base[2].value, true)
                     .addField("Luck", ship.stats.base[3].value, true)
