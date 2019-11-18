@@ -64,8 +64,9 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
         case "vs":
             if (args.length < 2) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane skin ship-name skin-name`");
             try {
-                const ship = await azurlane.getShipByName(args.slice(0, args.length - 1).join(" "));
-                let skin = ship.skins.filter(skin => skin.title === args[args.length - 1])[0];
+                let newArgs = args.join(" ").split(/ *\| */g);
+                const ship = await azurlane.getShipByName(newArgs[0]);
+                let skin = ship.skins.filter(skin => skin.title.includes(newArgs[1]))[0];
                 let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}** (${skin.title})`).setColor(COLOR[ship.rarity]).setThumbnail(skin.chibi).setURL(ship.wikiUrl);
                 embed.addField("Avaliable Skins", ship.skins.map(lskin => lskin.title === skin.title ? "**" + skin.title + "**" : skin.title).join("\n"));
                 embed.setImage(skin.image);
