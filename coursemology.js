@@ -301,7 +301,9 @@ function exeLU(course, page, json, nameFilter, channel, author) {
                         break;
                 }
             });
-            collector.on('end', message.delete);
+            collector.on('end', r => {
+                message.delete();
+            });
         });
     });
 }
