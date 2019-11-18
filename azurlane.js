@@ -12,7 +12,8 @@ const COLOR = {
     "Elite": 0xdda0dd,
     "Super Rare": 0xeee8aa,
     "Unreleased": 0x000000
-}
+};
+const DATA = {};
 
 exports.handleCommnd = async function(args, msg, PREFIX) {
     console.log("running azurlane sub-system...");
@@ -47,7 +48,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     .addField("Oil Usage", ship.stats.base[10].value, true)
                     .addField("Designed by", ship.miscellaneous.artist.name)
                     .addField("Avaliable Skins", ship.skins.map(skin => skin.title).join("\n"));
-                embed.setDescription("All stats shown are base stats");
+                embed.setDescription("_All stats shown below are base stats._");
                 msg.channel.send(embed);
             } catch (err) {
                 console.log(`ship subcommand, err code = ${err.statusCode}, args = ${args}`);
@@ -58,6 +59,16 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
         case "ss":
         case "ls":
         case "fs":
+            if (args.length < 2) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane ships (rarity|type|affiliation) filter`");
+            try {
+                const ships = await azurlane.getShips(args[0], args.slice(1).join(" "));
+                for (let i = 0; i < ships.length; i++) {
+                    console.log(`[${ships[i].id}] = ${ships[i].name}`); // [036] = San Diego
+                }
+            } catch (err) {
+                console.log(`ships subcommand, err code = ${err.statusCode}, args = ${args}`);
+                msg.channel.send("Invalid ship name.");
+            }
             break;
         case "viewskin":
         case "skin":
