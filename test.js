@@ -6,7 +6,7 @@ const azurlane = new AzurLane();
 
 async function main() {
     // Get specific ship by name, in this case "Akagi"
-    const ship = await azurlane.getShipByName("Formidable");
+    const ship = await azurlane.getShipByName("roon");
     console.log(`${ship.names.en} = ${JSON.stringify(ship)}`); // IJN Akagi's rarity is Super Rare
     //
     // // Get an array of ships with rarity "Super Rare"

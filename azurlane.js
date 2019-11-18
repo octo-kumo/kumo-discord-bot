@@ -74,7 +74,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                 embed.setImage(skin.image);
                 msg.channel.send(embed);
             } catch (err) {
-                console.log(`ship subcommand, err code = ${err.statusCode}, args = ${args}`);
+                console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
                 msg.channel.send("Invalid ship name/skin name.");
             }
             break;
