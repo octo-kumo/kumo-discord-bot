@@ -100,7 +100,7 @@ exports.handleCommand = function(args, msg, PREFIX) {
         case "courses":
         case "cs":
         case "listcourse":
-            let embed = new Discord.RichEmbed("Avaliable Courses");
+            let embed = new Discord.RichEmbed().setTitle("Avaliable Courses").setColor(0x21f8ff);
             for (let i = 0; i < config.COURSES.length; i++) embed.addField(config.COURSES[i], config.COURSE_NAMES[i]);
             embed.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
             msg.channel.send(embed);
