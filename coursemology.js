@@ -10,7 +10,7 @@ exports.handleCommand = function(args, msg, PREFIX) {
     console.log("running coursemology sub-system...");
     if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard|listusers|user) [args]`");
     let json = false;
-    if (args[args.length - 1] === "--json") {
+    if (args[args.length - 1] === "--json" || args[args.length - 1] === "-j") {
         args.pop();
         json = true;
     }
@@ -57,7 +57,10 @@ exports.handleCommand = function(args, msg, PREFIX) {
                 exeLU(config.DEFAULT_COURSE, 1, json, "", msg.channel, msg.author);
             } else if (args.length == 1) {
                 if (args[0] === "help") return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology listusers [course id] [page number]`");
-                if (isNaN(args[0])) {
+                else if (args[0] === "--all" || args[0] === "-a") {
+                    console.log("users subcommand, requested to include all courses, proceed to list users from courses [" + config.COURSES.join(", ") + "]...");
+                    return config.COURSES.forEach(course => exeLU(course, 1, json, "", msg.channel, msg.author));
+                } else if (isNaN(args[0])) {
                     console.log("users subcommand, filter provided, proceed to list users of filter \"" + args[0] + "\"...");
                     exeLU(config.DEFAULT_COURSE, 1, json, args[0], msg.channel, msg.author);
                 } else {
