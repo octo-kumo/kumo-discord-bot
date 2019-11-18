@@ -69,9 +69,14 @@ exports.handleCommand = function(args, msg, PREFIX) {
                 }
             } else if (args.length == 2) {
                 if (isNaN(args[0])) {
-                    let filter = args.join(" ");
-                    console.log("users subcommand, filter provided, proceed to list users of filter \"" + filter + "\"...");
-                    exeLU(config.DEFAULT_COURSE, 1, json, filter, msg.channel, msg.author);
+                    if (args[0] === "--all" || args[0] === "-a") {
+                        console.log("users subcommand, filter provided, requested to include all courses, proceed to list users from courses [" + config.COURSES.join(", ") + "] of filter \"" + args[1] + "\"...");
+                        config.COURSES.forEach(course => exeLU(course, 1, json, args[1], msg.channel, msg.author));
+                    } else {
+                        let filter = args.join(" ");
+                        console.log("users subcommand, filter provided, proceed to list users of filter \"" + filter + "\"...");
+                        exeLU(config.DEFAULT_COURSE, 1, json, filter, msg.channel, msg.author);
+                    }
                 } else if (isNaN(args[1])) {
                     console.log("users subcommand, course and filter provided, proceed to list users of specified course #" + args[0] + " and filter \"" + args[1] + "\"...");
                     exeLU(args[0], 1, json, args[1], msg.channel, msg.author);
@@ -80,8 +85,23 @@ exports.handleCommand = function(args, msg, PREFIX) {
                     exeLU(args[0], args[1], json, "", msg.channel, msg.author);
                 }
             } else {
-                console.log("users subcommand, course and page provided, even filter is provided, proceed to list users of specified course #" + args[0] + " on page #" + args[1] + "...");
-                exeLU(args[0], args[1], json, args.slice(2).join(" "), msg.channel, msg.author);
+                if (!isNaN(args[0]) && !isNaN(args[1])) {
+                    console.log("users subcommand, course and page provided, even filter is provided, proceed to list users of specified course #" + args[0] + " on page #" + args[1] + "...");
+                    exeLU(args[0], args[1], json, args.slice(2).join(" "), msg.channel, msg.author);
+                } else if (!isNaN(args[0])) {
+                    console.log("users subcommand, course and filter provided, proceed to list users of specified course #" + args[0] + " and filter \"" + args[1] + "\"...");
+                    exeLU(args[0], 1, json, filter, msg.channel, msg.author);
+                } else {
+                    if (args[0] === "--all" || args[0] === "-a") {
+                        let filter = args.slice(1).join(" ");
+                        console.log("users subcommand, filter provided, requested to include all courses, proceed to list users from courses [" + config.COURSES.join(", ") + "] of filter \"" + filter + "\"...");
+                        config.COURSES.forEach(course => exeLU(course, 1, json, args[1], msg.channel, msg.author));
+                    } else {
+                        let filter = args.join(" ");
+                        console.log("users subcommand, filter provided, proceed to list users of filter \"" + filter + "\"...");
+                        exeLU(config.DEFAULT_COURSE, 1, json, filter, msg.channel, msg.author);
+                    }
+                }
             }
             break;
         case "u":
