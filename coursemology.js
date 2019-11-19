@@ -379,7 +379,7 @@ function updateLB(course) {
             if (config.debug) config.HOOK.send(`DEBUG: Failed to access ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
         } else {
             let contents = parse(body).querySelector(".leaderboard-level tbody");
-            if (!contents && config.debug) return config.HOOK.send(`DEBUG: Course-Do-Not-Exist? ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
+            if (!contents) return config.debug ? config.HOOK.send(`DEBUG: Course-Do-Not-Exist? ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`) : "";
             let rows = contents.querySelectorAll("tr");
             let newLB = rows.map(row => {
                 return {
