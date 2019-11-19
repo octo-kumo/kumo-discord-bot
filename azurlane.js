@@ -41,17 +41,20 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     .addField("**Type**", ship.hullType, true)
                     .addField("**Class**", ship.class, true)
                     .addField("**Nationality**", ship.nationality, true)
-                    .addField("Health", stats[0].value, true)
-                    .addField("Armor", stats[1].value, true)
-                    .addField("Reload", stats[2].value, true)
-                    .addField("Luck", stats[3].value, true)
-                    .addField("Firepower", stats[4].value, true)
-                    .addField("Evasion", stats[6].value, true)
-                    .addField("Anti-air", stats[8].value, true)
-                    .addField("Aviation", stats[9].value, true)
-                    .addField("Oil Usage", stats[10].value, true)
-                    .addField("Designed by", ship.miscellaneous.artist.name)
-                    .addField("Avaliable Skins", ship.skins.map(skin => skin.title).join("\n"));
+                    .addField("❤️ Health", stats[0].value, true)
+                    .addField("🛡 Armor", stats[1].value, true)
+                    .addField("🔧 Reload", stats[2].value, true)
+                    .addField("💚 Luck", stats[3].value, true)
+                    .addField("⚔️ Firepower", stats[4].value, true)
+                    .addField("🦋 Evasion", stats[6].value, true)
+                    .addField("🚀 Speed", stats[7].value, true)
+                    .addField("✈️ Anti-air", stats[8].value, true)
+                    .addField("☁️ Aviation", stats[9].value, true)
+                    .addField("🛢️ Oil Usage", stats[10].value, true)
+                    .addField("🎯 Accuracy", stats[11].value, true)
+                    .addField("🌊 Anti-Submarine Warfare", stats[12].value)
+                    .addField("📝 Designed by", ship.miscellaneous.artist.name)
+                    .addField("📎 Avaliable Skins", ship.skins.map(skin => skin.title).join("\n"));
                 embed.setDescription("_All stats shown below are lv120 stats._");
                 msg.channel.send(embed);
             } catch (err) {
