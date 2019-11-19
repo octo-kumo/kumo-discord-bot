@@ -37,7 +37,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                 let stats = ship.stats.level120;
                 embed.addField("**ID**", (ship.id) ? ship.id : "**not yet decided**", true)
                     .addField("**Stars**", ship.stars.value, true)
-                    .addField("**Rarity**", ship.rarity, true)
+                    .addField("**Rarity**", "**" + ship.rarity + "**", true)
                     .addField("**Type**", ship.hullType, true)
                     .addField("**Class**", ship.class, true)
                     .addField("**Nationality**", ship.nationality, true)
@@ -47,14 +47,14 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     .addField("💚 Luck", stats[3].value, true)
                     .addField("⚔️ Firepower", stats[4].value, true)
                     .addField("🦋 Evasion", stats[6].value, true)
-                    .addField("🚀 Speed", stats[7].value, true)
-                    .addField("✈️ Anti-air", stats[8].value, true)
-                    .addField("☁️ Aviation", stats[9].value, true)
-                    .addField("🛢️ Oil Usage", stats[10].value, true)
-                    .addField("🎯 Accuracy", stats[11].value, true)
-                    .addField("🌊 Anti-Submarine Warfare", stats[12].value)
+                    .addField("Speed", stats[7].value, true)
+                    .addField("Anti-air", stats[8].value, true)
+                    .addField("Aviation", stats[9].value, true)
+                    .addField("Oil Usage", stats[10].value, true)
+                    .addField("Accuracy", stats[11].value, true)
+                    .addField("Anti-Submarine", stats[12].value, true)
                     .addField("📝 Designed by", ship.miscellaneous.artist.name)
-                    .addField("📎 Avaliable Skins", ship.skins.map(skin => skin.title).join("\n"));
+                    .addField("**Avaliable Skins**", ship.skins.map(skin => skin.title).join("\n"));
                 embed.setDescription("_All stats shown below are lv120 stats._");
                 msg.channel.send(embed);
             } catch (err) {
