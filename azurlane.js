@@ -2,7 +2,9 @@ const request = require('request');
 const JSDOM = require('jsdom').JSDOM;
 const Discord = require('discord.js');
 const config = require('./config.js').config;
+
 const filter = (reaction, user) => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name) && user.id !== config.id;
+const filter2 = (reaction, user) => ['👕'].includes(reaction.emoji.name) && user.id !== config.id;
 const headers = {
     'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0"
 };
@@ -59,7 +61,13 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     .addField("📝 Designed by", ship.author)
                     .addField("**Avaliable Skins**", ship.skins.map(skin => skin.title).join("\n"));
                 embed.setDescription("_All stats shown below are lv120 stats._");
-                msg.channel.send(embed);
+                msg.channel.send(embed).then(message => {
+                    message.react("👕");
+                    message.createReactionCollector(filter2).on('collect', r => {
+                        message.clearReactions();
+                        exeSK([ship.names.en + "|Default"], msg, lang);
+                    });
+                });
             } catch (err) {
                 console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
                 msg.channel.send("Invalid ship name.");
@@ -69,58 +77,60 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
         case "skin":
         case "sk":
         case "vs":
-            if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane skin ship-name|skin-name`");
-            try {
-                let newArgs = args.join(" ").split(/ *\| */g);
-                if (newArgs.length == 1) newArgs = [newArgs[0], "Default"];
-                const ship = await getShipByName(newArgs[0]);
-                let skin = ship.skins.filter(skin => skin.title.toUpperCase().includes(newArgs[1].toUpperCase()))[0];
-                let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}** (${skin.title})`).setColor(COLOR[ship.rarity]).setThumbnail(skin.chibi).setURL(ship.wikiUrl);
-                embed.addField("Avaliable Skins", ship.skins.map(lskin => lskin.title === skin.title ? "**" + lskin.title + "**" : lskin.title).join("\n"));
-                embed.setImage(skin.image);
-                msg.channel.send(embed).then(message => {
-                    if (ship.skins.length > 1) {
-                        message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️'));
-                        MESSAGES[message.id] = {
-                            name: ship.names[lang],
-                            skins: ship.skins,
-                            embed: embed,
-                            currentSkin: ship.skins.findIndex(lskin => lskin.title === skin.title),
-                            message: message
-                        };
-                        const collector = message.createReactionCollector(filter, {
-                            time: 900000
-                        });
-                        collector.on('collect', r => {
-                            console.log(`Collected ${r.emoji.name}`);
-                            switch (r.emoji.name) {
-                                case '❎':
-                                    r.message.delete();
-                                    delete MESSAGES[r.message.id];
-                                    break;
-                                case '⬅️':
-                                case '➡️':
-                                    message.reactions.forEach(reaction => reaction.users.filter(user => user.id !== config.id).forEach((id, user) => reaction.remove(user)));
-                                    let oldSkin = MESSAGES[r.message.id].currentSkin;
-                                    MESSAGES[r.message.id].currentSkin = Math.min(Math.max(MESSAGES[r.message.id].currentSkin + (r.emoji.name === '⬅️' ? -1 : 1), 0), MESSAGES[r.message.id].skins.length - 1);
-                                    if (oldSkin == MESSAGES[r.message.id].currentSkin) break;
-                                    let currentSkin = MESSAGES[r.message.id].skins[MESSAGES[r.message.id].currentSkin];
-                                    MESSAGES[r.message.id].embed.fields[0].value = MESSAGES[r.message.id].skins.map(lskin => lskin.title === currentSkin.title ? "**" + lskin.title + "**" : lskin.title).join("\n");
-                                    MESSAGES[r.message.id].embed.setTitle(`**${MESSAGES[r.message.id].name}** (${currentSkin.title})`).setThumbnail(currentSkin.chibi).setImage(currentSkin.image);
-                                    MESSAGES[r.message.id].message.edit(MESSAGES[r.message.id].embed);
-                                    break;
-                            }
-                        });
-                        collector.on('end', r => {
-                            message.delete();
-                        });
+            exeSK(args, msg, lang);
+            break;
+    }
+}
+
+function exeSK(args, msg, lang) {
+    if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane skin ship-name|skin-name`");
+    try {
+        let newArgs = args.join(" ").split(/ *\| */g);
+        if (newArgs.length == 1) newArgs = [newArgs[0], "Default"];
+        const ship = await getShipByName(newArgs[0]);
+        let skin = ship.skins.filter(skin => skin.title.toUpperCase().includes(newArgs[1].toUpperCase()))[0];
+        let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}** (${skin.title})`).setColor(COLOR[ship.rarity]).setThumbnail(skin.chibi).setURL(ship.wikiUrl);
+        embed.addField("Avaliable Skins", ship.skins.map(lskin => lskin.title === skin.title ? "**" + lskin.title + "**" : lskin.title).join("\n"));
+        embed.setImage(skin.image);
+        msg.channel.send(embed).then(message => {
+            if (ship.skins.length > 1) {
+                message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️'));
+                MESSAGES[message.id] = {
+                    name: ship.names[lang],
+                    skins: ship.skins,
+                    embed: embed,
+                    currentSkin: ship.skins.findIndex(lskin => lskin.title === skin.title),
+                    message: message
+                };
+                const collector = message.createReactionCollector(filter);
+                collector.on('collect', r => {
+                    console.log(`Collected ${r.emoji.name}`);
+                    switch (r.emoji.name) {
+                        case '❎':
+                            r.message.delete();
+                            delete MESSAGES[r.message.id];
+                            break;
+                        case '⬅️':
+                        case '➡️':
+                            message.reactions.forEach(reaction => reaction.users.filter(user => user.id !== config.id).forEach((id, user) => reaction.remove(user)));
+                            let oldSkin = MESSAGES[r.message.id].currentSkin;
+                            MESSAGES[r.message.id].currentSkin = Math.min(Math.max(MESSAGES[r.message.id].currentSkin + (r.emoji.name === '⬅️' ? -1 : 1), 0), MESSAGES[r.message.id].skins.length - 1);
+                            if (oldSkin == MESSAGES[r.message.id].currentSkin) break;
+                            let currentSkin = MESSAGES[r.message.id].skins[MESSAGES[r.message.id].currentSkin];
+                            MESSAGES[r.message.id].embed.fields[0].value = MESSAGES[r.message.id].skins.map(lskin => lskin.title === currentSkin.title ? "**" + lskin.title + "**" : lskin.title).join("\n");
+                            MESSAGES[r.message.id].embed.setTitle(`**${MESSAGES[r.message.id].name}** (${currentSkin.title})`).setThumbnail(currentSkin.chibi).setImage(currentSkin.image);
+                            MESSAGES[r.message.id].message.edit(MESSAGES[r.message.id].embed);
+                            break;
                     }
                 });
-            } catch (err) {
-                console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
-                msg.channel.send("Invalid ship name/skin name.");
+                collector.on('end', r => {
+                    message.delete();
+                });
             }
-            break;
+        }); // Pages
+    } catch (err) {
+        console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
+        msg.channel.send("Invalid ship name/skin name.");
     }
 }
 
