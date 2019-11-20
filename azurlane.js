@@ -133,7 +133,7 @@ function getShipByName(name) {
                     class: doc.querySelector("div:nth-child(3) > .wikitable tr:nth-child(3) > td:nth-child(2) > a").textContent,
                     nationality: cacheShip.nationality,
                     hullType: doc.querySelector(".wikitable tr:nth-child(3) a:nth-child(2)").textContent,
-                    stats: Object.values(doc.querySelectorAll(".tabbertab:nth-child(3) > .wikitable tbody td")).map(cell => cell.textContent.trim()),
+                    stats: Object.values(doc.querySelectorAll(".tabbertab:nth-child(1) > .wikitable tbody td")).map(cell => cell.textContent.trim()),
                     author: doc.querySelector(".nomobile:nth-child(1) tr:nth-child(2) a").textContent,
                 };
                 console.log(`Ship Loaded: ${JSON.stringify(ship)}`);
