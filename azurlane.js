@@ -85,7 +85,8 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                             name: ship.names[lang],
                             skins: ship.skins,
                             embed: embed,
-                            currentSkin: ship.skins.findIndex(lskin => lskin.title === skin.title)
+                            currentSkin: ship.skins.findIndex(lskin => lskin.title === skin.title),
+                            message: message
                         };
                         const collector = message.createReactionCollector(filter, {
                             time: 900000
