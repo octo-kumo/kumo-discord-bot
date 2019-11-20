@@ -160,7 +160,7 @@ function getShipByName(name) {
                 const arts = doc.querySelector("#Art tbody").getElementsByTagName("a");
                 const tabs = doc.querySelectorAll(".azl_box_body .tabber .tabbertab");
                 let ship = {
-                    wikiUrl: "https://azurlane.koumakan.jp/" + cacheShip.name.replace(" ", "_"),
+                    wikiUrl: "https://azurlane.koumakan.jp/" + cacheShip.name.replace(/ +/g, "_"),
                     id: cacheShip.id,
                     names: {
                         en: cacheShip.name,
