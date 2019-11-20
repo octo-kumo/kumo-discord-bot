@@ -22,7 +22,6 @@
         "express": ">=4.17.1",
         "moment": ">=2.24.0",
         "request": ">=2.88.0",
-        "node-html-parser": ">=1.1.16",
-        "azurlane": ">=1.5.0"
+        "jsdom": ">=15.2.1"
     }
 }
