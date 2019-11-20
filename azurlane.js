@@ -2,6 +2,7 @@ const request = require('request');
 const JSDOM = require('jsdom').JSDOM;
 const Discord = require('discord.js');
 const config = require('./config.js').config;
+const filter = (reaction, user) => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name) && user.id !== config.id;
 const headers = {
     'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0"
 };
@@ -16,6 +17,8 @@ const COLOR = {
 };
 const SHIPS = [];
 const SHIPS_CACHE = {};
+
+const MESSAGES = {};
 exports.ships = SHIPS;
 exports.handleCommnd = async function(args, msg, PREFIX) {
     console.log("running azurlane sub-system...");
@@ -75,7 +78,43 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                 let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}** (${skin.title})`).setColor(COLOR[ship.rarity]).setThumbnail(skin.chibi).setURL(ship.wikiUrl);
                 embed.addField("Avaliable Skins", ship.skins.map(lskin => lskin.title === skin.title ? "**" + lskin.title + "**" : lskin.title).join("\n"));
                 embed.setImage(skin.image);
-                msg.channel.send(embed);
+                msg.channel.send(embed).then(message => {
+                    if (ship.skins.length > 1) {
+                        message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️'));
+                        MESSAGES[message.id] = {
+                            name: ship.names[lang],
+                            skins: ship.skins,
+                            embed: embed,
+                            currentSkin: ship.skins.findIndex(lskin => lskin.title === skin.title)
+                        };
+                        const collector = message.createReactionCollector(filter, {
+                            time: 900000
+                        });
+                        collector.on('collect', r => {
+                            console.log(`Collected ${r.emoji.name}`);
+                            switch (r.emoji.name) {
+                                case '❎':
+                                    r.message.delete();
+                                    delete MESSAGES[r.message.id];
+                                    break;
+                                case '⬅️':
+                                case '➡️':
+                                    message.reactions.forEach(reaction => reaction.users.filter(user => user.id !== config.id).forEach((id, user) => reaction.remove(user)));
+                                    let oldPage = MESSAGES[r.message.id].currentSkin;
+                                    MESSAGES[r.message.id].page = Math.min(Math.max(MESSAGES[r.message.id] + (r.emoji.name === '⬅️' ? -1 : 1), 0), MESSAGES[r.message.id].skins.length - 1);
+                                    if (oldPage == MESSAGES[r.message.id].page) break;
+                                    let currentSkin = MESSAGES[r.message.id].skins[MESSAGES[r.message.id].currentSkin];
+                                    MESSAGES[r.message.id].embed.fields[0].value = MESSAGES[r.message.id].skins.map(lskin => lskin.title === currentSkin.title ? "**" + lskin.title + "**" : lskin.title).join("\n");
+                                    MESSAGES[r.message.id].embed.setTitle(`**${MESSAGES[r.message.id].name}** (${currentSkin.title})`).setThumbnail(currentSkin.chibi).setImage(currentSkin.image);
+                                    MESSAGES[r.message.id].message.edit(MESSAGES[r.message.id].embed);
+                                    break;
+                            }
+                        });
+                        collector.on('end', r => {
+                            message.delete();
+                        });
+                    }
+                });
             } catch (err) {
                 console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
                 msg.channel.send("Invalid ship name/skin name.");
