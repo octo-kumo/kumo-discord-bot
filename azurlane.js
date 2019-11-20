@@ -34,7 +34,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                 console.log("Getting Ship " + args.join(" "));
                 const ship = await getShipByName(args.join(" "));
                 let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}**`).setColor(COLOR[ship.rarity]).setThumbnail(ship.thumbnail).setURL(ship.wikiUrl);
-                let stats = ship.stats.level120;
+                let stats = ship.stats;
                 embed.addField("**ID**", (ship.id) ? ship.id : "**not yet decided**", true)
                     .addField("**Stars**", ship.stars, true)
                     .addField("**Rarity**", "**" + ship.rarity + "**", true)
