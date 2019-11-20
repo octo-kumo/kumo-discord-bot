@@ -151,7 +151,7 @@ function exeInfo(course, id, json, channel, author) {
             if (!contents) return channel.send(`Query has failed as ${config.query_base_url}/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)} is not valid!`);
             let achievements = {};
             contents.querySelectorAll(".condition_assessment").forEach(a => {
-                achievements[a.id.substring(21)] = {
+                achievements[a.id.value.substring(21)] = {
                     name: a.firstChild.text,
                     description: a.lastChild.text
                 };
@@ -199,9 +199,9 @@ function exeList(course, cat, tab, json, channel, author) {
             let rows = contents.querySelectorAll("tr");
             let desc = Object.values(rows).map(row => {
                 let title = row.firstChild.firstChild;
-                let disabled = !row.attributes.class.includes("currently-active");
+                let disabled = !row.attributes.class.value.includes("currently-active");
                 return {
-                    name: `${disabled?"~~":"**"}${row.attributes.id.replace("assessment_", "")}${disabled?"~~":"**"}`,
+                    name: `${disabled?"~~":"**"}${row.attributes.id.value.replace("assessment_", "")}${disabled?"~~":"**"}`,
                     value: `[${title.text}](${config.query_base_url}${title.attributes.href})`,
                     inline: true
                 };
@@ -396,7 +396,7 @@ function updateLB(course) {
             if (config.leaderboard[course]) {
                 let oldLB = config.leaderboard[course];
                 for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++)
-                    if (newLB[a].id !== oldLB[a].id)
+                    if (newLB[a].id.value !== oldLB[a].id.value)
                         if (a == 0)
                             config.HOOK.send(`[Course#${course}] **${newLB[a].name}** has taken the **#1** spot from **${oldLB[a].name}**!`);
                         else
