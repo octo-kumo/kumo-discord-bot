@@ -166,7 +166,7 @@ function getShipByName(name) {
                         en: cacheShip.name,
                         cn: doc.querySelector('[lang="zh"]').textContent,
                         jp: doc.querySelector('[lang="ja"]').textContent,
-                        kr: doc.querySelector('[lang="ko"]').textContent
+                        kr: doc.querySelector('[lang="ko"]') ? doc.querySelector('[lang="ko"]').textContent : doc.querySelector('[lang="zh"]').textContent
                     },
                     thumbnail: "https://azurlane.koumakan.jp" + doc.querySelector("div:nth-child(1) > div:nth-child(2) > .image > img").getAttribute("src"),
                     skins: Array.from(tabs).map((skinTab, i) => {
