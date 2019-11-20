@@ -1,7 +1,5 @@
 // Required dependencies
 const Discord = require('discord.js');
-const request = require('request');
-const parse = require('node-html-parser').parse;
 const config = require('./config.js').config;
 const coursemology = require('./coursemology.js');
 const azurlane = require('./azurlane.js');
@@ -20,15 +18,13 @@ const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
 
 console.log('====== ZY Discord Bot Started! ======');
 
+coursemology.initiate();
+azurlane.initiate();
 client.on('ready', () => {
     console.log("=> Bot Running!");
     client.user.setPresence(config.PRESENCE);
     setInterval(coursemology.update, 10000);
-
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
-    let jar = request.jar();
-    jar.setCookie(request.cookie('remember_user_token=' + process.env.CMTOKEN), config.query_base_url);
-    config.JAR = jar;
     config.id = client.user.id;
 });
 

@@ -1,11 +1,15 @@
 const request = require('request');
-const parse = require('node-html-parser').parse;
+const JSDOM = require('jsdom').JSDOM;
 const config = require('./config.js').config;
 const Discord = require('discord.js');
 
 const filter = (reaction, user) => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name) && user.id !== config.id;
 const listData = {};
-
+exports.initiate = function() {
+    let jar = request.jar();
+    jar.setCookie(request.cookie('remember_user_token=' + process.env.CMTOKEN), config.query_base_url);
+    config.JAR = jar;
+}
 exports.handleCommand = function(args, msg, PREFIX) {
     console.log("running coursemology sub-system...");
     if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard|listusers|user) [args]`");
@@ -143,8 +147,7 @@ function exeInfo(course, id, json, channel, author) {
         if (error || response.statusCode == 404) {
             channel.send("Coursemology Query Failed!");
         } else {
-            let result = parse(body);
-            let contents = result.querySelector("#assessment_" + id);
+            let contents = new JSDOM(body).window.document.querySelector("#assessment_" + id);
             if (!contents) return channel.send(`Query has failed as ${config.query_base_url}/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)} is not valid!`);
             let achievements = {};
             contents.querySelectorAll(".condition_assessment").forEach(a => {
@@ -190,8 +193,7 @@ function exeList(course, cat, tab, json, channel, author) {
         if (error || response.statusCode == 404) {
             channel.send("Coursemology Query Failed!");
         } else {
-            let result = parse(body);
-            let contents = result.querySelector(".assessments-list tbody");
+            let contents = new JSDOM(body).window.document.querySelector(".assessments-list tbody");
             if (!contents) return channel.send(`Query has failed as ${config.query_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)} is not valid!`);
             let embed = new Discord.RichEmbed().setTitle(`${result.querySelector(".page-header h1 span").text}${config.list_presets[course]?" ("+config.list_presets[course].name+")":""}`).setColor(0x21f8ff);
             let rows = contents.querySelectorAll("tr");
@@ -223,7 +225,7 @@ function exeLB(course, type, json, channel, author) {
             channel.send("Coursemology Query Failed!");
         } else {
             console.log("Parsing Leaderboard...");
-            let contents = parse(body).querySelector(".leaderboard-" + ["level", "achievement"][type] + " tbody");
+            let contents = new JSDOM(body).window.document.querySelector(".leaderboard-" + ["level", "achievement"][type] + " tbody");
             if (!contents) return channel.send(`Query has failed as ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard is not valid!`);
             let rows = contents.querySelectorAll("tr");
             let row1 = rows.shift();
@@ -330,7 +332,7 @@ function exeStalk(course, user_id, json, channel, author) {
                 channel.send("Coursemology Query Failed!");
             } else {
                 console.log("Parsing User Profile...");
-                let contents = parse(body).querySelector(".course-users");
+                let contents = new JSDOM(body).window.document.querySelector(".course-users");
                 if (!contents) return channel.send(`Query Failed! why are you even using this feature?`);
                 let user_info = contents.querySelector(".row").lastChild;
                 let name = user_info.querySelector("h2").text;
@@ -356,7 +358,7 @@ function updateUsers(course) {
         if (error || response.statusCode == 404) {
             console.log("failed to query users (" + response.statusCode + "), error = " + JSON.stringify(error));
         } else {
-            let contents = parse(body).querySelector(".course-users");
+            let contents = new JSDOM(body).window.document.querySelector(".course-users");
             if (!contents) return console.log("failed to query users, contents = null");
             let users = contents.querySelectorAll(".course_user");
             config.USERS_CACHE[course] = {};
@@ -378,7 +380,7 @@ function updateLB(course) {
         if (error || response.statusCode == 404) {
             if (config.debug) config.HOOK.send(`DEBUG: Failed to access ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
         } else {
-            let contents = parse(body).querySelector(".leaderboard-level tbody");
+            let contents = new JSDOM(body).window.document.querySelector(".leaderboard-level tbody");
             if (!contents) return config.debug ? config.HOOK.send(`DEBUG: Course-Do-Not-Exist? ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`) : "";
             let rows = contents.querySelectorAll("tr");
             let newLB = rows.map(row => {
