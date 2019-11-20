@@ -101,9 +101,9 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                                 case '⬅️':
                                 case '➡️':
                                     message.reactions.forEach(reaction => reaction.users.filter(user => user.id !== config.id).forEach((id, user) => reaction.remove(user)));
-                                    let oldPage = MESSAGES[r.message.id].currentSkin;
-                                    MESSAGES[r.message.id].page = Math.min(Math.max(MESSAGES[r.message.id] + (r.emoji.name === '⬅️' ? -1 : 1), 0), MESSAGES[r.message.id].skins.length - 1);
-                                    if (oldPage == MESSAGES[r.message.id].page) break;
+                                    let oldSkin = MESSAGES[r.message.id].currentSkin;
+                                    MESSAGES[r.message.id].currentSkin = Math.min(Math.max(MESSAGES[r.message.id].currentSkin + (r.emoji.name === '⬅️' ? -1 : 1), 0), MESSAGES[r.message.id].skins.length - 1);
+                                    if (oldSkin == MESSAGES[r.message.id].currentSkin) break;
                                     let currentSkin = MESSAGES[r.message.id].skins[MESSAGES[r.message.id].currentSkin];
                                     MESSAGES[r.message.id].embed.fields[0].value = MESSAGES[r.message.id].skins.map(lskin => lskin.title === currentSkin.title ? "**" + lskin.title + "**" : lskin.title).join("\n");
                                     MESSAGES[r.message.id].embed.setTitle(`**${MESSAGES[r.message.id].name}** (${currentSkin.title})`).setThumbnail(currentSkin.chibi).setImage(currentSkin.image);
