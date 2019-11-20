@@ -385,7 +385,7 @@ function updateLB(course) {
             let rows = contents.querySelectorAll("tr");
             let newLB = Object.values(rows).map(row => {
                 return {
-                    id: row.attributes.id.replace("course_user_", ""),
+                    id: row.attributes.id.value.replace("course_user_", ""),
                     rank: row.firstChild.text,
                     name: row.querySelector(".user-profile div a").text,
                     image: `${config.query_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
