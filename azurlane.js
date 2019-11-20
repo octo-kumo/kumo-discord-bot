@@ -58,8 +58,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     .addField("Oil Usage", stats[10], true)
                     .addField("Accuracy", stats[11], true)
                     .addField("Anti-Submarine", stats[12], true)
-                    .addField("📝 Designed by", ship.author)
-                    .addField("**Avaliable Skins**", ship.skins.map(skin => skin.title).join("\n"));
+                    .addField("📝 Designed by", ship.author);
                 embed.setDescription("_All stats shown below are lv120 stats._");
                 msg.channel.send(embed).then(message => {
                     message.react("👕");
