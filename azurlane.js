@@ -82,7 +82,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
     }
 }
 
-function exeSK(args, msg, lang) {
+async function exeSK(args, msg, lang) {
     if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane skin ship-name|skin-name`");
     try {
         let newArgs = args.join(" ").split(/ *\| */g);
