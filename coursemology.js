@@ -197,7 +197,7 @@ function exeList(course, cat, tab, json, channel, author) {
             if (!contents) return channel.send(`Query has failed as ${config.query_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)} is not valid!`);
             let embed = new Discord.RichEmbed().setTitle(`${result.querySelector(".page-header h1 span").text}${config.list_presets[course]?" ("+config.list_presets[course].name+")":""}`).setColor(0x21f8ff);
             let rows = contents.querySelectorAll("tr");
-            let desc = rows.map(row => {
+            let desc = Object.values(rows).map(row => {
                 let title = row.firstChild.firstChild;
                 let disabled = !row.attributes.class.includes("currently-active");
                 return {
@@ -234,7 +234,7 @@ function exeLB(course, type, json, channel, author) {
             let thumbURL = row1.querySelector(".user-picture img").attributes.src;
             if (thumbURL.charAt(0) === "/") thumbURL = config.query_base_url + thumbURL;
             embed.setThumbnail(thumbURL);
-            embed.setDescription(rows.map(row => {
+            embed.setDescription(Object.values(rows).map(row => {
                 console.log(`        #${row.firstChild.text.trim()} ${row.querySelector(".user-profile div a").text.trim()}`);
                 return `#${row.firstChild.text.trim()} [${row.querySelector(".user-profile div a").text.trim()}](${config.query_base_url}${row.querySelector(".user-profile div a").attributes.href})${type==0?" _("+row.querySelector(".user-profile").lastChild.text.trim()+")_":""}`;
             }).join("\n"));
@@ -383,7 +383,7 @@ function updateLB(course) {
             let contents = new JSDOM(body).window.document.querySelector(".leaderboard-level tbody");
             if (!contents) return config.debug ? config.HOOK.send(`DEBUG: Course-Do-Not-Exist? ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`) : "";
             let rows = contents.querySelectorAll("tr");
-            let newLB = rows.map(row => {
+            let newLB = Object.values(rows).map(row => {
                 return {
                     id: row.attributes.id.replace("course_user_", ""),
                     rank: row.firstChild.text,
