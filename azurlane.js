@@ -178,8 +178,8 @@ function getShipByName(name) {
                         };
                     }) : [{
                         title: "Default",
-                        image: art_images[0].getAttribute("src"),
-                        chibi: art_images[1].getAttribute("src")
+                        image: "https://azurlane.koumakan.jp" + art_images[0].getAttribute("src"),
+                        chibi: "https://azurlane.koumakan.jp" + art_images[1].getAttribute("src")
                     }],
                     buildTime: doc.querySelector("tr:nth-child(1) > td:nth-child(2) > a").textContent,
                     rarity: cacheShip.rarity,
