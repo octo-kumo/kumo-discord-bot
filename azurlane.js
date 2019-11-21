@@ -158,6 +158,7 @@ function getShipByName(name) {
                 if (error) reject(error);
                 const doc = new JSDOM(body).window.document;
                 const arts = doc.querySelector("#Art tbody").getElementsByTagName("a");
+                const art_images = doc.querySelector("#Art tbody").getElementsByTagName("img");
                 const tabs = doc.querySelectorAll(".azl_box_body .tabber .tabbertab");
                 let ship = {
                     wikiUrl: "https://azurlane.koumakan.jp/" + cacheShip.name.replace(/ +/g, "_"),
@@ -169,13 +170,17 @@ function getShipByName(name) {
                         kr: doc.querySelector('[lang="ko"]') ? doc.querySelector('[lang="ko"]').textContent : doc.querySelector('[lang="zh"]').textContent
                     },
                     thumbnail: "https://azurlane.koumakan.jp" + doc.querySelector("div:nth-child(1) > div:nth-child(2) > .image > img").getAttribute("src"),
-                    skins: Array.from(tabs).map((skinTab, i) => {
+                    skins: tabs.length > 1 ? Array.from(tabs).map((skinTab, i) => {
                         return {
                             title: skinTab.getAttribute("title"),
                             image: "https://azurlane.koumakan.jp" + skinTab.getElementsByTagName("img")[0].getAttribute("src"),
                             chibi: arts[i * 2 + 1].getAttribute("href")
                         };
-                    }),
+                    }) : {
+                        title: "Default",
+                        image: art_images[0].getAttribute("src"),
+                        chibi: art_images[1].getAttribute("src")
+                    },
                     buildTime: doc.querySelector("tr:nth-child(1) > td:nth-child(2) > a").textContent,
                     rarity: cacheShip.rarity,
                     stars: doc.querySelector("div:nth-child(1) > div:nth-child(3) > .wikitable:nth-child(1) tr:nth-child(2) > td").textContent.trim(),
