@@ -174,7 +174,7 @@ function getShipByName(name) {
                         return {
                             title: skinTab.getAttribute("title"),
                             image: "https://azurlane.koumakan.jp" + skinTab.getElementsByTagName("img")[0].getAttribute("src"),
-                            chibi: arts[i * 2 + 1].getAttribute("href")
+                            chibi: arts[i * 2 + 1] ? arts[i * 2 + 1].getAttribute("href") : "http://azurlane.koumakan.jp/w/images/thumb/4/4e/Cross.png/18px-Cross.png"
                         };
                     }) : [{
                         title: "Default",
