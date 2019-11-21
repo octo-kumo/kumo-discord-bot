@@ -173,12 +173,12 @@ function getShipByName(name) {
                     skins: tabs.length > 1 ? Array.from(tabs).map((skinTab, i) => {
                         return {
                             title: skinTab.getAttribute("title"),
-                            image: "https://azurlane.koumakan.jp" + skinTab.getElementsByTagName("img")[i].getAttribute("src"),
+                            image: "https://azurlane.koumakan.jp" + skinTab.getElementsByTagName("img")[0].getAttribute("src"),
                             chibi: arts[i * 2 + 1].getAttribute("href")
                         };
                     }) : [{
                         title: "Default",
-                        image: "https://azurlane.koumakan.jp" + skinTab.getElementsByTagName("img")[0].getAttribute("src"),
+                        image: "https://azurlane.koumakan.jp" + tabs[0].getElementsByTagName("img")[0].getAttribute("src"),
                         chibi: "https://azurlane.koumakan.jp" + art_images[1].getAttribute("src")
                     }],
                     buildTime: doc.querySelector("tr:nth-child(1) > td:nth-child(2) > a").textContent,
