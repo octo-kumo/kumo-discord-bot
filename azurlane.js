@@ -176,11 +176,11 @@ function getShipByName(name) {
                             image: "https://azurlane.koumakan.jp" + skinTab.getElementsByTagName("img")[0].getAttribute("src"),
                             chibi: arts[i * 2 + 1].getAttribute("href")
                         };
-                    }) : {
+                    }) : [{
                         title: "Default",
                         image: art_images[0].getAttribute("src"),
                         chibi: art_images[1].getAttribute("src")
-                    },
+                    }],
                     buildTime: doc.querySelector("tr:nth-child(1) > td:nth-child(2) > a").textContent,
                     rarity: cacheShip.rarity,
                     stars: doc.querySelector("div:nth-child(1) > div:nth-child(3) > .wikitable:nth-child(1) tr:nth-child(2) > td").textContent.trim(),
