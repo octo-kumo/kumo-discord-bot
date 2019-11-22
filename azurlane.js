@@ -6,7 +6,7 @@ const config = require('./config.js').config;
 const filter = (reaction, user) => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name) && user.id !== config.id;
 const filter2 = (reaction, user) => ['👕'].includes(reaction.emoji.name) && user.id !== config.id;
 const headers = {
-    'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0"
+    'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
 };
 const COLOR = {
     "Normal": 0xdcdcdc,
