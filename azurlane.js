@@ -47,7 +47,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     if (stats[key] && stats[key] !== "0")
                         embed.addField(`**${key}**`, key === "Hunting range" ? "```" + stats[key].map(row => row.map(cell => cell ? cell : " ").join(" ")).join("\n") + "```" : stats[key], true);
                 });
-                embed.addField("📝 Designed by", ship.misc.artist);
+                if (ship.misc.artist) embed.addField("📝 Designed by", ship.misc.artist);
                 msg.channel.send(embed).then(message => {
                     message.react("👕");
                     message.createReactionCollector(filter2).on('collect', r => {
