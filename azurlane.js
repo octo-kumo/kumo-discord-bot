@@ -35,7 +35,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
             try {
                 console.log("Getting Ship " + args.join(" "));
                 const ship = getShipByName(args.join(" "));
-                let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}**`).setColor(COLOR[ship.rarity]).setThumbnail(ship.thumbnail).setImage(ship.skins[0].image).setURL(ship.wikiUrl);
+                let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}**`).setColor(COLOR[ship.rarity]).setThumbnail("https://images.weserv.nl/?url=" + ship.thumbnail).setImage("https://images.weserv.nl/?url=" + ship.skins[0].image).setURL(ship.wikiUrl);
                 let stats = ship.stats["Level 120"];
                 embed.addField("**ID**", (ship.id) ? ship.id : "**not yet decided**", true)
                     .addField("**Stars**", ship.stars.stars, true)
@@ -73,9 +73,9 @@ async function exeSK(args, msg, lang) {
         if (newArgs.length == 1) newArgs = [newArgs[0], "Default"];
         const ship = getShipByName(newArgs[0]);
         let skin = ship.skins.filter(skin => skin.name.toUpperCase().includes(newArgs[1].toUpperCase()))[0];
-        let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}** (${skin.name})`).setColor(COLOR[ship.rarity]).setThumbnail(skin.chibi).setURL(ship.wikiUrl);
+        let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}** (${skin.name})`).setColor(COLOR[ship.rarity]).setThumbnail("https://images.weserv.nl/?url=" + skin.chibi).setURL(ship.wikiUrl);
         embed.addField("Avaliable Skins", ship.skins.map(lskin => lskin.name === skin.name ? "**" + lskin.name + "**" : lskin.name).join("\n"));
-        embed.setImage(skin.image);
+        embed.setImage("https://images.weserv.nl/?url=" + skin.image);
         msg.channel.send(embed).then(message => {
             if (ship.skins.length > 1) {
                 message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️'));
@@ -102,7 +102,7 @@ async function exeSK(args, msg, lang) {
                             if (oldSkin == MESSAGES[r.message.id].currentSkin) break;
                             let currentSkin = MESSAGES[r.message.id].skins[MESSAGES[r.message.id].currentSkin];
                             MESSAGES[r.message.id].embed.fields[0].value = MESSAGES[r.message.id].skins.map(lskin => lskin.name === currentSkin.name ? "**" + lskin.name + "**" : lskin.name).join("\n");
-                            MESSAGES[r.message.id].embed.setTitle(`**${MESSAGES[r.message.id].name}** (${currentSkin.name})`).setThumbnail(currentSkin.chibi).setImage(currentSkin.image);
+                            MESSAGES[r.message.id].embed.setTitle(`**${MESSAGES[r.message.id].name}** (${currentSkin.name})`).setThumbnail("https://images.weserv.nl/?url=" + currentSkin.chibi).setImage("https://images.weserv.nl/?url=" + currentSkin.image);
                             MESSAGES[r.message.id].message.edit(MESSAGES[r.message.id].embed);
                             break;
                     }
