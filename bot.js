@@ -19,7 +19,6 @@ const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
 console.log('====== ZY Discord Bot Started! ======');
 
 coursemology.initiate();
-azurlane.initiate();
 client.on('ready', () => {
     console.log("=> Bot Running!");
     client.user.setPresence(config.PRESENCE);
