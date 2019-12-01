@@ -16,7 +16,11 @@ const COLOR = {
     "Unreleased": 0x000000,
     "Decisive": 0xffffff
 };
-
+const translation = {
+    "Oil consumption": "Oil Usage",
+    "Accuracy (Hit)": "Accuracy",
+    "Anti-submarine warfare": "Anti-Sub"
+}
 const MESSAGES = {};
 exports.ships = SHIPS;
 exports.handleCommnd = async function(args, msg, PREFIX) {
@@ -45,7 +49,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     .addField("**Nationality**", ship.nationality, true);
                 Object.keys(stats).forEach(key => {
                     if (stats[key] && stats[key] !== "0")
-                        embed.addField(`**${key}**`, key === "Hunting range" ? "```" + stats[key].map(row => row.map(cell => cell ? cell : " ").join(" ")).join("\n") + "```" : stats[key], true);
+                        embed.addField(`**${translation[key]?translation[key]:key}**`, key === "Hunting range" ? "```" + stats[key].map(row => row.map(cell => cell ? cell : " ").join(" ")).join("\n") + "```" : stats[key], true);
                 });
                 if (ship.misc.artist) embed.addField("📝 Designed by", ship.misc.artist);
                 msg.channel.send(embed).then(message => {
