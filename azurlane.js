@@ -43,7 +43,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     .addField("**Type**", ship.hullType, true)
                     .addField("**Class**", ship.class, true)
                     .addField("**Nationality**", ship.nationality, true);
-                Object.keys(stats).forEach(key => embed.addField(`**${key}**`, stats[key], true));
+                Object.keys(stats).forEach(key => embed.addField(`**${key}**`, key === "Hunting range" ? stats[key].map(row => row.map(cell => cell ? cell : " ").join(" ")).join("\n") : stats[key], true));
                 embed.addField("📝 Designed by", ship.misc.artist);
                 msg.channel.send(embed).then(message => {
                     message.react("👕");
