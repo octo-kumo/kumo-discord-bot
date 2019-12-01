@@ -38,25 +38,13 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                 let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}**`).setColor(COLOR[ship.rarity]).setThumbnail(ship.thumbnail).setImage(ship.skins[0].image).setURL(ship.wikiUrl);
                 let stats = ship.stats["Level 120"];
                 embed.addField("**ID**", (ship.id) ? ship.id : "**not yet decided**", true)
-                    .addField("**Stars**", ship.stars, true)
+                    .addField("**Stars**", ship.stars.stars, true)
                     .addField("**Rarity**", "**" + ship.rarity + "**", true)
                     .addField("**Type**", ship.hullType, true)
                     .addField("**Class**", ship.class, true)
-                    .addField("**Nationality**", ship.nationality, true)
-                    .addField("❤️ Health", stats["Health"], true)
-                    .addField("🛡 Armor", stats["Armor"], true)
-                    .addField("🔧 Reload", stats["Reload"], true)
-                    .addField("💚 Luck", stats["Luck"], true)
-                    .addField("⚔️ Firepower", stats["Firepower"], true)
-                    .addField("🦋 Evasion", stats["Evasion"], true)
-                    .addField("Speed", stats["Speed"], true)
-                    .addField("Anti-air", stats["Anti-air"], true)
-                    .addField("Aviation", stats["Aviation"], true)
-                    .addField("Oil Usage", stats["Oil consumption"], true)
-                    .addField("Accuracy", stats["Accuracy (Hit)"], true)
-                    .addField("Anti-Submarine", stats["Anti-submarine warfare"], true)
-                    .addField("📝 Designed by", ship.author);
-                embed.setDescription("_All stats shown below are lv120 stats._");
+                    .addField("**Nationality**", ship.nationality, true);
+                Object.keys(stats).forEach(key => embed.addField(`**${key}**`, stats[key], true));
+                embed.addField("📝 Designed by", ship.misc.artist);
                 msg.channel.send(embed).then(message => {
                     message.react("👕");
                     message.createReactionCollector(filter2).on('collect', r => {
