@@ -32,7 +32,10 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
             try {
                 console.log("Getting Ship " + args.join(" "));
                 const ship = azurlane.getShip(args.join(" "));
-                let embed = new Discord.RichEmbed().setTitle(`**${ship.names.en}** (${ship.names.jp})`).setColor(COLOR[ship.rarity]).setThumbnail(ship.thumbnail).setImage(ship.skins[0].image).setURL(ship.wikiUrl);
+                let embed = new Discord.RichEmbed().setTitle(`**${ship.names.en}** (${ship.names.jp})`)
+                    .setColor(COLOR[ship.rarity])
+                    .setThumbnail(ship.thumbnail)
+                    .setImage(ship.skins[0].image).setURL(ship.wikiUrl);
                 let stats = ship.stats["Level 120"];
                 embed.addField("**ID**", (ship.id) ? ship.id : "**not yet decided**", true)
                     .addField("**Stars**", ship.stars.stars, true)
@@ -49,11 +52,12 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     message.react("👕");
                     message.createReactionCollector(filter2).on('collect', r => {
                         message.clearReactions();
-                        exeSK([ship.names.en + "|Default"], msg, lang);
+                        exeSk([ship.names.en], msg);
                     });
                 });
             } catch (err) {
                 console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
+                console.log(err.stack);
                 msg.channel.send("Invalid ship name.");
             }
             break;
@@ -61,47 +65,51 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
         case "skin":
         case "sk":
         case "vs":
-            const ship = azurlane.getShip(args.join(" "));
-            let skin = ship.skins[0];
-            let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}** (${skin.name})`).setColor(COLOR[ship.rarity]).setThumbnail(skin.chibi).setURL(ship.wikiUrl);
-            embed.addField("Avaliable Skins", ship.skins.map(lskin => lskin.name === skin.name ? "**" + lskin.name + "**" : lskin.name).join("\n"));
-            embed.setImage(skin.image);
-            msg.channel.send(embed).then(message => {
-                if (ship.skins.length > 1) {
-                    message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️'));
-                    MESSAGES[message.id] = {
-                        name: ship.names[lang],
-                        skins: ship.skins,
-                        embed: embed,
-                        currentSkin: ship.skins.findIndex(lskin => lskin.name === skin.name),
-                        message: message
-                    };
-                    const collector = message.createReactionCollector(filter);
-                    collector.on('collect', r => {
-                        console.log(`Collected ${r.emoji.name}`);
-                        switch (r.emoji.name) {
-                            case '❎':
-                                r.message.delete();
-                                delete MESSAGES[r.message.id];
-                                break;
-                            case '⬅️':
-                            case '➡️':
-                                message.reactions.forEach(reaction => reaction.users.filter(user => user.id !== config.id).forEach((id, user) => reaction.remove(user)));
-                                let oldSkin = MESSAGES[r.message.id].currentSkin;
-                                MESSAGES[r.message.id].currentSkin = Math.min(Math.max(MESSAGES[r.message.id].currentSkin + (r.emoji.name === '⬅️' ? -1 : 1), 0), MESSAGES[r.message.id].skins.length - 1);
-                                if (oldSkin == MESSAGES[r.message.id].currentSkin) break;
-                                let currentSkin = MESSAGES[r.message.id].skins[MESSAGES[r.message.id].currentSkin];
-                                MESSAGES[r.message.id].embed.fields[0].value = MESSAGES[r.message.id].skins.map(lskin => lskin.name === currentSkin.name ? "**" + lskin.name + "**" : lskin.name).join("\n");
-                                MESSAGES[r.message.id].embed.setTitle(`**${MESSAGES[r.message.id].name}** (${currentSkin.name})`).setThumbnail("https://images.weserv.nl/?url=" + currentSkin.chibi).setImage("https://images.weserv.nl/?url=" + currentSkin.image);
-                                MESSAGES[r.message.id].message.edit(MESSAGES[r.message.id].embed);
-                                break;
-                        }
-                    });
-                    collector.on('end', r => {
-                        message.delete();
-                    });
-                }
-            }); // Pages
+            exeSk(args, msg);
             break;
     }
 };
+
+function exeSk(args, msg) {
+    const ship = azurlane.getShip(args.join(" "));
+    let skin = ship.skins[0];
+    let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}** (${skin.name})`).setColor(COLOR[ship.rarity]).setThumbnail(skin.chibi).setURL(ship.wikiUrl);
+    embed.addField("Avaliable Skins", ship.skins.map(lskin => lskin.name === skin.name ? "**" + lskin.name + "**" : lskin.name).join("\n"));
+    embed.setImage(skin.image);
+    msg.channel.send(embed).then(message => {
+        if (ship.skins.length > 1) {
+            message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️'));
+            MESSAGES[message.id] = {
+                name: ship.names[lang],
+                skins: ship.skins,
+                embed: embed,
+                currentSkin: ship.skins.findIndex(lskin => lskin.name === skin.name),
+                message: message
+            };
+            const collector = message.createReactionCollector(filter);
+            collector.on('collect', r => {
+                console.log(`Collected ${r.emoji.name}`);
+                switch (r.emoji.name) {
+                    case '❎':
+                        r.message.delete();
+                        delete MESSAGES[r.message.id];
+                        break;
+                    case '⬅️':
+                    case '➡️':
+                        message.reactions.forEach(reaction => reaction.users.filter(user => user.id !== config.id).forEach((id, user) => reaction.remove(user)));
+                        let oldSkin = MESSAGES[r.message.id].currentSkin;
+                        MESSAGES[r.message.id].currentSkin = Math.min(Math.max(MESSAGES[r.message.id].currentSkin + (r.emoji.name === '⬅️' ? -1 : 1), 0), MESSAGES[r.message.id].skins.length - 1);
+                        if (oldSkin == MESSAGES[r.message.id].currentSkin) break;
+                        let currentSkin = MESSAGES[r.message.id].skins[MESSAGES[r.message.id].currentSkin];
+                        MESSAGES[r.message.id].embed.fields[0].value = MESSAGES[r.message.id].skins.map(lskin => lskin.name === currentSkin.name ? "**" + lskin.name + "**" : lskin.name).join("\n");
+                        MESSAGES[r.message.id].embed.setTitle(`**${MESSAGES[r.message.id].name}** (${currentSkin.name})`).setThumbnail("https://images.weserv.nl/?url=" + currentSkin.chibi).setImage("https://images.weserv.nl/?url=" + currentSkin.image);
+                        MESSAGES[r.message.id].message.edit(MESSAGES[r.message.id].embed);
+                        break;
+                }
+            });
+            collector.on('end', r => {
+                message.delete();
+            });
+        }
+    }); // Pages
+}
