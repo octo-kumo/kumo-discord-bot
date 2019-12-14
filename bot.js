@@ -32,7 +32,7 @@ client.on('message', async msg => {
     console.log(`=> Message "${msg.content}" received from ${msg.author.tag}.`);
     if (!msg.channel.type === "text") return;
     if (!msg.guild && msg.author.id !== "456001047756800000") return;
-    if (config.SIMPLE_REPLIES[msg.content.replace(/[^\w]+/g, '').toLowerCase()]) return msg.channel.send(config.SIMPLE_REPLIES[msg.content.replace(/[^\w]+/g, '').toLowerCase()]);
+    //if (config.SIMPLE_REPLIES[msg.content.replace(/[^\w]+/g, '').toLowerCase()]) return msg.channel.send(config.SIMPLE_REPLIES[msg.content.replace(/[^\w]+/g, '').toLowerCase()]);
     if (msg.content.indexOf(PREFIX) !== 0) return;
     console.log(`====== Message is a valid command.`);
     let args = msg.content.slice(1).trim().split(/ +/g);
