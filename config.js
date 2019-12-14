@@ -91,5 +91,13 @@ exports.config = {
         title: "Don't give up on your dreams!",
         body: "Go on and sleep!\nDon't you have dreams, ${username}?"
     }],
-    SLEEP_LATE: ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747132/sleep_late.jpg"]
+    SLEEP_LATE: ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747132/sleep_late.jpg"],
+    SIMPLE_REPLIES: {
+        'wat': 'wat',
+        'what': 'wat',
+        'cloudy': 'Yes it is. Great isn\'t it?',
+        'hrm': 'Hum?',
+        'wtf': '(**W**)hat about (**t**)he (**f**)ur?',
+        'bruh': 'Yes bro? ( ͡° ͜ʖ ͡°)'
+    }
 }
