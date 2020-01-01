@@ -1,10 +1,19 @@
 const Discord = require('discord.js');
 const config = require('./config.js').config;
-const SHIP_LIST = require('./ship_list.json');
 const SHIPS = require('./ships.json');
 
-const filter = (reaction, user) => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name) && user.id !== config.id;
-const filter2 = (reaction, user) => ['👕'].includes(reaction.emoji.name) && user.id !== config.id;
+const page_filter = (reaction, user) => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name) && user.id !== config.id;
+const page_increments = {
+    '⬅️': -1,
+    '➡️': 1
+};
+const statsLevels = {
+    "level120": "Level 120",
+    "level100": "Level 100",
+    "baseStats": "Base",
+    "level100Retrofit": "Level 100 Retrofit",
+    "level120Retrofit": "Level 120 Retrofit"
+}
 
 const COLOR = {
     "Normal": 0xdcdcdc,
@@ -13,129 +22,164 @@ const COLOR = {
     "Super Rare": 0xeee8aa,
     "Ultra Rare": 0xeee8aa,
     "Priority": 0xeee8aa,
-    "Unreleased": 0x000000,
-    "Decisive": 0xffffff
+    "Decisive": 0xeee8aa,
+    "Unreleased": 0x000000
 };
-const translation = {
+const TRANSLATION = {
     "Oil consumption": "Oil Usage",
     "Accuracy (Hit)": "Accuracy",
     "Anti-submarine warfare": "Anti-Sub"
-}
-const MESSAGES = {};
+};
+const BOOKS = {};
+
 exports.ships = SHIPS;
 exports.handleCommnd = async function(args, msg, PREFIX) {
     console.log("running azurlane sub-system...");
-    if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane (ship|skin) [args]`");
-    let lang = "en";
-    if (["--en", "--jp", "--cn"].includes(args[args.length - 1])) {
-        console.log("user specified language " + args[args.length - 1]);
-        lang = args.pop().substring(2);
-    }
-    switch (args.shift()) {
-        case "ship":
-        case "s":
-        case "info":
-        case "i":
-            try {
-                console.log("Getting Ship " + args.join(" "));
-                const ship = getShipByName(args.join(" "));
-                let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}**`).setColor(COLOR[ship.rarity]).setThumbnail("https://images.weserv.nl/?url=" + ship.thumbnail).setImage("https://images.weserv.nl/?url=" + ship.skins[0].image).setURL(ship.wikiUrl);
-                let stats = ship.stats["Level 120"];
-                embed.addField("**ID**", (ship.id) ? ship.id : "**not yet decided**", true)
-                    .addField("**Stars**", ship.stars.stars, true)
-                    .addField("**Rarity**", "**" + ship.rarity + "**", true)
-                    .addField("**Type**", ship.hullType, true)
-                    .addField("**Class**", ship.class, true)
-                    .addField("**Nationality**", ship.nationality, true);
-                Object.keys(stats).forEach(key => {
-                    if (stats[key] && stats[key] !== "0")
-                        embed.addField(`**${translation[key]?translation[key]:key}**`, key === "Hunting range" ? "```" + stats[key].map(row => row.map(cell => cell ? cell : " ").join(" ")).join("\n") + "```" : stats[key], true);
-                });
-                if (ship.misc.artist) embed.addField("📝 Designed by", ship.misc.artist);
-                msg.channel.send(embed).then(message => {
-                    message.react("👕");
-                    message.createReactionCollector(filter2).on('collect', r => {
-                        message.clearReactions();
-                        exeSK([ship.names.en + "|Default"], msg, lang);
-                    });
-                });
-            } catch (err) {
-                console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
-                msg.channel.send("Invalid ship name.");
-            }
-            break;
-        case "viewskin":
-        case "skin":
-        case "sk":
-        case "vs":
-            exeSK(args, msg, lang);
-            break;
-    }
-}
-
-async function exeSK(args, msg, lang) {
-    if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane skin ship-name|skin-name`");
+    if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane ship-name`");
     try {
-        let newArgs = args.join(" ").split(/ *\| */g);
-        if (newArgs.length == 1) newArgs = [newArgs[0], "Default"];
-        const ship = getShipByName(newArgs[0]);
-        let skin = ship.skins.filter(skin => skin.name.toUpperCase().includes(newArgs[1].toUpperCase()))[0];
-        let embed = new Discord.RichEmbed().setTitle(`**${ship.names[lang]}** (${skin.name})`).setColor(COLOR[ship.rarity]).setThumbnail("https://images.weserv.nl/?url=" + skin.chibi).setURL(ship.wikiUrl);
-        embed.addField("Avaliable Skins", ship.skins.map(lskin => lskin.name === skin.name ? "**" + lskin.name + "**" : lskin.name).join("\n"));
-        embed.setImage("https://images.weserv.nl/?url=" + skin.image);
-        msg.channel.send(embed).then(message => {
-            if (ship.skins.length > 1) {
-                message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️'));
-                MESSAGES[message.id] = {
-                    name: ship.names[lang],
-                    skins: ship.skins,
-                    embed: embed,
-                    currentSkin: ship.skins.findIndex(lskin => lskin.name === skin.name),
-                    message: message
-                };
-                const collector = message.createReactionCollector(filter);
-                collector.on('collect', r => {
-                    console.log(`Collected ${r.emoji.name}`);
-                    switch (r.emoji.name) {
-                        case '❎':
-                            r.message.delete();
-                            delete MESSAGES[r.message.id];
-                            break;
-                        case '⬅️':
-                        case '➡️':
-                            message.reactions.forEach(reaction => reaction.users.filter(user => user.id !== config.id).forEach((id, user) => reaction.remove(user)));
-                            let oldSkin = MESSAGES[r.message.id].currentSkin;
-                            MESSAGES[r.message.id].currentSkin = Math.min(Math.max(MESSAGES[r.message.id].currentSkin + (r.emoji.name === '⬅️' ? -1 : 1), 0), MESSAGES[r.message.id].skins.length - 1);
-                            if (oldSkin == MESSAGES[r.message.id].currentSkin) break;
-                            let currentSkin = MESSAGES[r.message.id].skins[MESSAGES[r.message.id].currentSkin];
-                            MESSAGES[r.message.id].embed.fields[0].value = MESSAGES[r.message.id].skins.map(lskin => lskin.name === currentSkin.name ? "**" + lskin.name + "**" : lskin.name).join("\n");
-                            MESSAGES[r.message.id].embed.setTitle(`**${MESSAGES[r.message.id].name}** (${currentSkin.name})`).setThumbnail("https://images.weserv.nl/?url=" + currentSkin.chibi).setImage("https://images.weserv.nl/?url=" + currentSkin.image);
-                            MESSAGES[r.message.id].message.edit(MESSAGES[r.message.id].embed);
-                            break;
-                    }
-                });
-                collector.on('end', r => {
-                    message.delete();
-                });
-            }
-        }); // Pages
+        let pages = generatePages(args.join(" "));
+        msg.channel.send(pages[0]).then(message => {
+            BOOKS[message.id] = {
+                pages: pages,
+                page: 0
+            };
+            message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️'));
+            message.createReactionCollector(page_filter).on('collect', r => {
+                if (!r) return;
+                r.remove(msg.author.id);
+                let incre = page_increments[r.emoji.name];
+                if (r.emoji.name === '❎') return message.delete();
+                let book = BOOKS[message.id];
+                if ((book.page >= book.pages.length && incre === 1) || (book.page <= 0 && incre === -1)) return;
+                message.edit(book.pages[book.page += incre]);
+            });
+        });
     } catch (err) {
         console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
-        msg.channel.send("Invalid ship name/skin name.");
+        console.log(err.stack);
+        msg.channel.send("Invalid ship name.");
     }
 }
-
-function findExactShip(name) {
-    return SHIP_LIST.find(ship => ship.name.toUpperCase() === name.toUpperCase());
+const STATS_NAME_TRANSLATION = {
+    "baseStats": "Base",
+    "level100": "Level 100",
+    "level120": "Level 120",
+    "level100Retrofit": "Level 100 Retrofit",
+    "level120Retrofit": "Level 120 Retrofit"
+}
+const STATS_EMOJI_TRANSLATION = {
+    "health": "<:iconduration:655290064104063029> Health",
+    "armor": "<:iconarmor:655290056080359444> Armor",
+    "reload": "<:iconrefill:655290076019818496> Reload",
+    "luck": "<:iconluck:655290065223680020> Luck",
+    "firepower": "<:iconfirepower:655290065282400256> Firepower",
+    "torpedo": "<:icontorpedo:655290077408264192> Torpedo",
+    "evasion": "<:iconevasion:655290064741335051> Evasion",
+    "speed": "Speed",
+    "antiair": "<:iconantiair:655289973485862912> Anti-Air",
+    "aviation": "<:iconaviation:655290057938436137> Aviation",
+    "oilConsumption": "<:iconconsumption:655290063692759052> Oil Usage",
+    "accuracyHit": "Accuracy",
+    "antisubmarineWarfare": "<:iconasw:655290057736978432> ASW",
+    "oxygen": "<:iconoxygen:661814201903480842> Oxygen",
+    "ammunition": "<:iconammunition:661814201345507349> Ammunition",
+    "huntingRange": "<:iconhuntrange:661814201538576387> Hunting Range"
 }
 
-function findShip(name) {
-    return SHIP_LIST.find(ship => ship.name.toUpperCase().includes(name.toUpperCase()));
+function generatePages(name) {
+    let pages = [];
+    const ship = getShipByName(name);
+    const generalInfo = new Discord.RichEmbed(); // Page 1
+    generalInfo.setTitle("General Info")
+        .addField("Rarity", ship.rarity + " " + ship.stars.stars)
+        .addField("ID", ship.id, true)
+        .addField("Class", ship.class, true)
+        .addField("Type", ship.hullType);
+    if (ship.misc.artist) generalInfo.addField("Artist", ship.misc.artist, true);
+    if (ship.misc.web) generalInfo.addField("Web", ship.misc.web.name, true);
+    if (ship.misc.pixiv) generalInfo.addField("Pixiv", ship.misc.pixiv.name, true);
+    if (ship.misc.twitter) generalInfo.addField("Twitter", ship.misc.twitter.name, true);
+    if (ship.misc.voice) generalInfo.addField("Voice Actress", ship.misc.voice.name);
+    pages.push(generalInfo);
+    const stats = []; // Page 2-?
+    pages.push(generateStatsPage(ship, "baseStats"));
+    pages.push(generateStatsPage(ship, "level100"));
+    pages.push(generateStatsPage(ship, "level120"));
+    if (ship.retrofit) {
+        pages.push(generateStatsPage(ship, "level100Retrofit"));
+        pages.push(generateStatsPage(ship, "level120Retrofit"));
+    }
+
+    const skills_limits_eq = new Discord.RichEmbed(); // Page 3
+    skills_limits_eq.setTitle("Equipment Slots / Skills / Limit Breaks")
+        .addField("(1) " + ship.slots[1].type, ship.slots[1].minEfficiency ? ship.slots[1].minEfficiency + "% → " + ship.slots[1].maxEfficiency + "%" : "", true)
+        .addField("(2) " + ship.slots[2].type, ship.slots[2].minEfficiency + "% → " + ship.slots[2].maxEfficiency + "%", true)
+        .addField("(3) " + ship.slots[3].type, ship.slots[3].minEfficiency + "% → " + ship.slots[3].maxEfficiency + "%", true);
+    skills_limits_eq.addBlankField();
+    console.log(ship.skills['1']);
+    skills_limits_eq.addField(ship.skills['1'].names.en + "\n" + ship.skills['1'].names.jp, ship.skills['1'].description, true);
+    if (ship.skills['2']) skills_limits_eq.addField(ship.skills['2'].names.en + "\n" + ship.skills['2'].names.jp, ship.skills['2'].description, true);
+    else skills_limits_eq.addBlankField(true);
+    if (ship.skills['3']) skills_limits_eq.addField(ship.skills['3'].names.en + "\n" + ship.skills['3'].names.jp, ship.skills['3'].description, true);
+    else skills_limits_eq.addBlankField(true);
+    skills_limits_eq.addBlankField();
+    skills_limits_eq.addField("Limit Break 1", ship.limitBreaks[1].join("\n"), true);
+    skills_limits_eq.addField("Limit Break 2", ship.limitBreaks[2].join("\n"), true);
+    skills_limits_eq.addField("Limit Break 3", ship.limitBreaks[3].join("\n"), true);
+    pages.push(skills_limits_eq);
+    const construction = new Discord.RichEmbed(); // Page 4
+    construction.setTitle("Construction");
+    pages.push(construction);
+    for (let i = 0; i < pages.length; i++) {
+        pages[i].setAuthor(`${ship.names.code} (${ship.names.jp})`, ship.thumbnail, ship.wikiUrl)
+            .setColor(COLOR[ship.rarity])
+            .setThumbnail(ship.skins[0].chibi);
+        pages[i].setFooter("Page " + (i + 1) + "/" + pages.length);
+    }
+    return pages;
+}
+
+function generateStatsPage(ship, key) {
+    const statsPage = new Discord.RichEmbed();
+    statsPage.setTitle(STATS_NAME_TRANSLATION[key] + " Stats")
+    let names = "**";
+    let values = "";
+    for (let st in ship.stats[key]) {
+        if (st === "huntingRange") continue;
+        names = names + STATS_EMOJI_TRANSLATION[st] + "\n";
+        values = values + ship.stats[key][st] + "\n";
+    }
+    statsPage.addField("Stat", names.trim() + "**", true);
+    statsPage.addField("Value", values.trim(), true);
+    if (ship.stats[key].huntingRange) {
+        let range = "```\n";
+        for (let row of ship.stats[key].huntingRange) {
+            for (let col of row) range = range + " " + (col ? col : " ") + " ";
+            range = range + "\n"
+        }
+        statsPage.addField(STATS_EMOJI_TRANSLATION["huntingRange"], range.trim() + "```");
+    }
+    return statsPage;
 }
 
 function getShipByName(name) {
-    let cacheShip = findExactShip(name);
-    if (!cacheShip) cacheShip = findShip(name);
-    if (cacheShip) return SHIPS[cacheShip.id];
-    else return null;
+    for (let ship of Object.values(SHIPS)) {
+        if (ship.names.en && ship.names.en.toUpperCase() === name.toUpperCase()) return ship;
+        if (ship.names.jp && ship.names.jp.toUpperCase() === name.toUpperCase()) return ship;
+        if (ship.names.kr && ship.names.kr.toUpperCase() === name.toUpperCase()) return ship;
+        if (ship.names.cn && ship.names.cn.toUpperCase() === name.toUpperCase()) return ship;
+        if (ship.names.code && ship.names.code.toUpperCase() === name.toUpperCase()) return ship;
+    }
+    for (let ship of Object.values(SHIPS)) {
+        if (ship.names.en && ship.names.en.toUpperCase().includes(name.toUpperCase())) return ship;
+        if (ship.names.jp && ship.names.jp.toUpperCase().includes(name.toUpperCase())) return ship;
+        if (ship.names.kr && ship.names.kr.toUpperCase().includes(name.toUpperCase())) return ship;
+        if (ship.names.cn && ship.names.cn.toUpperCase().includes(name.toUpperCase())) return ship;
+        if (ship.names.code && ship.names.code.toUpperCase().includes(name.toUpperCase())) return ship;
+    }
+    return null;
+}
+
+function clone(obj) {
+    return JSON.parse(JSON.stringify(obj));
 }

@@ -1,11 +1,11 @@
 // Required dependencies
 const Discord = require('discord.js');
 const config = require('./config.js').config;
-const coursemology = require('./coursemology.js');
+// const coursemology = require('./coursemology.js');
 const azurlane = require('./azurlane.js');
 
 // Constants
-const PREFIX = process.env.PREFIX;
+const PREFIX = process.env.PREFIX || "!";
 const client = new Discord.Client();
 
 // Embed Presets
@@ -18,11 +18,11 @@ const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
 
 console.log('====== ZY Discord Bot Started! ======');
 
-coursemology.initiate();
+// coursemology.initiate();
 client.on('ready', () => {
     console.log("=> Bot Running!");
     client.user.setPresence(config.PRESENCE);
-    setInterval(coursemology.update, 10000);
+    // setInterval(coursemology.update, 10000);
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     config.id = client.user.id;
 });
