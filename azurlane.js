@@ -120,7 +120,6 @@ function generatePages(name) {
     for (skill of ship.skills) {
         let skill_field = generateSkillField(skill);
         skills_limits_eq.addField(skill_field.name, skill_field.value, true);
-        console.log(skill_field.name);
     }
     skills_limits_eq.addBlankField();
     if (ship.rarity === "Priority" || ship.rarity === "Decisive")
@@ -129,8 +128,8 @@ function generatePages(name) {
             skills_limits_eq.addField(delv_field.name, delv_field.value, true);
         }
     else {
-        for (limit of ship.limitBreaks) {
-            let limit_field = generateLimitField(limit);
+        for (let i = 0; i < ship.limitBreaks.length; i++) {
+            let limit_field = generateLimitField(i + 1, ship.limitBreaks[i]);
             skills_limits_eq.addField(limit_field.name, limit_field.value, true);
         }
     }
@@ -144,7 +143,7 @@ function generatePages(name) {
     return pages;
 }
 
-function generateSkillField(index, skill) {
+function generateSkillField(skill) {
     if (!skill) return {
         name: "\u200b",
         value: "\u200b"
