@@ -112,20 +112,19 @@ function generatePages(name) {
 
     const skills_limits_eq = new Discord.RichEmbed(); // Page 3
     skills_limits_eq.setTitle("Equipment Slots / Skills / Limit Breaks")
-        .addField("(1) " + ship.slots[1].type, ship.slots[1].minEfficiency ? ship.slots[1].minEfficiency + "% → " + ship.slots[1].maxEfficiency + "%" : "", true)
+        .addField("(1) " + ship.slots[1].type, ship.slots[1].minEfficiency ? ship.slots[1].minEfficiency + "% → " + ship.slots[1].maxEfficiency + "%" : "None", true)
         .addField("(2) " + ship.slots[2].type, ship.slots[2].minEfficiency + "% → " + ship.slots[2].maxEfficiency + "%", true)
         .addField("(3) " + ship.slots[3].type, ship.slots[3].minEfficiency + "% → " + ship.slots[3].maxEfficiency + "%", true);
     skills_limits_eq.addBlankField();
-    console.log(ship.skills['1']);
-    skills_limits_eq.addField(ship.skills['1'].names.en + "\n" + ship.skills['1'].names.jp, ship.skills['1'].description, true);
-    if (ship.skills['2']) skills_limits_eq.addField(ship.skills['2'].names.en + "\n" + ship.skills['2'].names.jp, ship.skills['2'].description, true);
-    else skills_limits_eq.addBlankField(true);
-    if (ship.skills['3']) skills_limits_eq.addField(ship.skills['3'].names.en + "\n" + ship.skills['3'].names.jp, ship.skills['3'].description, true);
-    else skills_limits_eq.addBlankField(true);
+    for (skill of ship.skills) skills_limits_eq.fields.push(generateSkillField(skill));
     skills_limits_eq.addBlankField();
-    skills_limits_eq.addField("Limit Break 1", ship.limitBreaks[1].join("\n"), true);
-    skills_limits_eq.addField("Limit Break 2", ship.limitBreaks[2].join("\n"), true);
-    skills_limits_eq.addField("Limit Break 3", ship.limitBreaks[3].join("\n"), true);
+    if (ship.rarity === "Priority" || ship.rarity === "Decisive") {
+        for (level of Object.keys(ship.devLevels)) {
+            skills_limits_eq.fields.push(generateDevLevel(level, ship.devLevels[level]));
+        }
+    } else {
+        for (limit of ship.limitBreaks) skills_limits_eq.fields.push(generateLimitField(limit));
+    }
     pages.push(skills_limits_eq);
     const construction = new Discord.RichEmbed(); // Page 4
     construction.setTitle("Construction");
@@ -137,6 +136,43 @@ function generatePages(name) {
         pages[i].setFooter("Page " + (i + 1) + "/" + pages.length);
     }
     return pages;
+}
+
+function generateSkillField(index, skill) {
+    if (!skill) return {
+        name: "\u200b",
+        value: "\u200b",
+        inline: true
+    };
+    return {
+        name: skill.names.en + "\n" + skill.names.jp,
+        value: skill.description,
+        inline: true
+    };
+}
+
+function generateLimitField(index, limit) {
+    if (!limit) return {
+        name: "\u200b",
+        value: "\u200b",
+        inline: true
+    };
+    return {
+        name: "Limit Break " + index,
+        value: limit.join("\n"),
+        inline: true
+    };
+}
+
+function generateDevLevel(level, buffs) {
+    return {
+        name: "Lv " + level,
+        value: buffs.map(buff => {
+            if (typeof buff === "object") return Object.keys(buff).map(sbuff => STATS_EMOJI_TRANSLATION[sbuff] + " " + buff[sbuff]).join(", ")
+            else return buff;
+        }).join("\n"),
+        inline: true
+    };
 }
 
 function generateStatsPage(ship, key) {
