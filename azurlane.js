@@ -100,6 +100,7 @@ function generatePages(name) {
     if (ship.misc.pixiv) generalInfo.addField("Pixiv", ship.misc.pixiv.name, true);
     if (ship.misc.twitter) generalInfo.addField("Twitter", ship.misc.twitter.name, true);
     if (ship.misc.voice) generalInfo.addField("Voice Actress", ship.misc.voice.name);
+    generalInfo.addField("construction Time / Obtained From", ship.construction.constructionTime);
     pages.push(generalInfo);
     const stats = []; // Page 2-?
     pages.push(generateStatsPage(ship, "baseStats"));
@@ -116,19 +117,23 @@ function generatePages(name) {
         .addField("(2) " + ship.slots[2].type, ship.slots[2].minEfficiency + "% → " + ship.slots[2].maxEfficiency + "%", true)
         .addField("(3) " + ship.slots[3].type, ship.slots[3].minEfficiency + "% → " + ship.slots[3].maxEfficiency + "%", true);
     skills_limits_eq.addBlankField();
-    for (skill of ship.skills) skills_limits_eq.fields.push(generateSkillField(skill));
+    for (skill of ship.skills) {
+        let skill_field = generateSkillField(skill);
+        skills_limits_eq.addField(skill_field.name, skill_field.value, true);
+    }
     skills_limits_eq.addBlankField();
-    if (ship.rarity === "Priority" || ship.rarity === "Decisive") {
+    if (ship.rarity === "Priority" || ship.rarity === "Decisive")
         for (level of Object.keys(ship.devLevels)) {
-            skills_limits_eq.fields.push(generateDevLevel(level, ship.devLevels[level]));
+            let delv_field = generateDevLevel(level, ship.devLevels[level]);
+            skills_limits_eq.addField(delv_field.name, delv_field.value, true);
         }
-    } else {
-        for (limit of ship.limitBreaks) skills_limits_eq.fields.push(generateLimitField(limit));
+    else {
+        for (limit of ship.limitBreaks) {
+            let limit_field = generateLimitField(limit);
+            skills_limits_eq.addField(limit_field.name, limit_field.value, true);
+        }
     }
     pages.push(skills_limits_eq);
-    const construction = new Discord.RichEmbed(); // Page 4
-    construction.setTitle("Construction");
-    pages.push(construction);
     for (let i = 0; i < pages.length; i++) {
         pages[i].setAuthor(`${ship.names.code} (${ship.names.jp})`, ship.thumbnail, ship.wikiUrl)
             .setColor(COLOR[ship.rarity])
@@ -141,26 +146,22 @@ function generatePages(name) {
 function generateSkillField(index, skill) {
     if (!skill) return {
         name: "\u200b",
-        value: "\u200b",
-        inline: true
+        value: "\u200b"
     };
     return {
         name: skill.names.en + "\n" + skill.names.jp,
-        value: skill.description,
-        inline: true
+        value: skill.description
     };
 }
 
 function generateLimitField(index, limit) {
     if (!limit) return {
         name: "\u200b",
-        value: "\u200b",
-        inline: true
+        value: "\u200b"
     };
     return {
         name: "Limit Break " + index,
-        value: limit.join("\n"),
-        inline: true
+        value: limit.join("\n")
     };
 }
 
@@ -170,8 +171,7 @@ function generateDevLevel(level, buffs) {
         value: buffs.map(buff => {
             if (typeof buff === "object") return Object.keys(buff).map(sbuff => STATS_EMOJI_TRANSLATION[sbuff] + " " + buff[sbuff]).join(", ")
             else return buff;
-        }).join("\n"),
-        inline: true
+        }).join("\n")
     };
 }
 
