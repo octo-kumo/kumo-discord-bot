@@ -120,6 +120,7 @@ function generatePages(name) {
     for (skill of ship.skills) {
         let skill_field = generateSkillField(skill);
         skills_limits_eq.addField(skill_field.name, skill_field.value, true);
+        console.log(skill_field.name);
     }
     skills_limits_eq.addBlankField();
     if (ship.rarity === "Priority" || ship.rarity === "Decisive")
