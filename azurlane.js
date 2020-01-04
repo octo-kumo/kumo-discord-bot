@@ -53,7 +53,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     let incre = name === "⬅️" ? -1 : 1;
                     if ((book.page >= book.pages.length && incre === 1) || (book.page <= 0 && incre === -1)) return;
                     message.edit(book.pages[book.page += incre]);
-                } else if (book.page !== book.page = book.anchors[page_anchor_index[name]] || 0) message.edit(book.pages[book.page]);
+                } else if (book.page !== (book.page = book.anchors[page_anchor_index[name]] || 0)) message.edit(book.pages[book.page]);
             });
         });
     } catch (err) {
