@@ -2,11 +2,13 @@ const Discord = require('discord.js');
 const config = require('./config.js').config;
 const SHIPS = require('./ships.json');
 
-const page_filter = (reaction, user) => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name) && user.id !== config.id;
-const page_increments = {
-    '⬅️': -1,
-    '➡️': 1
-};
+const page_filter = (reaction, user) => ['⬅️', '📊', '🎉', '👕', '🖌️', '➡️', '❎'].includes(reaction.emoji.name) && user.id !== config.id;
+const page_anchor_index = {
+    '📊': 'stats',
+    '🎉': 'skills',
+    '👕': 'skins',
+    '🖌️': 'gallery'
+}
 const statsLevels = {
     "level120": "Level 120",
     "level100": "Level 100",
@@ -40,15 +42,22 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
         let book = generateBook(args.join(" "));
         msg.channel.send(book.pages[0]).then(message => {
             BOOKS[message.id] = book;
-            message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️'));
+            message.react('⬅️').then(() => message.react('📊')).then(() => message.react('🎉')).then(() => message.react('👕')).then(() => message.react('🖌️')).then(() => message.react('➡️')).then(() => message.react('❎'));
             message.createReactionCollector(page_filter).on('collect', r => {
                 if (!r) return;
                 r.remove(msg.author.id);
-                let incre = page_increments[r.emoji.name];
+                let name = r.emoji.name;
                 if (r.emoji.name === '❎') return message.delete();
                 let book = BOOKS[message.id];
-                if ((book.page >= book.pages.length && incre === 1) || (book.page <= 0 && incre === -1)) return;
-                message.edit(book.pages[book.page += incre]);
+                if (name === "⬅️" || name === "➡️") {
+                    let incre = name === "⬅️" ? -1 : 1;
+                    if ((book.page >= book.pages.length && incre === 1) || (book.page <= 0 && incre === -1)) return;
+                    message.edit(book.pages[book.page += incre]);
+                } else {
+                    let anchor = page_anchor_index[name];
+                    book.page = book.anchors[anchor] || 0;
+                    message.edit(book.pages[book.page]);
+                }
             });
         });
     } catch (err) {
@@ -141,12 +150,20 @@ function generateBook(name) {
     }
     anchors.skills = pages.length;
     pages.push(skills_limits_eq);
+    anchors.skins = pages.length;
     for (let i = 0; i < ship.skins.length; i++) {
         const skinPage = new Discord.RichEmbed();
         skinPage.setTitle(ship.skins[i].name).setThumbnail(ship.skins[i].chibi).setImage(ship.skins[i].image);
         skinPage.setDescription(ship.skins.map(skin => skin.name === ship.skins[i].name ? `**${skin.name}**` : skin.name).join("\n"));
-        for (let key of Object.keys(ship.skins[i].info)) skinPage.addField(SKIN_INFO_TRANSLATION[key], ship.skins[i].info[key]);
+        for (let key of Object.keys(ship.skins[i].info)) skinPage.addField(SKIN_INFO_TRANSLATION[key], ship.skins[i].info[key], true);
         pages.push(skinPage);
+    }
+    anchors.gallery = pages.length;
+    for (let item of ship.gallery) {
+        const itemPage = new Discord.RichEmbed();
+        itemPage.setDescription(item.description);
+        itemPage.setImage(item.url);
+        pages.push(itemPage);
     }
     for (let i = 0; i < pages.length; i++) {
         pages[i].setAuthor(`${ship.names.code} (${ship.names.jp})`, ship.thumbnail, ship.wikiUrl).setColor(COLOR[ship.rarity]);
