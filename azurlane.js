@@ -37,12 +37,9 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
     console.log("running azurlane sub-system...");
     if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane ship-name`");
     try {
-        let pages = generatePages(args.join(" "));
-        msg.channel.send(pages[0]).then(message => {
-            BOOKS[message.id] = {
-                pages: pages,
-                page: 0
-            };
+        let book = generateBook(args.join(" "));
+        msg.channel.send(book.pages[0]).then(message => {
+            BOOKS[message.id] = book;
             message.react('⬅️').then(() => message.react('❎')).then(() => message.react('➡️'));
             message.createReactionCollector(page_filter).on('collect', r => {
                 if (!r) return;
@@ -85,9 +82,18 @@ const STATS_EMOJI_TRANSLATION = {
     "ammunition": "<:iconammunition:661814201345507349> Ammunition",
     "huntingRange": "<:iconhuntrange:661814201538576387> Hunting Range"
 }
+const SKIN_INFO_TRANSLATION = {
+    "obtainedFrom": "From",
+    "live2DModel": "Has Live2D Model",
+    "eNClient": "EN Name",
+    "cNClient": "CN Name",
+    "jPClient": "JP Name",
+    "cost": "<:ruby:655377729033732096> Cost"
+}
 
-function generatePages(name) {
+function generateBook(name) {
     let pages = [];
+    let anchors = {};
     const ship = getShipByName(name);
     const generalInfo = new Discord.RichEmbed(); // Page 1
     generalInfo.setTitle("General Info")
@@ -103,6 +109,7 @@ function generatePages(name) {
     generalInfo.addField("construction Time / Obtained From", ship.construction.constructionTime);
     pages.push(generalInfo);
     const stats = []; // Page 2-?
+    anchors.stats = 1;
     pages.push(generateStatsPage(ship, "baseStats"));
     pages.push(generateStatsPage(ship, "level100"));
     pages.push(generateStatsPage(ship, "level120"));
@@ -110,7 +117,6 @@ function generatePages(name) {
         pages.push(generateStatsPage(ship, "level100Retrofit"));
         pages.push(generateStatsPage(ship, "level120Retrofit"));
     }
-
     const skills_limits_eq = new Discord.RichEmbed(); // Page 3
     skills_limits_eq.setTitle("Equipment Slots / Skills / Limit Breaks")
         .addField("(1) " + ship.slots[1].type, ship.slots[1].minEfficiency ? ship.slots[1].minEfficiency + "% → " + ship.slots[1].maxEfficiency + "%" : "None", true)
@@ -133,14 +139,25 @@ function generatePages(name) {
             skills_limits_eq.addField(limit_field.name, limit_field.value, true);
         }
     }
+    anchors.skills = pages.length;
     pages.push(skills_limits_eq);
+    for (let i = 0; i < ship.skins.length; i++) {
+        const skinPage = new Discord.RichEmbed();
+        skinPage.setTitle(ship.skins[i].name).setThumbnail(ship.skins[i].chibi).setImage(ship.skins[i].image);
+        skinPage.setDescription(ship.skins.map(skin => skin.name === ship.skins[i].name ? `**${skin.name}**` : skin.name).join("\n"));
+        for (let key of Object.keys(ship.skins[i].info)) skinPage.addField(SKIN_INFO_TRANSLATION[key], ship.skins[i].info[key]);
+        pages.push(skinPage);
+    }
     for (let i = 0; i < pages.length; i++) {
-        pages[i].setAuthor(`${ship.names.code} (${ship.names.jp})`, ship.thumbnail, ship.wikiUrl)
-            .setColor(COLOR[ship.rarity])
-            .setThumbnail(ship.skins[0].chibi);
+        pages[i].setAuthor(`${ship.names.code} (${ship.names.jp})`, ship.thumbnail, ship.wikiUrl).setColor(COLOR[ship.rarity]);
+        if (!pages[i].thumbnail) pages[i].setThumbnail(ship.skins[0].chibi);
         pages[i].setFooter("Page " + (i + 1) + "/" + pages.length);
     }
-    return pages;
+    return {
+        page: 0,
+        pages: pages,
+        anchors: anchors
+    };
 }
 
 function generateSkillField(skill) {
