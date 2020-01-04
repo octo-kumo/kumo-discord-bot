@@ -99,7 +99,84 @@ const SKIN_INFO_TRANSLATION = {
 function generateBook(name) {
     let pages = [];
     let anchors = {};
+    anchors.stats = 1;
     const ship = getShipByName(name);
+    pages.push(generateGenInfoPage(ship));
+    const stats = []; // Page 2-?
+    pages.push(generateStatsPage(ship, "baseStats"));
+    pages.push(generateStatsPage(ship, "level100"));
+    pages.push(generateStatsPage(ship, "level120"));
+    if (ship.retrofit) {
+        pages.push(generateStatsPage(ship, "level100Retrofit"));
+        pages.push(generateStatsPage(ship, "level120Retrofit"));
+    }
+    anchors.skills = pages.length;
+    pages.push(generateSkillsPage(ship));
+    anchors.skins = pages.length;
+    for (let i = 0; i < ship.skins.length; i++) {
+        const skinPage = new Discord.RichEmbed();
+        skinPage.setTitle("Skins (" + ship.skins[i].name + ")").setThumbnail(ship.skins[i].chibi).setImage(ship.skins[i].image);
+        skinPage.setDescription(ship.skins.map(skin => skin.name === ship.skins[i].name ? `**${skin.name}**` : skin.name).join("\n"));
+        for (let key of Object.keys(ship.skins[i].info)) skinPage.addField(SKIN_INFO_TRANSLATION[key], ship.skins[i].info[key], true);
+        skinPage.setFooter("Skin #" + (i + 1));
+        pages.push(skinPage);
+    }
+    anchors.gallery = pages.length;
+    for (let i = 0; i < ship.gallery.length; i++) {
+        const itemPage = new Discord.RichEmbed();
+        itemPage.setTitle("Gallery");
+        itemPage.setDescription(ship.gallery[i].description);
+        itemPage.setImage(ship.gallery[i].url);
+        itemPage.setFooter("Item #" + (i + 1));
+        pages.push(itemPage);
+    }
+
+    for (let i = 0; i < pages.length; i++) {
+        pages[i].setAuthor(`${ship.names.code} (${ship.names.jp})`, ship.thumbnail, ship.wikiUrl).setColor(COLOR[ship.rarity]);
+        if (!pages[i].thumbnail) pages[i].setThumbnail(ship.skins[0].chibi);
+        if (!pages[i].footer) pages[i].setFooter("Page " + (i + 1) + "/" + pages.length);
+        else pages[i].setFooter("Page " + (i + 1) + "/" + pages.length + " • " + pages[i].footer);
+    }
+    return {
+        page: 0,
+        pages: pages,
+        anchors: anchors
+    };
+}
+
+function creatSkillField(skill) {
+    if (!skill) return {
+        name: "\u200b",
+        value: "\u200b"
+    };
+    return {
+        name: skill.names.en + "\n" + skill.names.jp,
+        value: skill.description
+    };
+}
+
+function creatLimitField(index, limit) {
+    if (!limit) return {
+        name: "\u200b",
+        value: "\u200b"
+    };
+    return {
+        name: "Limit Break " + index,
+        value: limit.join("\n")
+    };
+}
+
+function createDevLevelField(level, buffs) {
+    return {
+        name: "Lv " + level,
+        value: buffs.map(buff => {
+            if (typeof buff === "object") return Object.keys(buff).map(sbuff => STATS_EMOJI_TRANSLATION[sbuff] + " " + buff[sbuff]).join(", ")
+            else return buff;
+        }).join("\n")
+    };
+}
+
+function generateGenInfoPage(ship) {
     const generalInfo = new Discord.RichEmbed(); // Page 1
     generalInfo.setTitle("General Info")
         .addField("Rarity", ship.rarity + " " + ship.stars.stars)
@@ -112,98 +189,7 @@ function generateBook(name) {
     if (ship.misc.twitter) generalInfo.addField("Twitter", ship.misc.twitter.name, true);
     if (ship.misc.voice) generalInfo.addField("Voice Actress", ship.misc.voice.name, true);
     generalInfo.addField("Construction Time / Obtained From", ship.construction.constructionTime);
-    pages.push(generalInfo);
-    const stats = []; // Page 2-?
-    anchors.stats = 1;
-    pages.push(generateStatsPage(ship, "baseStats"));
-    pages.push(generateStatsPage(ship, "level100"));
-    pages.push(generateStatsPage(ship, "level120"));
-    if (ship.retrofit) {
-        pages.push(generateStatsPage(ship, "level100Retrofit"));
-        pages.push(generateStatsPage(ship, "level120Retrofit"));
-    }
-    const skills_limits_eq = new Discord.RichEmbed(); // Page 3
-    skills_limits_eq.setTitle("Equipment Slots / Skills / Limit Breaks")
-        .addField("(1) " + ship.slots[1].type, ship.slots[1].minEfficiency ? ship.slots[1].minEfficiency + "% → " + ship.slots[1].maxEfficiency + "%" : "None", true)
-        .addField("(2) " + ship.slots[2].type, ship.slots[2].minEfficiency + "% → " + ship.slots[2].maxEfficiency + "%", true)
-        .addField("(3) " + ship.slots[3].type, ship.slots[3].minEfficiency + "% → " + ship.slots[3].maxEfficiency + "%", true);
-    skills_limits_eq.addBlankField();
-    for (skill of ship.skills) {
-        let skill_field = generateSkillField(skill);
-        skills_limits_eq.addField(skill_field.name, skill_field.value, true);
-    }
-    skills_limits_eq.addBlankField();
-    if (ship.rarity === "Priority" || ship.rarity === "Decisive")
-        for (level of Object.keys(ship.devLevels)) {
-            let delv_field = generateDevLevel(level, ship.devLevels[level]);
-            skills_limits_eq.addField(delv_field.name, delv_field.value, true);
-        }
-    else {
-        for (let i = 0; i < ship.limitBreaks.length; i++) {
-            let limit_field = generateLimitField(i + 1, ship.limitBreaks[i]);
-            skills_limits_eq.addField(limit_field.name, limit_field.value, true);
-        }
-    }
-    anchors.skills = pages.length;
-    pages.push(skills_limits_eq);
-    anchors.skins = pages.length;
-    for (let i = 0; i < ship.skins.length; i++) {
-        const skinPage = new Discord.RichEmbed();
-        skinPage.setTitle("Skins (" + ship.skins[i].name + ")").setThumbnail(ship.skins[i].chibi).setImage(ship.skins[i].image);
-        skinPage.setDescription(ship.skins.map(skin => skin.name === ship.skins[i].name ? `**${skin.name}**` : skin.name).join("\n"));
-        for (let key of Object.keys(ship.skins[i].info)) skinPage.addField(SKIN_INFO_TRANSLATION[key], ship.skins[i].info[key], true);
-        pages.push(skinPage);
-    }
-    anchors.gallery = pages.length;
-    for (let item of ship.gallery) {
-        const itemPage = new Discord.RichEmbed();
-        itemPage.setTitle("Gallery");
-        itemPage.setDescription(item.description);
-        itemPage.setImage(item.url);
-        pages.push(itemPage);
-    }
-    for (let i = 0; i < pages.length; i++) {
-        pages[i].setAuthor(`${ship.names.code} (${ship.names.jp})`, ship.thumbnail, ship.wikiUrl).setColor(COLOR[ship.rarity]);
-        if (!pages[i].thumbnail) pages[i].setThumbnail(ship.skins[0].chibi);
-        pages[i].setFooter("Page " + (i + 1) + "/" + pages.length);
-    }
-    return {
-        page: 0,
-        pages: pages,
-        anchors: anchors
-    };
-}
-
-function generateSkillField(skill) {
-    if (!skill) return {
-        name: "\u200b",
-        value: "\u200b"
-    };
-    return {
-        name: skill.names.en + "\n" + skill.names.jp,
-        value: skill.description
-    };
-}
-
-function generateLimitField(index, limit) {
-    if (!limit) return {
-        name: "\u200b",
-        value: "\u200b"
-    };
-    return {
-        name: "Limit Break " + index,
-        value: limit.join("\n")
-    };
-}
-
-function generateDevLevel(level, buffs) {
-    return {
-        name: "Lv " + level,
-        value: buffs.map(buff => {
-            if (typeof buff === "object") return Object.keys(buff).map(sbuff => STATS_EMOJI_TRANSLATION[sbuff] + " " + buff[sbuff]).join(", ")
-            else return buff;
-        }).join("\n")
-    };
+    return generalInfo;
 }
 
 function generateStatsPage(ship, key) {
@@ -227,6 +213,34 @@ function generateStatsPage(ship, key) {
         statsPage.addField(STATS_EMOJI_TRANSLATION["huntingRange"], range.trim() + "```");
     }
     return statsPage;
+}
+
+function generateSkillsPage(ship) {
+    const skills_limits_eq = new Discord.RichEmbed(); // Page 3
+    skills_limits_eq.setTitle("Equipment Slots / Skills / Limit Breaks");
+    skills_limits_eq.addField("**Equipment Slots**", "\u200B");
+    skills_limits_eq.addField("(1) " + ship.slots[1].type, ship.slots[1].minEfficiency ? ship.slots[1].minEfficiency + "% → " + ship.slots[1].maxEfficiency + "%" : "None", true)
+        .addField("(2) " + ship.slots[2].type, ship.slots[2].minEfficiency + "% → " + ship.slots[2].maxEfficiency + "%", true)
+        .addField("(3) " + ship.slots[3].type, ship.slots[3].minEfficiency + "% → " + ship.slots[3].maxEfficiency + "%", true);
+    skills_limits_eq.addField("**Skills**", "\u200B");
+    for (skill of ship.skills) {
+        let skill_field = creatSkillField(skill);
+        skills_limits_eq.addField(skill_field.name, skill_field.value, true);
+    }
+    if (ship.rarity === "Priority" || ship.rarity === "Decisive") {
+        skills_limits_eq.addField("**Development Levels**", "\u200B");
+        for (level of Object.keys(ship.devLevels)) {
+            let delv_field = createDevLevelField(level, ship.devLevels[level]);
+            skills_limits_eq.addField(delv_field.name, delv_field.value, true);
+        }
+    } else {
+        skills_limits_eq.addField("**Limit Breaks**", "\u200B");
+        for (let i = 0; i < ship.limitBreaks.length; i++) {
+            let limit_field = creatLimitField(i + 1, ship.limitBreaks[i]);
+            skills_limits_eq.addField(limit_field.name, limit_field.value, true);
+        }
+    }
+    return skills_limits_eq;
 }
 
 function getShipByName(name) {

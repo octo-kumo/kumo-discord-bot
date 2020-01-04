@@ -93,6 +93,8 @@ exports.config = {
     }],
     SLEEP_LATE: ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747132/sleep_late.jpg"],
     SIMPLE_REPLIES: {
+        'lol': ':P',
+        'wip': ';)',
         'bio': 'you are bio',
         'nice': ':clap: yes very nice!',
         'wat': 'wat',
