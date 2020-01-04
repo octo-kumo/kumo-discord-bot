@@ -90,9 +90,10 @@ const STATS_EMOJI_TRANSLATION = {
 const SKIN_INFO_TRANSLATION = {
     "obtainedFrom": "From",
     "live2DModel": "Has Live2D Model",
-    "eNClient": "EN Name",
-    "cNClient": "CN Name",
-    "jPClient": "JP Name",
+    "enClient": "EN Name",
+    "cnClient": "CN Name",
+    "jpClient": "JP Name",
+    "krClient": "KR Name",
     "cost": "<:ruby:655377729033732096> Cost"
 }
 
@@ -130,12 +131,11 @@ function generateBook(name) {
         itemPage.setFooter("Item #" + (i + 1));
         pages.push(itemPage);
     }
-
     for (let i = 0; i < pages.length; i++) {
         pages[i].setAuthor(`${ship.names.code} (${ship.names.jp})`, ship.thumbnail, ship.wikiUrl).setColor(COLOR[ship.rarity]);
         if (!pages[i].thumbnail) pages[i].setThumbnail(ship.skins[0].chibi);
-        if (!pages[i].footer) pages[i].setFooter("Page " + (i + 1) + "/" + pages.length);
-        else pages[i].setFooter("Page " + (i + 1) + "/" + pages.length + " • " + pages[i].footer);
+        let footer = "Page " + (i + 1) + "/" + pages.length + (pages[i].footer ? " • " + pages[i].footer.text : "");
+        pages[i].setFooter(footer);
     }
     return {
         page: 0,
