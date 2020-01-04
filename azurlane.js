@@ -111,7 +111,7 @@ function generateBook(name) {
     if (ship.misc.pixiv) generalInfo.addField("Pixiv", ship.misc.pixiv.name, true);
     if (ship.misc.twitter) generalInfo.addField("Twitter", ship.misc.twitter.name, true);
     if (ship.misc.voice) generalInfo.addField("Voice Actress", ship.misc.voice.name, true);
-    generalInfo.addField("construction Time / Obtained From", ship.construction.constructionTime);
+    generalInfo.addField("Construction Time / Obtained From", ship.construction.constructionTime);
     pages.push(generalInfo);
     const stats = []; // Page 2-?
     anchors.stats = 1;
