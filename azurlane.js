@@ -53,11 +53,7 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     let incre = name === "⬅️" ? -1 : 1;
                     if ((book.page >= book.pages.length && incre === 1) || (book.page <= 0 && incre === -1)) return;
                     message.edit(book.pages[book.page += incre]);
-                } else {
-                    let anchor = page_anchor_index[name];
-                    book.page = book.anchors[anchor] || 0;
-                    message.edit(book.pages[book.page]);
-                }
+                } else if (book.page !== book.page = book.anchors[page_anchor_index[name]] || 0) message.edit(book.pages[book.page]);
             });
         });
     } catch (err) {
@@ -153,7 +149,7 @@ function generateBook(name) {
     anchors.skins = pages.length;
     for (let i = 0; i < ship.skins.length; i++) {
         const skinPage = new Discord.RichEmbed();
-        skinPage.setTitle(ship.skins[i].name).setThumbnail(ship.skins[i].chibi).setImage(ship.skins[i].image);
+        skinPage.setTitle("Skins (" + ship.skins[i].name + ")").setThumbnail(ship.skins[i].chibi).setImage(ship.skins[i].image);
         skinPage.setDescription(ship.skins.map(skin => skin.name === ship.skins[i].name ? `**${skin.name}**` : skin.name).join("\n"));
         for (let key of Object.keys(ship.skins[i].info)) skinPage.addField(SKIN_INFO_TRANSLATION[key], ship.skins[i].info[key], true);
         pages.push(skinPage);
@@ -161,6 +157,7 @@ function generateBook(name) {
     anchors.gallery = pages.length;
     for (let item of ship.gallery) {
         const itemPage = new Discord.RichEmbed();
+        itemPage.setTitle("Gallery");
         itemPage.setDescription(item.description);
         itemPage.setImage(item.url);
         pages.push(itemPage);
