@@ -3,6 +3,7 @@ const Discord = require('discord.js');
 const config = require('./config.js').config;
 // const coursemology = require('./coursemology.js');
 const azurlane = require('./azurlane.js');
+const waifulabs = require('./waifulabs.js');
 
 // Constants
 const PREFIX = process.env.PREFIX || "!";
@@ -52,6 +53,7 @@ client.on('message', async msg => {
     }
     if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg, PREFIX);
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommnd(args, msg, PREFIX);
+    if (command === "waifulabs" || command === "wl" || command === "waifu") waifulabs.newBatch(msg);
     if (msg.author.id === "456001047756800000" && (command === "toggledebug" || command === "td")) {
         config.debug = !config.debug;
         console.log("DEBUG TOGGLED, debug = " + config.debug)
