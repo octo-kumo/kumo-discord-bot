@@ -16,8 +16,7 @@ exports.newBatch = msg => {
             const image = girls.newGirls[i].image;
             const attachment = new Discord.Attachment(Buffer.from(image, 'base64'), 'image.png');
             let imageEmbed = new Discord.RichEmbed();
-            imageEmbed
-                .setDescription('Waifu #' + (i + 1) + "\n```json\n" + JSON.stringify(girls.newGirls[i].seeds) + "\n```")
+            imageEmbed.setDescription('Waifu #' + (i + 1) + "\n```json\n" + JSON.stringify(girls.newGirls[i].seeds) + "\n```")
                 .attachFile(attachment)
                 .setThumbnail('attachment://image.png');
             await msg.channel.send(imageEmbed);
