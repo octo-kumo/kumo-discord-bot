@@ -182,7 +182,7 @@ function generateGenInfoPage(ship) {
         .addField("Rarity", ship.rarity + " " + ship.stars.stars)
         .addField("ID", ship.id, true)
         .addField("Class", ship.class, true)
-        .addField("Type", ship.hullType);
+        .addField("Type", ship.hullType, true);
     if (ship.misc.artist) generalInfo.addField("Artist", ship.misc.artist, true);
     if (ship.misc.web) generalInfo.addField("Web", ship.misc.web.name, true);
     if (ship.misc.pixiv) generalInfo.addField("Pixiv", ship.misc.pixiv.name, true);
