@@ -18,13 +18,13 @@ const statsLevels = {
 }
 
 const COLOR = {
-    "Normal": 0xdcdcdc,
-    "Rare": 0xb0e0e6,
-    "Elite": 0xdda0dd,
-    "Super Rare": 0xeee8aa,
-    "Ultra Rare": 0xeee8aa,
-    "Priority": 0xeee8aa,
-    "Decisive": 0xeee8aa,
+    "Normal": 0xFFFFFF,
+    "Rare": 0x41D7FF,
+    "Elite": 0xCC7BFF,
+    "Super Rare": 0xFDC637,
+    "Ultra Rare": 0xBD4000,
+    "Priority": 0xBD4000,
+    "Decisive": 0xBD4000,
     "Unreleased": 0x000000
 };
 const TRANSLATION = {
