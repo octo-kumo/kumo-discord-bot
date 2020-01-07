@@ -1,5 +1,9 @@
 const getEqualFilter = (child, value) => (obj => obj[child] && obj[child].toUpperCase() === value.toUpperCase()); // = operator
 const getIncludeFilter = (child, value) => (obj => obj[child] && obj[child].toUpperCase().includes(value.toUpperCase())); // includes operator
+const getNameFilter = (filterGen, value) => (obj => {
+    for (let lang of Object.keys(obj.names))
+        if (filterGen(lang, value)(obj.names[lang])) return true;
+});
 
 const METHOD_INDEX = {
     'equals': getEqualFilter,
@@ -20,6 +24,7 @@ function generateFilter(raw) {
         groups.value = groups.value.replace(/\\ /g, ' '); // Unescape
         let filterGen = METHOD_INDEX[groups.method];
         if (!filterGen) continue; // This should not be possible
+        if (groups.name === "name") filterGen = getNameFilter(filterGen, groups.value);
         filters.push(filterGen(groups.name, groups.value));
     }
     return obj => {
