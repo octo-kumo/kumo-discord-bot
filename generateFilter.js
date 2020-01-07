@@ -25,8 +25,8 @@ function generateFilter(raw) {
         groups.value = groups.value.replace(/\\ /g, ' '); // Unescape
         let filterGen = METHOD_INDEX[groups.method];
         if (!filterGen) continue; // This should not be possible
-        if (groups.name === "name") filterGen = getNameFilter(filterGen, groups.value);
-        filters.push(filterGen(groups.name, groups.value));
+        if (groups.name === "name") filters.push(getNameFilter(filterGen, groups.value));
+        else filters.push(filterGen(groups.name, groups.value));
     }
     return obj => {
         for (let filter of filters)
