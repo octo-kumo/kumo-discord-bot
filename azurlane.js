@@ -37,30 +37,30 @@ const BOOKS = {};
 
 exports.ships = SHIPS;
 exports.handleCommnd = async function(args, msg, PREFIX) {
-    console.log("running azurlane sub-system...");
-    if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane ship-name`");
-    if (args[0] === "find") {
-        args.shift();
-        let filter = generateFilter(args.join(" "));
-        let book = generateShipsBook(filter);
-        msg.channel.send(book.pages[0]).then(message => {
-            BOOKS[message.id] = book;
-            message.react('⬅️').then(() => message.react('➡️')).then(() => message.react('❎'));
-            message.createReactionCollector(ship_book_filter).on('collect', r => {
-                if (!r) return;
-                r.remove(msg.author.id);
-                let name = r.emoji.name;
-                if (r.emoji.name === '❎') return message.delete();
-                let book = BOOKS[message.id];
-                if (name === "⬅️" || name === "➡️") {
-                    let incre = name === "⬅️" ? -1 : 1;
-                    if ((book.page >= book.pages.length && incre === 1) || (book.page <= 0 && incre === -1)) return;
-                    message.edit(book.pages[book.page += incre]);
-                }
+    try {
+        console.log("running azurlane sub-system...");
+        if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane ship-name`");
+        if (args[0] === "find") {
+            args.shift();
+            let filter = generateFilter(args.join(" "));
+            let book = generateShipsBook(filter);
+            msg.channel.send(book.pages[0]).then(message => {
+                BOOKS[message.id] = book;
+                message.react('⬅️').then(() => message.react('➡️')).then(() => message.react('❎'));
+                message.createReactionCollector(ship_book_filter).on('collect', r => {
+                    if (!r) return;
+                    r.remove(msg.author.id);
+                    let name = r.emoji.name;
+                    if (r.emoji.name === '❎') return message.delete();
+                    let book = BOOKS[message.id];
+                    if (name === "⬅️" || name === "➡️") {
+                        let incre = name === "⬅️" ? -1 : 1;
+                        if ((book.page >= book.pages.length && incre === 1) || (book.page <= 0 && incre === -1)) return;
+                        message.edit(book.pages[book.page += incre]);
+                    }
+                });
             });
-        });
-    } else {
-        try {
+        } else {
             let book = generateBook(args.join(" "));
             if (!book) return msg.reply("Is that a ship from another world?");
             msg.channel.send(book.pages[0]).then(message => {
@@ -79,11 +79,11 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     } else if (book.page !== (book.page = book.anchors[ship_book_anchors[name]] || 0)) message.edit(book.pages[book.page]);
                 });
             });
-        } catch (err) {
-            console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
-            console.log(err.stack);
-            msg.channel.send("Error: " + err.message);
         }
+    } catch (err) {
+        console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
+        console.log(err.stack);
+        msg.channel.send("Error: " + err.message);
     }
 }
 
