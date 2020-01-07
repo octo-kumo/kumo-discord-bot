@@ -1,8 +1,10 @@
 const getEqualFilter = (child, value) => (obj => obj[child] && obj[child].toUpperCase() === value.toUpperCase()); // = operator
 const getIncludeFilter = (child, value) => (obj => obj[child] && obj[child].toUpperCase().includes(value.toUpperCase())); // includes operator
 const getNameFilter = (filterGen, value) => (obj => {
+    let filters = [];
     for (let lang of Object.keys(obj.names))
-        if (obj.names[lang] && filterGen(lang, value)(obj.names[lang])) return true;
+        if (obj.names[lang] && filterGen(lang, value)(obj.names)) return true;
+    return false;
 });
 
 const METHOD_INDEX = {
