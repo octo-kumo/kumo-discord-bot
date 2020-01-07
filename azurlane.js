@@ -1,9 +1,10 @@
 const Discord = require('discord.js');
 const config = require('./config.js').config;
 const SHIPS = require('./ships.json');
+const generateFilter = require('./generateFilter.js');
 
-const page_filter = (reaction, user) => ['⬅️', '📊', '🎉', '👕', '🖌️', '➡️', '❎'].includes(reaction.emoji.name) && user.id !== config.id;
-const page_anchor_index = {
+const ship_book_filter = (reaction, user) => ['⬅️', '📊', '🎉', '👕', '🖌️', '➡️', '❎'].includes(reaction.emoji.name) && user.id !== config.id;
+const ship_book_anchors = {
     '📊': 'stats',
     '🎉': 'skills',
     '👕': 'skins',
@@ -38,12 +39,14 @@ exports.ships = SHIPS;
 exports.handleCommnd = async function(args, msg, PREFIX) {
     console.log("running azurlane sub-system...");
     if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane ship-name`");
-    try {
-        let book = generateBook(args.join(" "));
+    if (args[0] === "find") {
+        args.shift();
+        let filter = generateFilter(args.join(" "));
+        let book = generateShipsBook(filter);
         msg.channel.send(book.pages[0]).then(message => {
             BOOKS[message.id] = book;
-            message.react('⬅️').then(() => message.react('📊')).then(() => message.react('🎉')).then(() => message.react('👕')).then(() => message.react('🖌️')).then(() => message.react('➡️')).then(() => message.react('❎'));
-            message.createReactionCollector(page_filter).on('collect', r => {
+            message.react('⬅️').then(() => message.react('➡️')).then(() => message.react('❎'));
+            message.createReactionCollector(ship_book_filter).on('collect', r => {
                 if (!r) return;
                 r.remove(msg.author.id);
                 let name = r.emoji.name;
@@ -53,15 +56,66 @@ exports.handleCommnd = async function(args, msg, PREFIX) {
                     let incre = name === "⬅️" ? -1 : 1;
                     if ((book.page >= book.pages.length && incre === 1) || (book.page <= 0 && incre === -1)) return;
                     message.edit(book.pages[book.page += incre]);
-                } else if (book.page !== (book.page = book.anchors[page_anchor_index[name]] || 0)) message.edit(book.pages[book.page]);
+                }
             });
         });
-    } catch (err) {
-        console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
-        console.log(err.stack);
-        msg.channel.send("Invalid ship name.");
+    } else {
+        try {
+            let book = generateBook(args.join(" "));
+            if (!book) return msg.reply("Is that a ship from another world?");
+            msg.channel.send(book.pages[0]).then(message => {
+                BOOKS[message.id] = book;
+                message.react('⬅️').then(() => message.react('📊')).then(() => message.react('🎉')).then(() => message.react('👕')).then(() => message.react('🖌️')).then(() => message.react('➡️')).then(() => message.react('❎'));
+                message.createReactionCollector(ship_book_filter).on('collect', r => {
+                    if (!r) return;
+                    r.remove(msg.author.id);
+                    let name = r.emoji.name;
+                    if (r.emoji.name === '❎') return message.delete();
+                    let book = BOOKS[message.id];
+                    if (name === "⬅️" || name === "➡️") {
+                        let incre = name === "⬅️" ? -1 : 1;
+                        if ((book.page >= book.pages.length && incre === 1) || (book.page <= 0 && incre === -1)) return;
+                        message.edit(book.pages[book.page += incre]);
+                    } else if (book.page !== (book.page = book.anchors[ship_book_anchors[name]] || 0)) message.edit(book.pages[book.page]);
+                });
+            });
+        } catch (err) {
+            console.log(`ship subcommand, err code = ${err.statusCode}, err message = ${err.message}, args = ${args}`);
+            console.log(err.stack);
+            msg.channel.send("Error: " + err.message);
+        }
     }
 }
+
+function generateShipsBook(filter) {
+    let ships = [];
+    for (let key of Object.keys(SHIPS))
+        if (filter(SHIPS[key])) ships.push(SHIPS[key]);
+    let targetEmbed = new Discord.RichEmbed();
+    let pages = [];
+    if (ships.length === 0) {
+        targetEmbed.setDescription("_No ship matches your query!_");
+        pages.push(targetEmbed);
+    }
+    for (let i = 0; i < ships.length; i++) {
+        if (i % 16 === 0) {
+            pages.push(targetEmbed);
+            targetEmbed = new Discord.RichEmbed();
+        } else if (i === (ships.length - 1)) pages.push(targetEmbed);
+        targetEmbed.addField("#" + (i + 1), `${ships[i].names.en} ${ships[i].rarity} _${ships[i].nationality}_`);
+    }
+    for (let i = 0; i < pages.length; i++) {
+        pages[i].setAuthor(`${ship.names.code} (${ship.names.jp})`, ship.thumbnail, ship.wikiUrl).setColor(COLOR[ship.rarity]);
+        if (!pages[i].thumbnail) pages[i].setThumbnail(ship.skins[0].chibi);
+        let footer = "Page " + (i + 1) + "/" + pages.length + " • Total " + ships.length + " ships";
+        pages[i].setFooter(footer);
+    }
+    return {
+        page: 0,
+        pages: pages
+    };
+}
+
 const STATS_NAME_TRANSLATION = {
     "baseStats": "Base",
     "level100": "Level 100",
@@ -102,6 +156,7 @@ function generateBook(name) {
     let anchors = {};
     anchors.stats = 1;
     const ship = getShipByName(name);
+    if (!ship) return null;
     pages.push(generateGenInfoPage(ship));
     const stats = []; // Page 2-?
     pages.push(generateStatsPage(ship, "baseStats"));
@@ -181,6 +236,7 @@ function generateGenInfoPage(ship) {
     generalInfo.setTitle("General Info")
         .addField("Rarity", ship.rarity + " " + ship.stars.stars)
         .addField("ID", ship.id, true)
+        .addField("Nation", ship.nationality, true)
         .addField("Class", ship.class, true)
         .addField("Type", ship.hullType, true);
     if (ship.misc.artist) generalInfo.addField("Artist", ship.misc.artist, true);
