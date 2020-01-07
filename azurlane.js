@@ -26,7 +26,8 @@ const COLOR = {
     "Ultra Rare": 0xBD4000,
     "Priority": 0xBD4000,
     "Decisive": 0xBD4000,
-    "Unreleased": 0x000000
+    "Unreleased": 0x000000,
+    "query": 0x4593d7
 };
 const TRANSLATION = {
     "Oil consumption": "Oil Usage",
@@ -105,8 +106,7 @@ function generateShipsBook(filter) {
         targetEmbed.addField("#" + (i + 1), `${ships[i].names.en} ${ships[i].rarity} _${ships[i].nationality}_`);
     }
     for (let i = 0; i < pages.length; i++) {
-        pages[i].setAuthor(`${ship.names.code} (${ship.names.jp})`, ship.thumbnail, ship.wikiUrl).setColor(COLOR[ship.rarity]);
-        if (!pages[i].thumbnail) pages[i].setThumbnail(ship.skins[0].chibi);
+        pages[i].setAuthor("Query Results").setColor(COLOR.query);
         let footer = "Page " + (i + 1) + "/" + pages.length + " • Total " + ships.length + " ships";
         pages[i].setFooter(footer);
     }
