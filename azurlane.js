@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const config = require('./config.js').config;
 const SHIPS = require('./ships.json');
-const generateFilter = require('./generateFilter.js');
+const generateFilter = require('./generateFilter.js').generateFilter;
 
 const ship_book_filter = (reaction, user) => ['⬅️', '📊', '🎉', '👕', '🖌️', '➡️', '❎'].includes(reaction.emoji.name) && user.id !== config.id;
 const ship_book_anchors = {

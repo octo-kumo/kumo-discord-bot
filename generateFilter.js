@@ -1,7 +1,7 @@
 const getEqualFilter = (child, value) => (obj => obj[child].toUpperCase() === value.toUpperCase()); // = operator
 const getIncludeFilter = (child, value) => (obj => obj[child].toUpperCase().includes(value.toUpperCase())); // includes operator
 
-exports = generateFilter;
+exports.generateFilter = generateFilter;
 
 const METHOD_INDEX = {
     'equals': getEqualFilter,
