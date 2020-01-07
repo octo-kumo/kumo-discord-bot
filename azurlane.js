@@ -99,11 +99,11 @@ function generateShipsBook(filter) {
         pages.push(targetEmbed);
     }
     for (let i = 0; i < ships.length; i++) {
-        if (i % 16 === 0) {
+        targetEmbed.addField("#" + (i + 1), `${ships[i].names.en} ${ships[i].rarity} _${ships[i].nationality}_`);
+        if (i !== 0 && i % 16 === 0) {
             pages.push(targetEmbed);
             targetEmbed = new Discord.RichEmbed();
         } else if (i === (ships.length - 1)) pages.push(targetEmbed);
-        targetEmbed.addField("#" + (i + 1), `${ships[i].names.en} ${ships[i].rarity} _${ships[i].nationality}_`);
     }
     for (let i = 0; i < pages.length; i++) {
         pages[i].setAuthor("Query Results").setColor(COLOR.query);
