@@ -99,7 +99,7 @@ function generateShipsBook(filter) {
         pages.push(targetEmbed);
     }
     for (let i = 0; i < ships.length; i++) {
-        targetEmbed.addField("#" + (i + 1), `${ships[i].names.en} ${ships[i].rarity} _${ships[i].nationality}_`);
+        targetEmbed.addField("#" + (i + 1) + " " + ships[i].names.code + " (" + ships[i].names.jp + ")", `**${ships[i].rarity}** _${ships[i].nationality}_`);
         if (i !== 0 && i % 16 === 0) {
             pages.push(targetEmbed);
             targetEmbed = new Discord.RichEmbed();
