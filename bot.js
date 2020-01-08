@@ -34,14 +34,16 @@ client.on('message', async msg => {
     if (!msg.channel.type === "text") return;
     if (!msg.guild && msg.author.id !== "456001047756800000") return;
     if (msg.author.id === config.id) return;
-    if (config.SIMPLE_REPLIES[msg.content.replace(/[^\w]+/g, '').toLowerCase()])
-        return msg.channel.send(config.SIMPLE_REPLIES[msg.content.replace(/[^\w]+/g, '').toLowerCase()]);
+    let matcher = msg.content.replace(/[^\w ]+/g, '').trim().toLowerCase()
+    if (config.SIMPLE_REPLIES[matcher])
+        return msg.channel.send(config.SIMPLE_REPLIES[matcher]);
+    for (let key of Object.keys(config.CONTAINS_REPLIES))
+        if (matcher.includes(key)) return msg.channel.send(config.CONTAINS_REPLIES[key]);
     if (msg.content.indexOf(PREFIX) !== 0) return;
     console.log(`====== Message is a valid command.`);
     let args = msg.content.slice(1).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
     console.log(`running "${command}", args = [${args.join(", ")}]...`);
-
     if (command === "help") msg.channel.send(HELP_EMBED);
     if (command === "ping") {
         const m = await msg.channel.send("Ping?");

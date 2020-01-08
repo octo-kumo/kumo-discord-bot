@@ -93,6 +93,8 @@ exports.config = {
     }],
     SLEEP_LATE: ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747132/sleep_late.jpg"],
     SIMPLE_REPLIES: {
+        'idk': 'me neither',
+        '😉': ';)',
         'lol': ':P',
         'wip': ';)',
         'bio': 'you are bio',
@@ -101,7 +103,12 @@ exports.config = {
         'what': 'wat',
         'cloudy': 'Yes it is. Great isn\'t it?',
         'hrm': 'Hum?',
-        'wtf': '(**W**)hat about (**t**)he (**f**)ur?',
-        'bruh': 'Yes bro? ( ͡° ͜ʖ ͡°)'
+        'wtf': '_Theres nothing you can do~_ Or perhaps there is. IDK',
+        'bruh': 'Yes? ( ͡° ͜ʖ ͡°)',
+        'kumo': 'Hi'
+    },
+    CONTAINS_REPLIES: {
+        '<@!456001047756800000>': 'I will notify my human self',
+        '<@!643028637112860682>': 'I will notif- wait, you are calling me, what is it?'
     }
 }
