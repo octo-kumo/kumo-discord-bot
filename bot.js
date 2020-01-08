@@ -38,7 +38,7 @@ client.on('message', async msg => {
     if (config.SIMPLE_REPLIES[matcher])
         return msg.channel.send(config.SIMPLE_REPLIES[matcher]);
     for (let key of Object.keys(config.CONTAINS_REPLIES))
-        if (matcher.includes(key)) return msg.channel.send(config.CONTAINS_REPLIES[key]);
+        if (msg.content.includes(key)) return msg.channel.send(config.CONTAINS_REPLIES[key]);
     if (msg.content.indexOf(PREFIX) !== 0) return;
     console.log(`====== Message is a valid command.`);
     let args = msg.content.slice(1).trim().split(/ +/g);
