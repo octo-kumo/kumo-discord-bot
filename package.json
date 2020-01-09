@@ -1,7 +1,7 @@
 {
-    "name": "nush-discord-bot",
+    "name": "kumo-discord-bot",
     "version": "1.0.0",
-    "description": "\"M2040X\" Discord (Utility) Bot",
+    "description": "Discord Bot 'Kumo'",
     "main": "bot.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,14 +9,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/LE0ZY/nush-discord-bot.git"
+        "url": "git+https://github.com/LE0ZY/kumo-discord-bot.git"
     },
-    "author": "yun",
+    "author": "Kumo",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/LE0ZY/nush-discord-bot/issues"
+        "url": "https://github.com/LE0ZY/kumo-discord-bot/issues"
     },
-    "homepage": "https://github.com/LE0ZY/nush-discord-bot#readme",
+    "homepage": "https://github.com/LE0ZY/kumo-discord-bot#readme",
     "dependencies": {
         "discord.js": ">=11.5.1",
         "express": ">=4.17.1",
