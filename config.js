@@ -103,6 +103,7 @@ exports.config = {
     }],
     SLEEP_LATE: ["https://res.cloudinary.com/chatboxzy/image/upload/v1573747132/sleep_late.jpg"],
     SIMPLE_REPLIES: {
+        'oof': 'Indeed',
         'idk': 'me neither',
         '😉': ';)',
         'lol': ':P',

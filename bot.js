@@ -3,6 +3,7 @@ const Discord = require('discord.js');
 const config = require('./config.js').config;
 const coursemology = require('./coursemology.js');
 const azurlane = require('./azurlane.js');
+const music = require('./music.js');
 const waifulabs = require('./waifulabs.js');
 
 // Constants
@@ -22,9 +23,10 @@ console.log('====== ZY Discord Bot Started! ======');
 
 // coursemology.initiate();
 client.on('ready', () => {
-    console.log("=> Bot Running!");
+    console.log("=> Bot Running in " + client.guilds.keyArray().length + " servers!");
+    client.guilds.get('665471208757657620').channels.get('665471209277882400').send("READY!");
     client.user.setPresence(config.PRESENCE);
-    setInterval(coursemology.update, 10000);
+    setInterval(coursemology.update, 60000);
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     config.id = client.user.id;
 });
@@ -55,7 +57,8 @@ client.on('message', async msg => {
         m.edit(PING_EMBED);
     }
     if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg, PREFIX);
-    if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommnd(args, msg, PREFIX);
+    if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
+    if (command === "music" || command === "am" || command === "m" || command === "song" || command === "!play") music.handleCommand(args, msg, PREFIX);
     if (command === "waifulabs" || command === "wl" || command === "waifu") waifulabs.newBatch(msg);
     if (msg.author.id === "456001047756800000" && (command === "toggledebug" || command === "td")) {
         config.debug = !config.debug;
@@ -84,6 +87,11 @@ client.on('message', async msg => {
     console.log("====== Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
 });
 
-
+client.once('reconnecting', () => {
+    console.log('Reconnecting!');
+});
+client.once('disconnect', () => {
+    console.log('Disconnect!');
+});
 
 client.login(process.env.TOKEN);

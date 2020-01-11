@@ -37,7 +37,7 @@ const TRANSLATION = {
 const BOOKS = {};
 
 exports.ships = SHIPS;
-exports.handleCommnd = async function(args, msg, PREFIX) {
+exports.handleCommand = async function(args, msg, PREFIX) {
     try {
         console.log("running azurlane sub-system...");
         if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "azurlane ship-name`");
