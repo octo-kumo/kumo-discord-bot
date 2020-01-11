@@ -1,5 +1,16 @@
 exports.config = {
     list_presets: {
+        "1811": {
+            name: "CS4131 Mobile Application Development AY2020",
+            labs: {
+                cat: 2067,
+                tab: 3425
+            },
+            reviews: {
+                cat: 2068,
+                tab: 3426
+            }
+        },
         "1706": {
             name: "CS3233 Object Oriented Programming II AY2019",
             labs: {
@@ -45,13 +56,12 @@ exports.config = {
         },
         status: 'idle'
     },
-    JAR: null,
     HOOK: null,
     USERS_CACHE: {},
-    DEFAULT_COURSE: 1706,
+    DEFAULT_COURSE: 1811,
     NUMBER_OF_USER_PER_PAGE: 8,
-    COURSES: [1706, 1389, 614, 1613],
-    COURSE_NAMES: ["CS3233 Object Oriented Programming II AY2019", "CS3231 Object Oriented Programming I AY2019", "CS2231 Introduction to Programming AY2018S1", "CS1131 Computational Thinking AY2017"],
+    COURSES: [1811, 1706, 1389, 614, 1613],
+    COURSE_NAMES: ["CS4131 Mobile Application Development AY2020", "CS3233 Object Oriented Programming II AY2019", "CS3231 Object Oriented Programming I AY2019", "CS2231 Introduction to Programming AY2018S1", "CS1131 Computational Thinking AY2017"],
     SLEEP_IMAGES: [
         "https://res.cloudinary.com/chatboxzy/image/upload/v1573747146/sleep_1.jpg",
         "https://res.cloudinary.com/chatboxzy/image/upload/v1573747147/sleep_2.jpg",

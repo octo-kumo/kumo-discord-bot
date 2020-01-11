@@ -5,11 +5,12 @@ const Discord = require('discord.js');
 
 const filter = (reaction, user) => ['⬅️', '❎', '➡️'].includes(reaction.emoji.name) && user.id !== config.id;
 const listData = {};
-exports.initiate = function() {
-    let jar = request.jar();
-    jar.setCookie(request.cookie('remember_user_token=' + process.env.CMTOKEN), config.query_base_url);
-    config.JAR = jar;
-}
+
+const headers = {
+    "Cookie": "remember_user_token=" + process.env.CMTOKEN,
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"
+};
+
 exports.handleCommand = function(args, msg, PREFIX) {
     console.log("running coursemology sub-system...");
     if (args.length < 1) return msg.channel.send("Correct Usage: `" + PREFIX + "coursemology (info|list|leaderboard|listusers|user) [args]`");
@@ -142,26 +143,27 @@ exports.handleCommand = function(args, msg, PREFIX) {
 function exeInfo(course, id, json, channel, author) {
     request({
         url: `${config.query_base_url}/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)}`,
-        jar: config.JAR
+        headers: headers
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
             channel.send("Coursemology Query Failed!");
         } else {
-            let contents = new JSDOM(body).window.document.querySelector("#assessment_" + id);
+            let doc = new JSDOM(body).window.document;
+            let contents = doc.querySelector("#assessment_" + id);
             if (!contents) return channel.send(`Query has failed as ${config.query_base_url}/courses/${encodeURIComponent(course)}/assessments/${encodeURIComponent(id)} is not valid!`);
             let achievements = {};
             contents.querySelectorAll(".condition_assessment").forEach(a => {
-                achievements[a.id.value.substring(21)] = {
-                    name: a.firstChild.text,
-                    description: a.lastChild.text
+                achievements[a.id.substring(21)] = {
+                    name: a.firstChild.textContent,
+                    description: a.lastChild.textContent
                 };
             });
             let object = {
-                name: result.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").text,
-                description: contents.querySelector(".well") ? contents.querySelector(".well").text : null,
-                type: contents.querySelector(".type td").text,
-                base_exp: contents.querySelector(".base_exp td").text,
-                bonus_exp: contents.querySelector(".bonus_exp td").text,
+                name: doc.querySelector(".course-layout .course-assessment-assessments .page-header h1 span").textContent,
+                description: contents.querySelector(".well") ? contents.querySelector(".well").textContent : null,
+                type: contents.querySelector(".type td").textContent,
+                base_exp: contents.querySelector(".base_exp td").textContent,
+                bonus_exp: contents.querySelector(".bonus_exp td").textContent,
                 achievements: achievements
             };
             if (json) {
@@ -175,7 +177,7 @@ function exeInfo(course, id, json, channel, author) {
                 let linksInDiv = contents.querySelectorAll("div a");
                 let files = [];
                 for (var i = 0; i < linksInDiv.length; i++)
-                    if (linksInDiv[i].attributes.href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) files.push("[" + linksInDiv[i].text + "](" + config.query_base_url + linksInDiv[i].attributes.href + ")");
+                    if (linksInDiv[i].href.match("(\\/courses\\/[0-9]+\\/materials\\/folders\\/[0-9]+\\/files\\/[0-9]+)")) files.push("[" + linksInDiv[i].textContent + "](" + config.query_base_url + linksInDiv[i].href + ")");
                 embed.addField("Attached Files", files.join("\n"));
                 embed.setFooter("Requested By " + author.username, author.displayAvatarURL);
                 channel.send(embed);
@@ -188,21 +190,22 @@ function exeList(course, cat, tab, json, channel, author) {
     if (config.debug) channel.send(`DEBUG: ${author.username} has requested list of assessment in category#${cat}, tab#${tab}, on course#${course}!`);
     request({
         url: `${config.query_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)}`,
-        jar: config.JAR
+        headers: headers
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
             channel.send("Coursemology Query Failed!");
         } else {
-            let contents = new JSDOM(body).window.document.querySelector(".assessments-list tbody");
+            let doc = new JSDOM(body).window.document
+            let contents = doc.querySelector(".assessments-list tbody");
             if (!contents) return channel.send(`Query has failed as ${config.query_base_url}/courses/${encodeURIComponent(course)}/assessments?category=${encodeURIComponent(cat)}&tab=${encodeURIComponent(tab)} is not valid!`);
-            let embed = new Discord.RichEmbed().setTitle(`${result.querySelector(".page-header h1 span").text}${config.list_presets[course]?" ("+config.list_presets[course].name+")":""}`).setColor(0x21f8ff);
+            let embed = new Discord.RichEmbed().setTitle(`${doc.querySelector(".page-header h1 span").textContent}${config.list_presets[course]?" ("+config.list_presets[course].name+")":""}`).setColor(0x21f8ff);
             let rows = contents.querySelectorAll("tr");
             let desc = Object.values(rows).map(row => {
                 let title = row.firstChild.firstChild;
-                let disabled = !row.attributes.class.value.includes("currently-active");
+                let disabled = !row.className.includes("currently-active");
                 return {
-                    name: `${disabled?"~~":"**"}${row.attributes.id.value.replace("assessment_", "")}${disabled?"~~":"**"}`,
-                    value: `[${title.text}](${config.query_base_url}${title.attributes.href})`,
+                    name: `${disabled?"~~":"**"}${row.id.replace("assessment_", "")}${disabled?"~~":"**"}`,
+                    value: `[${title.textContent}](${config.query_base_url}${title.href})`,
                     inline: true
                 };
             });
@@ -219,7 +222,7 @@ function exeLB(course, type, json, channel, author) {
         else type = 0;
     request({
         url: `${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
-        jar: config.JAR
+        headers: headers
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
             channel.send("Coursemology Query Failed!");
@@ -227,16 +230,16 @@ function exeLB(course, type, json, channel, author) {
             console.log("Parsing Leaderboard...");
             let contents = new JSDOM(body).window.document.querySelector(".leaderboard-" + ["level", "achievement"][type] + " tbody");
             if (!contents) return channel.send(`Query has failed as ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard is not valid!`);
-            let rows = contents.querySelectorAll("tr");
+            let rows = Array.from(contents.querySelectorAll("tr"));
             let row1 = rows.shift();
-            let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").text.trim()}${type==0?" _("+row1.querySelector(".user-profile").lastChild.text.trim()+")_":""}`).setColor(0x21f8ff);
-            embed.setURL(config.query_base_url + row1.querySelector(".user-profile div a").attributes.href)
-            let thumbURL = row1.querySelector(".user-picture img").attributes.src;
+            let embed = new Discord.RichEmbed().setTitle(`#1 ${row1.querySelector(".user-profile div a").textContent.trim()}${type==0?" _("+row1.querySelector(".user-profile").lastChild.textContent.trim()+")_":""}`).setColor(0x21f8ff);
+            embed.setURL(config.query_base_url + row1.querySelector(".user-profile div a").href)
+            let thumbURL = row1.querySelector(".user-picture img").src;
             if (thumbURL.charAt(0) === "/") thumbURL = config.query_base_url + thumbURL;
             embed.setThumbnail(thumbURL);
             embed.setDescription(Object.values(rows).map(row => {
-                console.log(`        #${row.firstChild.text.trim()} ${row.querySelector(".user-profile div a").text.trim()}`);
-                return `#${row.firstChild.text.trim()} [${row.querySelector(".user-profile div a").text.trim()}](${config.query_base_url}${row.querySelector(".user-profile div a").attributes.href})${type==0?" _("+row.querySelector(".user-profile").lastChild.text.trim()+")_":""}`;
+                console.log(`        #${row.firstChild.textContent.trim()} ${row.querySelector(".user-profile div a").textContent.trim()}`);
+                return `#${row.firstChild.textContent.trim()} [${row.querySelector(".user-profile div a").textContent.trim()}](${config.query_base_url}${row.querySelector(".user-profile div a").href})${type==0?" _("+row.querySelector(".user-profile").lastChild.textContent.trim()+")_":""}`;
             }).join("\n"));
             channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
         }
@@ -325,7 +328,7 @@ function exeStalk(course, user_id, json, channel, author) {
     } else {
         request({
             url: `${config.query_base_url}/courses/${encodeURIComponent(course)}/users/${encodeURIComponent(user_id)}`,
-            jar: config.JAR
+            headers: headers
         }, function(error, response, body) {
             if (error || response.statusCode == 404) {
                 console.log(`Failed ${course}, ${user_id}`);
@@ -335,12 +338,14 @@ function exeStalk(course, user_id, json, channel, author) {
                 let contents = new JSDOM(body).window.document.querySelector(".course-users");
                 if (!contents) return channel.send(`Query Failed! why are you even using this feature?`);
                 let user_info = contents.querySelector(".row").lastChild;
-                let name = user_info.querySelector("h2").text;
+                let name = user_info.querySelector("h2").textContent;
                 let embed = new Discord.RichEmbed().setTitle("Profile of " + name).setColor(0x21f8ff);
                 embed.setURL(`${config.query_base_url}/courses/${encodeURIComponent(course)}/users/${encodeURIComponent(user_id)}`);
-                let image = contents.querySelector(".profile-box .image img").attributes.src;
+                let image = contents.querySelector(".profile-box .image img").src;
                 if (!image.endsWith("svg")) embed.setThumbnail(image);
-                embed.addField("ID", user_id, true).addField("Email", user_info.querySelector("p").text, true).addField(`Achievements (${contents.lastChild.childNodes.length})`, contents.lastChild.childNodes.map(ach => ach.querySelector("h6").text).join(", "));
+                let finalText = [];
+                for (let node of contents.lastChild.childNodes) finalText.push(node.querySelector("h6").textContent);
+                embed.addField("ID", user_id, true).addField("Email", user_info.querySelector("p").textContent, true).addField(`Achievements (${contents.lastChild.childNodes.length})`, finalText.join(", "));
                 channel.send(embed.setFooter("Requested By " + author.username, author.displayAvatarURL));
             }
         });
@@ -351,9 +356,10 @@ function exeStalk(course, user_id, json, channel, author) {
 //TODO: to be expanded
 
 function updateUsers(course) {
+    console.log(`${config.query_base_url}/courses/${course}/users`);
     request({
         url: `${config.query_base_url}/courses/${course}/users`,
-        jar: config.JAR
+        headers: headers
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
             console.log("failed to query users (" + response.statusCode + "), error = " + JSON.stringify(error));
@@ -364,8 +370,8 @@ function updateUsers(course) {
             config.USERS_CACHE[course] = {};
             users.forEach(user => {
                 config.USERS_CACHE[course][user.id.substring(12)] = {
-                    name: user.querySelector(".user-name").text,
-                    icon: user.querySelector(".profile-picture img").attributes.src
+                    name: user.querySelector(".user-name").textContent,
+                    icon: user.querySelector(".profile-picture img").src
                 };
             });
         }
@@ -375,7 +381,7 @@ function updateUsers(course) {
 function updateLB(course) {
     request({
         url: `${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`,
-        jar: config.JAR
+        headers: headers
     }, function(error, response, body) {
         if (error || response.statusCode == 404) {
             if (config.debug) config.HOOK.send(`DEBUG: Failed to access ${config.query_base_url}/courses/${encodeURIComponent(course)}/leaderboard`);
@@ -385,18 +391,18 @@ function updateLB(course) {
             let rows = contents.querySelectorAll("tr");
             let newLB = Object.values(rows).map(row => {
                 return {
-                    id: row.attributes.id.value.replace("course_user_", ""),
-                    rank: row.firstChild.text,
-                    name: row.querySelector(".user-profile div a").text,
-                    image: `${config.query_base_url}${row.querySelector(".user-profile div a").attributes.href}`,
-                    level: row.querySelector(".user-profile").lastChild.text
+                    id: row.id.replace("course_user_", ""),
+                    rank: row.firstChild.textContent,
+                    name: row.querySelector(".user-profile div a").textContent,
+                    image: `${config.query_base_url}${row.querySelector(".user-profile div a").href}`,
+                    level: row.querySelector(".user-profile").lastChild.textContent
                 };
             });
             if (config.debug) config.HOOK.send(`[Course#${course}] DEBUG: #1 on leaderboard is ${newLB[0].name}`);
             if (config.leaderboard[course]) {
                 let oldLB = config.leaderboard[course];
                 for (var a = 0; a < Math.min(newLB.length, oldLB.length); a++)
-                    if (newLB[a].id.value !== oldLB[a].id.value)
+                    if (newLB[a].id !== oldLB[a].id)
                         if (a == 0)
                             config.HOOK.send(`[Course#${course}] **${newLB[a].name}** has taken the **#1** spot from **${oldLB[a].name}**!`);
                         else

@@ -1,7 +1,7 @@
 // Required dependencies
 const Discord = require('discord.js');
 const config = require('./config.js').config;
-// const coursemology = require('./coursemology.js');
+const coursemology = require('./coursemology.js');
 const azurlane = require('./azurlane.js');
 const waifulabs = require('./waifulabs.js');
 
@@ -13,7 +13,8 @@ const client = new Discord.Client();
 const PING_EMBED = new Discord.RichEmbed().setTitle("Ping Results").setColor(0x21f8ff).addField("Latency", 0).addField("Discord API Latency", 0);
 const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
     .addField(`${PREFIX}ping`, "Get the bot's ping")
-    .addField(`${PREFIX}toggledebug`, "Toggle Debug Messages")
+    .addField(`${PREFIX}azurlane [ship name]`, "Access data from Azur Lane")
+    .addField(`${PREFIX}azurlane finds [name/? =/? data]+`, "Query for ships")
     .addField(`${PREFIX}coursemology`, `Access Coursemology.\nUsage: \`${PREFIX}coursemology (info|list|leaderboard|listusers|user) [args]\``)
     .addField(`${PREFIX}sleep`, "Tell you whether or not you should sleep.")
 
@@ -23,7 +24,7 @@ console.log('====== ZY Discord Bot Started! ======');
 client.on('ready', () => {
     console.log("=> Bot Running!");
     client.user.setPresence(config.PRESENCE);
-    // setInterval(coursemology.update, 10000);
+    setInterval(coursemology.update, 10000);
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     config.id = client.user.id;
 });
