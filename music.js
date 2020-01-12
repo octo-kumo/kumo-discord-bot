@@ -26,6 +26,17 @@ exports.handleCommand = async (args, msg, prefix) => {
         case "stop":
             stop(msg);
             break;
+        case "pause":
+            pause(msg);
+            break;
+        case "resume":
+            resume(msg);
+            break;
+        case "queue":
+        case "q":
+        case "list":
+            list(msg);
+            break;
     }
     console.log("music sub-command finished");
 }
@@ -33,7 +44,7 @@ exports.handleCommand = async (args, msg, prefix) => {
 async function play(args, msg) {
     if (args.length === 0)
         if (!queues[msg.guild.id]) return msg.reply('You command went straight through me');
-        else return msg.reply('TODO, play will just resume');
+        else return resume(msg);
     const voiceChannel = msg.member.voiceChannel;
     if (!voiceChannel) return msg.reply('I don\'t see you');
     if (msg.client.voiceConnections.get(msg.guild.id) && msg.client.voiceConnections.get(msg.guild.id).channel.id !== voiceChannel.id) return msg.reply('I am busy, come to #' + msg.client.voiceConnections.get(msg.guild.id).channel.name);
@@ -80,18 +91,45 @@ function progressQueue(guild, song) {
     });
 }
 
+function list(msg) {
+    let queue = queues[msg.guild.id];
+    let embed = new Discord.Embed();
+    embed.setTitle("Queue");
+    let finalText = [];
+    for (let i = 0; i < queue.songs.length; i++) {
+        finalText.push('#' + ((i + 1) + "").padStart(3, ' ') + " " + queue.songs[i].title + " (" + queue.songs[i].timestamp + ")");
+    }
+    embed.setDescription("```\n" + finalText.join("\n") + "\n```");
+    embed.setFooter("Total " + queue.songs.length + " songs");
+    msg.channel.send(embed);
+}
+
 function skip(msg) {
     let queue = queues[msg.guild.id];
-    if (!msg.member.voiceChannel) return msg.channel.send(':sweat: Erm, did you meant someone else?');
+    if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel, lol');
     if (!queue) return message.channel.send(':person_shrugging: There aren\'t any to begin with.');
     queue.connection.dispatcher.end();
 }
 
 function stop(msg) {
     let queue = queues[msg.guild.id];
-    if (!msg.member.voiceChannel) return msg.channel.send(':sweat: Erm, did you meant someone else?');
+    if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel, lol');
     queue.songs = [];
     queue.connection.dispatcher.end();
+}
+
+function pause(msg) {
+    let queue = queues[msg.guild.id];
+    if (!queue) return msg.channel.send('You are not in a voice channel, lol');
+    queue.playing = false;
+    queue.connection.dispatcher.pause();
+}
+
+function resume(msg) {
+    let queue = queues[msg.guild.id];
+    if (!queue) return msg.channel.send('You are not in a voice channel, lol');
+    queue.playing = true;
+    queue.connection.dispatcher.resume();
 }
 
 function search(query) {

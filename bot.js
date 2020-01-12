@@ -58,7 +58,7 @@ client.on('message', async msg => {
     }
     if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg, PREFIX);
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
-    if (command === "music" || command === "am" || command === "m" || command === "song" || command === "!play") music.handleCommand(args, msg, PREFIX);
+    if (command === "music" || command === "am" || command === "m" || command === "song" || command === "!play") await music.handleCommand(args, msg, PREFIX);
     if (command === "waifulabs" || command === "wl" || command === "waifu") waifulabs.newBatch(msg);
     if (msg.author.id === "456001047756800000" && (command === "toggledebug" || command === "td")) {
         config.debug = !config.debug;
