@@ -18,7 +18,6 @@
     },
     "homepage": "https://github.com/LE0ZY/kumo-discord-bot#readme",
     "dependencies": {
-        "@discordjs/uws": "^11.149.1",
         "discord.js": "^11.5.1",
         "express": "^4.17.1",
         "ffmpeg": ">=0.0.4",
