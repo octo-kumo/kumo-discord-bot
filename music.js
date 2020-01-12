@@ -93,6 +93,7 @@ function progressQueue(guild, song) {
 
 function list(msg) {
     let queue = queues[msg.guild.id];
+    if(!queue) return msg.channel.send("_No Song No Life_");
     let embed = new Discord.RichEmbed();
     embed.setTitle("Queue");
     let finalText = [];
