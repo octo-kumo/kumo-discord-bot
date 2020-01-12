@@ -93,7 +93,7 @@ function progressQueue(guild, song) {
 
 function list(msg) {
     let queue = queues[msg.guild.id];
-    let embed = new Discord.Embed();
+    let embed = new Discord.RichEmbed();
     embed.setTitle("Queue");
     let finalText = [];
     for (let i = 0; i < queue.songs.length; i++) {
