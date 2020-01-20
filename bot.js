@@ -26,9 +26,10 @@ client.on('ready', () => {
     console.log("=> Bot Running in " + client.guilds.keyArray().length + " servers!");
     client.guilds.get('665471208757657620').channels.get('665471209277882400').send("READY!");
     client.user.setPresence(config.PRESENCE);
-    setInterval(coursemology.update, 60000);
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     config.id = client.user.id;
+    coursemology.update(config.DEFAULT_COURSE);
+    setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
 });
 
 client.on('message', async msg => {
@@ -56,7 +57,8 @@ client.on('message', async msg => {
         console.log(` ping results obtained. lat = ${m.createdTimestamp - msg.createdTimestamp}, discord lat = ${Math.round(client.ping)}`);
         m.edit(PING_EMBED);
     }
-    if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg, PREFIX);
+    if (command === "coursemology" || command === "cm") msg.reply("Coursemology command is currently disabled.\nHelp me design some embed and send it to me! (The data side is perfectly fine, just the design)")
+    //if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg, PREFIX);
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
     if (command === "music" || command === "am" || command === "m" || command === "song") await music.handleCommand(args, msg, PREFIX);
     if (command.startsWith("!")) await music.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
@@ -88,11 +90,14 @@ client.on('message', async msg => {
     console.log("====== Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
 });
 
-client.once('reconnecting', () => {
+client.on('reconnecting', () => {
     console.log('Reconnecting!');
 });
-client.once('disconnect', () => {
+client.on('disconnect', () => {
     console.log('Disconnect!');
+});
+client.on('guildCreate', (guild) => {
+    console.log("Joined " + guild.id);
 });
 
 client.login(process.env.TOKEN);

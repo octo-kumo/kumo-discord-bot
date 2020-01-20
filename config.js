@@ -6,9 +6,13 @@ exports.config = {
                 cat: 2067,
                 tab: 3425
             },
-            reviews: {
+            assignments: {
                 cat: 2068,
                 tab: 3426
+            },
+            projects: {
+                cat: 2069,
+                tab: 3427
             }
         },
         "1706": {
