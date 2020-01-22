@@ -19,8 +19,10 @@ exports.update = (course) => {
 
 async function updateActivities(course) {
     const NEW_ACTIVITIES = await loadActivities(course);
-    if (ACTIVITIES.length === 0) ACTIVITIES = NEW_ACTIVITIES;
-    else {
+    if (ACTIVITIES.length === 0) {
+        ACTIVITIES = NEW_ACTIVITIES;
+        console.log("ACTIVITIES init: " + ACTIVITIES.length);
+    } else {
         let diff = [];
         for (let i = 0; i < NEW_ACTIVITIES.length; i++) {
             if (ACTIVITIES[0] && NEW_ACTIVITIES[i].id === ACTIVITIES[0].id) break; // Done
