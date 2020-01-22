@@ -32,6 +32,7 @@ async function updateActivities(course) {
             let embeds = [];
             for (let i = diff.length - 1; i >= 0; i--) {
                 let notification = diff[i];
+                console.log("New Activity: " + notification.content);
                 embeds.push({
                     color: 0x53bad1,
                     title: notification.content,
