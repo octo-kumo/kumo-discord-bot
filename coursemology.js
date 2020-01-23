@@ -36,7 +36,10 @@ async function updateActivities(course) {
                 embeds.push({
                     color: 0x53bad1,
                     title: notification.content,
-                    description: notification.links.map(link => `[${link.text}](${link.url})`).join("\n"),
+                    fields: [{
+                        name: "Links",
+                        value: notification.links.map(link => `[${link.text}](${link.url})`).join(", ")
+                    }],
                     footer: {
                         text: notification.timestamp
                     }
