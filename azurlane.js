@@ -135,7 +135,7 @@ const STATS_EMOJI_TRANSLATION = {
     "antiair": "<:iconantiair:655289973485862912> Anti-Air",
     "aviation": "<:iconaviation:655290057938436137> Aviation",
     "oilConsumption": "<:iconconsumption:655290063692759052> Oil Usage",
-    "accuracyHit": "Accuracy",
+    "accuracy": "Accuracy",
     "antisubmarineWarfare": "<:iconasw:655290057736978432> ASW",
     "oxygen": "<:iconoxygen:661814201903480842> Oxygen",
     "ammunition": "<:iconammunition:661814201345507349> Ammunition",
