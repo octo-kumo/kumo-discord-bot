@@ -18,7 +18,7 @@ const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
     .addField(`${PREFIX}azurlane finds [name/? =/? data]+`, "Query for ships")
     .addField(`${PREFIX}coursemology`, `Access Coursemology.\nUsage: \`${PREFIX}coursemology (info|list|leaderboard|listusers|user) [args]\``)
     .addField(`${PREFIX}sleep`, "Tell you whether or not you should sleep.")
-
+chainUpStdOut();
 console.log('====== ZY Discord Bot Started! ======');
 
 // coursemology.initiate();
@@ -101,3 +101,28 @@ client.on('guildCreate', (guild) => {
 });
 
 client.login(process.env.TOKEN);
+
+function chainUpStdOut() {
+    const hook = new Discord.WebhookClient('670179846005063681', 'UckNPFVsz2nJ4bUAMtPMq_z0jFL0d66YNaq-C3OhhvXEDtid1hBj4tAOp5WVM9hFYYYn');
+    var util = require('util')
+    var events = require('events')
+
+    function hook_stdout(callback) {
+        var old_write = process.stdout.write
+        process.stdout.write = (function(write) {
+            return function(string, encoding, fd) {
+                write.apply(process.stdout, arguments)
+                callback(string, encoding, fd)
+            }
+        })(process.stdout.write)
+        return () => process.stdout.write = old_write;
+    }
+    let str = [];
+    hook_stdout((s) => {
+        str.push(s);
+        if (s.endsWith('\n')) {
+            hook.send("`" + str.join("") + "`");
+            str = []
+        }
+    });
+}

@@ -29,8 +29,8 @@ exports.handleCommand = (args, msg, prefix) => {
                 embed: generateAssessmentEmbed(assessment),
                 files: assessment.files
             });
+            if (isNaN(args[0])) args = [args.join(" ")];
             if (args.length === 1) args = [config.DEFAULT_COURSE, args[0]];
-            console.log(ALL_ASSESSMENTS);
             for (let assessment of ALL_ASSESSMENTS) {
                 if (assessment.course === args[0] && assessment.name.toUpperCase().includes(args[1].toUpperCase())) {
                     sendAssessment(assessment);
@@ -41,7 +41,7 @@ exports.handleCommand = (args, msg, prefix) => {
             console.log("No local cache");
             loadAssessment(args[0], args[1])
                 .then(sendAssessment)
-                .catch(err => msg.reply("**ERROR, ERROR** _Recalibrating..._\n```console\n" + err.stack + "```"));
+                .catch(err => msg.reply("**ERROR, ERROR** _Recalibrating..._"));
             break;
     }
 }
