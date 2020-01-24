@@ -3,6 +3,7 @@ const request = require('request');
 const fs = require('fs');
 const JSDOM = require('jsdom').JSDOM;
 const config = require('./config.js').config;
+const fetch = require('node-fetch');
 
 let LABS = [];
 let ASSIGNMENTS = [];
@@ -287,7 +288,7 @@ function loadAssessment(course, assessment_id) {
         request({
             url: `https://nushigh.coursemology.org/courses/${course}/assessments/${assessment_id}`,
             headers: headers
-        }, (error, response, body) => {
+        }, async (error, response, body) => {
             try {
                 const doc = new JSDOM(body).window.document;
                 const data = doc.getElementById("assessment_" + assessment_id);
@@ -317,7 +318,8 @@ function loadAssessment(course, assessment_id) {
                     } else if (mode === "files") {
                         files.push({
                             name: child.firstElementChild.textContent.trim(),
-                            attachment: "https://nushigh.coursemology.org" + child.firstElementChild.href
+                            attachment: await downloadAsBuffer("https://nushigh.coursemology.org" + child.firstElementChild.href),
+                            url: "https://nushigh.coursemology.org" + child.firstElementChild.href
                         });
                     } else if (mode === "achievement") {
                         achievements.push({
@@ -352,6 +354,17 @@ function loadAssessment(course, assessment_id) {
             if (config.debug) console.log('error ' + error.message);
             reject(error);
         });
+    });
+}
+
+function downloadAsBuffer(file_url) {
+    return new Promise((resolve, reject) => {
+        fetch(file_url, {
+                headers: headers,
+                method: 'GET'
+            })
+            .then(res => res.buffer())
+            .then(body => resolve(body));
     });
 }
 
