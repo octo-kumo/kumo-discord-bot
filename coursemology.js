@@ -30,34 +30,22 @@ exports.handleCommand = (args, msg, prefix) => {
                 files: assessment.files
             });
             if (args.length === 1) args = [config.DEFAULT_COURSE, args[0]];
-            let found;
-            if (isNaN(args[1]) && args[1].trim().length > 0) {
-                for (let assessment of ALL_ASSESSMENTS) {
-                    if (assessment.course === args[0] && assessment.name.toUpperCase().includes(args[1].toUpperCase())) {
-                        found = assessment;
-                        console.log("Found local cache for " + found.name);
-                        break;
-                    }
-                }
-            } else {
-                for (let assessment of ALL_ASSESSMENTS) {
-                    console.log(assessment.course, args[0], assessment.course === args[0]);
-                    console.log(assessment.id.toString(10), args[1], assessment.id.toString(10) === args[1]);
-                    if (assessment.course === args[0] && assessment.id.toString(10) === args[1]) {
-                        found = assessment;
-                        console.log("Found local cache for " + found.name);
-                        break;
-                    }
+            console.log(ALL_ASSESSMENTS);
+            for (let assessment of ALL_ASSESSMENTS) {
+                if (assessment.course === args[0] && assessment.name.toUpperCase().includes(args[1].toUpperCase())) {
+                    sendAssessment(assessment);
+                    console.log("Found local cache for " + assessment.name);
+                    return;
                 }
             }
-            if (!found) {
-                loadAssessment(args[0], args[1])
-                    .then(sendAssessment)
-                    .catch(err => msg.reply("**ERROR, ERROR** _Recalibrating..._\n```console\n" + err.stack + "```"));
-            } else sendAssessment(found);
+            console.log("No local cache");
+            loadAssessment(args[0], args[1])
+                .then(sendAssessment)
+                .catch(err => msg.reply("**ERROR, ERROR** _Recalibrating..._\n```console\n" + err.stack + "```"));
             break;
     }
 }
+
 exports.update = (course) => {
     updateActivities(course);
     updateLabs(course);
