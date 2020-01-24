@@ -57,8 +57,8 @@ client.on('message', async msg => {
         console.log(` ping results obtained. lat = ${m.createdTimestamp - msg.createdTimestamp}, discord lat = ${Math.round(client.ping)}`);
         m.edit(PING_EMBED);
     }
-    if (command === "coursemology" || command === "cm") msg.reply("Coursemology command is currently disabled.\nHelp me design some embed and send it to me! (The data side is perfectly fine, just the design)")
-    //if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg, PREFIX);
+    //if (command === "coursemology" || command === "cm") msg.reply("Coursemology command is currently disabled.\nHelp me design some embed and send it to me! (The data side is perfectly fine, just the design)")
+    if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
     if (command === "music" || command === "am" || command === "m" || command === "song") await music.handleCommand(args, msg, PREFIX);
     if (command.startsWith("!")) await music.handleCommand([command.substring(1)].concat(args), msg, PREFIX);

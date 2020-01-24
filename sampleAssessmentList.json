@@ -1,0 +1,241 @@
+[
+    {
+        "id": "assessment_29280",
+        "name": "Lab 1: Recap on OOP",
+        "active": true,
+        "achievements": [
+            "9034",
+            "9056"
+        ],
+        "baseExp": 100,
+        "timeBonusExp": 20,
+        "startAt": "11 Jun 09:00",
+        "bonusCutOff": "24 Jun 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_29279",
+        "name": "Lab 2.1: Inheritance & Polymorphism",
+        "active": true,
+        "achievements": [
+            "9035",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "04 Jul 11:30",
+        "bonusCutOff": "12 Jul 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_29300",
+        "name": "Lab 2.2: Inheritance & Polymorphism",
+        "active": true,
+        "achievements": [
+            "9036",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "10 Jul 12:00",
+        "bonusCutOff": "19 Jul 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_30031",
+        "name": "Lab 3.1 Abstract Classes, Interfaces & Generics",
+        "active": true,
+        "achievements": [
+            "9037",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "15 Jul 14:30",
+        "bonusCutOff": "24 Jul 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_29282",
+        "name": "Lab 3.2: Abstract Classes, Interfaces & Generics",
+        "active": true,
+        "achievements": [
+            "9037",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "18 Jul 11:30",
+        "bonusCutOff": "26 Jul 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_29277",
+        "name": "Lab 4: JavaFX Coding the UI",
+        "active": true,
+        "achievements": [
+            "9040",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "22 Jul 14:20",
+        "bonusCutOff": "01 Aug 23:49",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_30131",
+        "name": "Lab 5.1: JavaFX EventHandling",
+        "active": true,
+        "achievements": [
+            "9040",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "29 Jul 14:30",
+        "bonusCutOff": "07 Aug 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_29278",
+        "name": "Lab 5.2: JavaFX EventHandling",
+        "active": true,
+        "achievements": [
+            "9040",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "01 Aug 11:30",
+        "bonusCutOff": "08 Aug 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_29283",
+        "name": "Lab 6: Regular Expression",
+        "active": true,
+        "achievements": [
+            "9041",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "14 Aug 12:30",
+        "bonusCutOff": "21 Aug 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_29284",
+        "name": "Lab 7: Exceptions",
+        "active": true,
+        "achievements": [
+            "9042",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "22 Aug 11:30",
+        "bonusCutOff": "29 Aug 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_29285",
+        "name": "Lab 8.1: Multithreading",
+        "active": true,
+        "achievements": [
+            "9053",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "28 Aug 12:30",
+        "bonusCutOff": "06 Sep 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_29288",
+        "name": "Lab 8.2 Multithreading",
+        "active": true,
+        "achievements": [
+            "9053",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "16 Sep 14:30",
+        "bonusCutOff": "27 Sep 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_29286",
+        "name": "Lab 9: Animation",
+        "active": true,
+        "achievements": [
+            "9054",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "20 Sep 10:00",
+        "bonusCutOff": "03 Oct 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_29287",
+        "name": "Lab 10: Internationalization",
+        "active": true,
+        "achievements": [
+            "9055",
+            "9056"
+        ],
+        "baseExp": 50,
+        "timeBonusExp": 10,
+        "startAt": "26 Sep 11:30",
+        "bonusCutOff": "06 Oct 23:59",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    },
+    {
+        "id": "assessment_31136",
+        "name": "Operation Z: Give me my badges back!",
+        "active": true,
+        "achievements": [
+            "9482"
+        ],
+        "baseExp": 5,
+        "timeBonusExp": null,
+        "startAt": "03 Oct 16:00",
+        "bonusCutOff": "-",
+        "course": "1706",
+        "category": "1880",
+        "tab": "3080"
+    }
+]

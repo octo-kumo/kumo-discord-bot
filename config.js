@@ -62,7 +62,7 @@ exports.config = {
     },
     HOOK: null,
     USERS_CACHE: {},
-    DEFAULT_COURSE: 1811,
+    DEFAULT_COURSE: "1811",
     NUMBER_OF_USER_PER_PAGE: 8,
     COURSES: [1811, 1706, 1389, 614, 1613],
     COURSE_NAMES: ["CS4131 Mobile Application Development AY2020", "CS3233 Object Oriented Programming II AY2019", "CS3231 Object Oriented Programming I AY2019", "CS2231 Introduction to Programming AY2018S1", "CS1131 Computational Thinking AY2017"],

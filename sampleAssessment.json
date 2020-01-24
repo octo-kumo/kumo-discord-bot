@@ -1,0 +1,79 @@
+{
+    "id": 29280,
+    "course": "1706",
+    "name": "Lab 1: Recap on OOP",
+    "description": "The objectives of this lab is to:\nRecap on what you have learnt in CS3231 OOP1 on Classes and Objects, and JavaFX\nGet you started on how to create JavaFX UI using CODE (we focused on SceneBuilder in OOP1)\nGet you to explore Java Ensemble, and to discover the rich capabilities in JavaFX\nGet you started in brainstorming for your Project Idea in CS3233 OOP2\nNote that you are REQUIRED to complete this lab before the start of semester 2.\nIf you did not complete this lab, or find the lab too challenging for you, you will be asked to reconsider if you should continue taking CS3233 OOP2.",
+    "markdown": "The objectives of this lab is to:\n • Recap on what you have learnt in CS3231 OOP1 on Classes and Objects, and JavaFX\n • Get you started on how to create JavaFX UI using CODE (we focused on SceneBuilder in OOP1)\n • Get you to explore Java Ensemble, and to discover the rich capabilities in JavaFX\n • Get you started in brainstorming for your Project Idea in CS3233 OOP2\nNote that you are REQUIRED to complete this lab before the start of semester 2.\nIf you did not complete this lab, or find the lab too challenging for you, you will be asked to reconsider if you should continue taking CS3233 OOP2.",
+    "info": {
+        "assessmentType": "Autograded Assessment",
+        "baseExperiencePoints": 100,
+        "bonusExperiencePoints": 20,
+        "startAt": "June 11, 2019 09:00",
+        "bonusCutOff": "June 24, 2019 23:59",
+        "endAt": null
+    },
+    "fields": [
+        {
+            "value": "Autograded Assessment",
+            "name": "Assessment Type",
+            "inline": true
+        },
+        {
+            "value": 100,
+            "name": "Base Experience Points",
+            "inline": true
+        },
+        {
+            "value": 20,
+            "name": "Bonus Experience Points",
+            "inline": true
+        },
+        {
+            "value": "June 11, 2019 09:00",
+            "name": "Start At",
+            "inline": true
+        },
+        {
+            "value": "June 24, 2019 23:59",
+            "name": "Bonus Cut Off",
+            "inline": true
+        },
+        {
+            "value": null,
+            "name": "End At",
+            "inline": true
+        }
+    ],
+    "achievements": [
+        {
+            "id": "condition_assessment_25190",
+            "url": "https://nushigh.coursemology.org/courses/1706/achievements/9056",
+            "name": "Star Employee",
+            "description": "Score at least 50% for Lab 1: Recap on OOP"
+        },
+        {
+            "id": "condition_assessment_24448",
+            "url": "https://nushigh.coursemology.org/courses/1706/achievements/9034",
+            "name": "OOP reloaded",
+            "description": "Score at least 100% for Lab 1: Recap on OOP"
+        }
+    ],
+    "files": [
+        {
+            "name": "Ensemble8.jar",
+            "attachment": "https://nushigh.coursemology.org/courses/1706/materials/folders/36314/files/56598"
+        },
+        {
+            "name": "Chapter 1 - Abstraction & Encapsulation.pdf",
+            "attachment": "https://nushigh.coursemology.org/courses/1706/materials/folders/36314/files/55870"
+        },
+        {
+            "name": "Chapter 13B - JavaFX.pdf",
+            "attachment": "https://nushigh.coursemology.org/courses/1706/materials/folders/36314/files/55828"
+        },
+        {
+            "name": "Chapter 13A - JavaFX.pdf",
+            "attachment": "https://nushigh.coursemology.org/courses/1706/materials/folders/36314/files/55827"
+        }
+    ]
+}
