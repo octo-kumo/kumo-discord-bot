@@ -5,11 +5,8 @@ const JSDOM = require('jsdom').JSDOM;
 const config = require('./config.js').config;
 const fetch = require('node-fetch');
 
-let LABS = [];
-let ASSIGNMENTS = [];
-let PROJECTS = [];
+let COURSES = {};
 let ALL_ASSESSMENTS = [];
-let ACTIVITIES = [];
 
 const headers = {
     "Cookie": "remember_user_token=" + process.env.CMTOKEN,
@@ -17,6 +14,8 @@ const headers = {
 };
 exports.handleCommand = (args, msg, prefix) => {
     if (args.length === 0) return msg.reply("_Coursemology autograding is lagging..._");
+    let json = false;
+    if (json = args.includes("--json")) args.splice(args.indexOf('--json'), 1);
     console.log("coursemology sub-system; command:", args[0], ", args:", "\"" + args.slice(1).join("\", \"") + "\"");
     switch (args.shift()) {
         case "lab":
@@ -28,10 +27,18 @@ exports.handleCommand = (args, msg, prefix) => {
             if (args.length === 0) return msg.reply("_Labs aren't showing..._");
             let sendAssessment = (assessment) => {
                 console.log("Sending assessment...");
-                msg.channel.send(generateAssessmentEmbed(assessment));
+                let json_text = JSON.stringify(assessment, null, 4);
+                if (json) {
+                    if (json_text.length > 2000 - 13) {
+                        json_text = JSON.stringify(assessment);
+                        if (json_text.length > 2000 - 13) msg.channel.send('_It is too long for discord to accept_');
+                        else msg.channel.send('```json\n' + json_text + '\n```');
+                    } else msg.channel.send('```json\n' + json_text + '\n```');
+                } else msg.channel.send(generateAssessmentEmbed(assessment));
             }
             if (isNaN(args[0])) args = [args.join(" ")];
             if (args.length === 1) args = [config.DEFAULT_COURSE, args[0]];
+            if (isNaN(args[1]) || args.length > 2) args = [args[0], args.slice(1).join(' ')];
             for (let assessment of ALL_ASSESSMENTS) {
                 if (assessment.course === args[0] && (assessment.name.toUpperCase().includes(args[1].toUpperCase()) || assessment.id === args[1])) {
                     sendAssessment(assessment);
@@ -57,6 +64,14 @@ exports.update = (course) => {
 }
 
 async function updateActivities(course) {
+    let assessments = COURSES[course];
+    if (!assessments) assessments = COURSES[course] = {
+        LABS: [],
+        ASSIGNMENTS: [],
+        PROJECTS: [],
+        ACTIVITIES: []
+    };
+    let ACTIVITIES = assessments.ACTIVITIES;
     const NEW_ACTIVITIES = await loadActivities(course);
     if (ACTIVITIES.length === 0) {
         ACTIVITIES = NEW_ACTIVITIES;
@@ -94,6 +109,17 @@ async function updateActivities(course) {
 
 //ORDER = OLDEST (index 0) => NEWEST (index n)
 async function updateLabs(course) {
+    let assessments = COURSES[course];
+    if (!assessments) assessments = COURSES[course] = {
+        LABS: [],
+        ASSIGNMENTS: [],
+        PROJECTS: [],
+        ACTIVITIES: []
+    };
+    let LABS = assessments.LABS;
+    let ASSIGNMENTS = assessments.ASSIGNMENTS;
+    let PROJECTS = assessments.PROJECTS;
+
     const preset = config.list_presets[course];
     const NEW_LABS = await loadAssessmentsList(course, preset.labs.cat, preset.labs.tab);
     const NEW_ASSIGNMENTS = await loadAssessmentsList(course, preset.assignments.cat, preset.assignments.tab);
@@ -115,7 +141,7 @@ async function updateLabs(course) {
         console.log("ASSIGNMENTS init: " + ASSIGNMENTS.length);
         PROJECTS = await download(NEW_PROJECTS);
         console.log("PROJECTS init: " + PROJECTS.length);
-        ALL_ASSESSMENTS = LABS.concat(ASSIGNMENTS).concat(PROJECTS);
+        ALL_ASSESSMENTS = ALL_ASSESSMENTS.concat(LABS.concat(ASSIGNMENTS).concat(PROJECTS));
     } else {
         let diff = [];
         let new_array = NEW_LABS;
@@ -305,8 +331,7 @@ function loadAssessment(course, assessment_id) {
                     info[camelize(row.firstElementChild.textContent)] = data;
                     fields.push({
                         value: data ? data : "-",
-                        name: row.firstElementChild.textContent.trim(),
-                        inline: true
+                        name: row.firstElementChild.textContent.trim()
                     });
                 }
                 // Files/Achievements
@@ -344,10 +369,10 @@ function loadAssessment(course, assessment_id) {
                     tab: json.assessment.tabId,
                     name: json.assessment.title,
                     autograded: json.assessment.autograded,
-                    description: deepToString(new JSDOM(json.assessment.description).window.document.firstElementChild).trim(),
+                    // description: deepToString(new JSDOM(json.assessment.description).window.document.firstElementChild).trim(),
                     markdown: deepToString(new JSDOM(json.assessment.description).window.document.firstElementChild, true).trim(),
-                    questions: json.questions,
-                    info: info,
+                    questions: json.questions.length,
+                    // info: info,
                     fields: fields,
                     achievements: achievements,
                     files: files
@@ -372,9 +397,10 @@ function generateAssessmentEmbed(assessment) {
     let basicInfo = new Discord.RichEmbed();
     basicInfo.setTitle(assessment.name);
     basicInfo.setDescription(assessment.markdown + assessment.achievements.length > 0 ? "\n**Achievements**:\n" + assessment.achievements.map(a => `**${a.name}** ${a.description}`).join("\n") : "");
-    basicInfo.fields = assessment.fields;
+    for (let field of assessment.fields)
+        basicInfo.addField(field.name, field.value, true);
     basicInfo.addField("Auto Graded", assessment.autograded ? "Yes" : "Manual", true);
-    basicInfo.addField("Number of Questions", assessment.questions.length, true);
+    basicInfo.addField("Number of Questions", assessment.questions, true);
     basicInfo.addField("Files", assessment.files.map(file => `[${file.name}](${file.url})`).join(", "));
     basicInfo.setFooter(config.list_presets[assessment.course].name + " • ID: " + assessment.id);
     basicInfo.setColor(0x00ffff);
