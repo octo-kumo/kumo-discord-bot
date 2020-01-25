@@ -121,8 +121,8 @@ function chainUpStdOut() {
     hook_stdout((s) => {
         str.push(s);
         if (s.endsWith('\n')) {
-            hook.send("`" + str.join("") + "`");
-            str = []
+            hook.send("`[" + new Date().toISOString() + "] " + str.join("") + "`");
+            str = [];
         }
     });
 }
