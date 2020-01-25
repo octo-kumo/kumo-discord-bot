@@ -26,23 +26,27 @@ exports.handleCommand = (args, msg, prefix) => {
         case "assessment":
         case "a":
             if (args.length === 0) return msg.reply("_Labs aren't showing..._");
-            let sendAssessment = (assessment) => msg.channel.send({
-                embed: generateAssessmentEmbed(assessment),
-                files: assessment.files
-            });
+            let sendAssessment = (assessment) => {
+                console.log("Sending assessment...");
+                msg.channel.send(generateAssessmentEmbed(assessment));
+            }
             if (isNaN(args[0])) args = [args.join(" ")];
             if (args.length === 1) args = [config.DEFAULT_COURSE, args[0]];
             for (let assessment of ALL_ASSESSMENTS) {
-                if (assessment.course === args[0] && assessment.name.toUpperCase().includes(args[1].toUpperCase())) {
+                if (assessment.course === args[0] && (assessment.name.toUpperCase().includes(args[1].toUpperCase()) || assessment.id === args[1])) {
                     sendAssessment(assessment);
                     console.log("Found local cache for " + assessment.name);
                     return;
                 }
             }
             console.log("No local cache");
-            loadAssessment(args[0], args[1])
-                .then(sendAssessment)
-                .catch(err => msg.reply("**ERROR, ERROR** _Recalibrating..._"));
+            loadAssessment(args[0], args[1]).then(a => {
+                ALL_ASSESSMENTS.push(a);
+                sendAssessment(a);
+            }).catch(err => {
+                msg.reply("**ERROR, ERROR** _Recalibrating..._");
+                console.log(err.stack)
+            });
             break;
     }
 }
@@ -300,7 +304,7 @@ function loadAssessment(course, assessment_id) {
                     if (!isNaN(data)) data = parseInt(data);
                     info[camelize(row.firstElementChild.textContent)] = data;
                     fields.push({
-                        value: data,
+                        value: data ? data : "-",
                         name: row.firstElementChild.textContent.trim(),
                         inline: true
                     });
@@ -318,7 +322,6 @@ function loadAssessment(course, assessment_id) {
                     } else if (mode === "files") {
                         files.push({
                             name: child.firstElementChild.textContent.trim(),
-                            attachment: await downloadAsBuffer("https://nushigh.coursemology.org" + child.firstElementChild.href),
                             url: "https://nushigh.coursemology.org" + child.firstElementChild.href
                         });
                     } else if (mode === "achievement") {
@@ -330,12 +333,20 @@ function loadAssessment(course, assessment_id) {
                         });
                     }
                 }
+                let json = await (fetch("https://nushigh.coursemology.org" + doc.querySelector(".page-header .btn-info").href + "?format=json", {
+                    headers: headers,
+                    method: 'GET'
+                }).then(res => res.json()));
                 const assessment = {
                     id: assessment_id,
                     course: course,
-                    name: doc.querySelector(".page-header span").textContent,
-                    description: deepToString(data.getElementsByClassName("well")[0]).trim(),
-                    markdown: deepToString(data.getElementsByClassName("well")[0], true).trim(),
+                    category: json.assessment.categoryId,
+                    tab: json.assessment.tabId,
+                    name: json.assessment.title,
+                    autograded: json.assessment.autograded,
+                    description: deepToString(new JSDOM(json.assessment.description).window.document.firstElementChild).trim(),
+                    markdown: deepToString(new JSDOM(json.assessment.description).window.document.firstElementChild, true).trim(),
+                    questions: json.questions,
                     info: info,
                     fields: fields,
                     achievements: achievements,
@@ -357,22 +368,14 @@ function loadAssessment(course, assessment_id) {
     });
 }
 
-function downloadAsBuffer(file_url) {
-    return new Promise((resolve, reject) => {
-        fetch(file_url, {
-                headers: headers,
-                method: 'GET'
-            })
-            .then(res => res.buffer())
-            .then(body => resolve(body));
-    });
-}
-
 function generateAssessmentEmbed(assessment) {
     let basicInfo = new Discord.RichEmbed();
     basicInfo.setTitle(assessment.name);
     basicInfo.setDescription(assessment.markdown + assessment.achievements.length > 0 ? "\n**Achievements**:\n" + assessment.achievements.map(a => `**${a.name}** ${a.description}`).join("\n") : "");
     basicInfo.fields = assessment.fields;
+    basicInfo.addField("Auto Graded", assessment.autograded ? "Yes" : "Manual", true);
+    basicInfo.addField("Number of Questions", assessment.questions.length, true);
+    basicInfo.addField("Files", assessment.files.map(file => `[${file.name}](${file.url})`).join(", "));
     basicInfo.setFooter(config.list_presets[assessment.course].name + " • ID: " + assessment.id);
     basicInfo.setColor(0x00ffff);
     return basicInfo;
@@ -392,7 +395,6 @@ const ITALIC_TAGS = ['EM', 'SUB', 'SUP', 'A'];
 
 function deepToString(element, markdown) {
     if (!element) return "";
-    if (element.tagName === "H3" && element.textContent === "Description") return "";
     let str;
     if (element.childNodes.length > 1) {
         str = [];

@@ -50,7 +50,7 @@ exports.config = {
         }
     },
     query_base_url: "https://nushigh.coursemology.org",
-    debug: false,
+    debug: process.env.LOCAL === true,
     leaderboard: {},
     leaderboard_feed_channel: null,
     id: "",
