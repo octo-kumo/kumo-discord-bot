@@ -17,7 +17,8 @@ exports.handleCommand = (args, msg, prefix) => {
     let json = false;
     if (json = args.includes("--json")) args.splice(args.indexOf('--json'), 1);
     console.log("coursemology sub-system; command:", args[0], ", args:", "\"" + args.slice(1).join("\", \"") + "\"");
-    switch (args.shift()) {
+    let command = args.shift();
+    switch (command) {
         case "lab":
         case "l":
         case "info":
@@ -56,7 +57,7 @@ exports.handleCommand = (args, msg, prefix) => {
             });
             break;
         default:
-            return handleCommand(['info'].concat(args).concat(json ? ['--json'] : []), msg, prefix);
+            return handleCommand(['info', command].concat(args).concat(json ? ['--json'] : []), msg, prefix);
             break;
     }
 }
