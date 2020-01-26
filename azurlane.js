@@ -143,7 +143,7 @@ const STATS_EMOJI_TRANSLATION = {
 }
 const SKIN_INFO_TRANSLATION = {
     "obtainedFrom": "From",
-    "live2DModel": "Has Live2D Model",
+    "live2dModel": "Has Live2D Model",
     "enClient": "EN Name",
     "cnClient": "CN Name",
     "jpClient": "JP Name",
