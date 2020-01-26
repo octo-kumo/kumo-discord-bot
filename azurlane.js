@@ -279,7 +279,7 @@ function generateSkillsPage(ship) {
         .addField("(2) " + ship.slots[2].type, ship.slots[2].minEfficiency + "% → " + ship.slots[2].maxEfficiency + "%", true)
         .addField("(3) " + ship.slots[3].type, ship.slots[3].minEfficiency + "% → " + ship.slots[3].maxEfficiency + "%", true);
     skills_limits_eq.addField("**Skills**", "\u200B");
-    for (skill of ship.skills) {
+    for (let skill of ship.skills) {
         let skill_field = creatSkillField(skill);
         skills_limits_eq.addField(skill_field.name, skill_field.value, true);
     }
