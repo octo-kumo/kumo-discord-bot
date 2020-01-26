@@ -62,14 +62,15 @@ exports.handleCommand = (args, msg, prefix) => {
     }
 }
 
-exports.update = (course) => {
-    updateActivities(course);
-    updateLabs(course);
+exports.update = async (course) => {
+    await updateActivities(course);
+    await updateLabs(course);
 }
 
 async function updateActivities(course) {
     let assessments = COURSES[course];
-    if (!assessments) assessments = COURSES[course] = {
+    if (!assessments) COURSES[course] = assessments = {
+        course: course,
         LABS: [],
         ASSIGNMENTS: [],
         PROJECTS: [],
@@ -109,12 +110,14 @@ async function updateActivities(course) {
             ACTIVITIES = NEW_ACTIVITIES;
         }
     }
+    COURSES[course].ACTIVITIES = ACTIVITIES;
 }
 
 //ORDER = OLDEST (index 0) => NEWEST (index n)
 async function updateLabs(course) {
     let assessments = COURSES[course];
-    if (!assessments) assessments = COURSES[course] = {
+    if (!assessments) COURSES[course] = assessments = {
+        course: course,
         LABS: [],
         ASSIGNMENTS: [],
         PROJECTS: [],
@@ -165,6 +168,9 @@ async function updateLabs(course) {
             embeds: diff.map(generateAssessmentEmbed)
         });
     }
+    COURSES[course].LABS = LABS;
+    COURSES[course].ASSIGNMENTS = ASSIGNMENTS;
+    COURSES[course].PROJECTS = PROJECTS;
 }
 
 function loadActivities(course) {
