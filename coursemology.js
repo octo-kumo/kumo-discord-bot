@@ -406,7 +406,7 @@ function loadAssessment(course, assessment_id) {
 function generateAssessmentEmbed(assessment) {
     let basicInfo = new Discord.RichEmbed();
     basicInfo.setTitle(assessment.name);
-    basicInfo.setDescription(assessment.markdown + assessment.achievements.length > 0 ? "\n**Achievements**:\n" + assessment.achievements.map(a => `**${a.name}** ${a.description}`).join("\n") : "");
+    basicInfo.setDescription(assessment.markdown + (assessment.achievements.length > 0 ? "\n**Achievements**:\n" + assessment.achievements.map(a => `**${a.name}** ${a.description}`).join("\n") : ""));
     for (let field of assessment.fields)
         basicInfo.addField(field.name, field.value, true);
     basicInfo.addField("Auto Graded", assessment.autograded ? "Yes" : "Manual", true);
