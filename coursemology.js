@@ -411,7 +411,7 @@ function generateAssessmentEmbed(assessment) {
         basicInfo.addField(field.name, field.value, true);
     basicInfo.addField("Auto Graded", assessment.autograded ? "Yes" : "Manual", true);
     basicInfo.addField("Number of Questions", assessment.questions, true);
-    if (assessment.files.length > 0) basicInfo.addField("Files", assessment.files.map(file => `[${file.name}](${file.description})`).join(", "));
+    if (assessment.files.length > 0) basicInfo.addField("Files", assessment.files.map(file => `[${file.name}](${file.url})`).join(", "));
     if (assessment.achievements.length > 0) basicInfo.addField("Achievements", assessment.achievements.map(achievement => `**${achievement.name}** ${achievement.description}`).join("\n"));
     basicInfo.setFooter(config.list_presets[assessment.course].name + " • ID: " + assessment.id);
     basicInfo.setColor(0x00ffff);
