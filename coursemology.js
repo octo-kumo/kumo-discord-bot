@@ -126,6 +126,15 @@ async function updateLabs(course) {
     let LABS = assessments.LABS;
     let ASSIGNMENTS = assessments.ASSIGNMENTS;
     let PROJECTS = assessments.PROJECTS;
+    for (let ass of LABS) {
+        if (ass.unreleased) ass = await loadAssessment(ass.course, ass.id);
+    }
+    for (let ass of ASSIGNMENTS) {
+        if (ass.unreleased) ass = await loadAssessment(ass.course, ass.id);
+    }
+    for (let ass of PROJECTS) {
+        if (ass.unreleased) ass = await loadAssessment(ass.course, ass.id);
+    }
 
     const preset = config.list_presets[course];
     const NEW_LABS = await loadAssessmentsList(course, preset.labs.cat, preset.labs.tab);
@@ -368,24 +377,26 @@ function loadAssessment(course, assessment_id) {
                         });
                     }
                 }
-                let json = await (fetch("https://nushigh.coursemology.org" + doc.querySelector(".page-header .btn-info").href + "?format=json", {
+                let json = null;
+                if (doc.querySelector(".page-header .btn-info")) json = await (fetch("https://nushigh.coursemology.org" + doc.querySelector(".page-header .btn-info").href + "?format=json", {
                     headers: headers,
                     method: 'GET'
                 }).then(res => res.json()));
                 const assessment = {
                     id: assessment_id,
                     course: course,
-                    category: json.assessment.categoryId,
-                    tab: json.assessment.tabId,
-                    name: json.assessment.title,
-                    autograded: json.assessment.autograded,
+                    category: json ? json.assessment.categoryId : null,
+                    tab: json ? json.assessment.tabId : null,
+                    name: json ? json.assessment.title : doc.querySelector(".page-header").textContent,
+                    autograded: json ? json.assessment.autograded : null,
                     // description: deepToString(new JSDOM(json.assessment.description).window.document.firstElementChild).trim(),
-                    markdown: deepToString(new JSDOM(json.assessment.description).window.document.firstElementChild, true).trim(),
-                    questions: json.questions.length,
+                    markdown: json ? deepToString(new JSDOM(json.assessment.description).window.document.firstElementChild, true).trim() : null,
+                    questions: json ? json.questions.length : 0,
                     // info: info,
                     fields: fields,
                     achievements: achievements,
-                    files: files
+                    files: files,
+                    unreleased: (!json)
                 };
                 resolve(assessment);
             } catch (error) {
@@ -406,15 +417,18 @@ function loadAssessment(course, assessment_id) {
 function generateAssessmentEmbed(assessment) {
     let basicInfo = new Discord.RichEmbed();
     basicInfo.setTitle(assessment.name);
+    basicInfo.setFooter(config.list_presets[assessment.course].name + " • ID: " + assessment.id);
+    basicInfo.setColor(0x00ffff);
+    for (let field of assessment.fields) basicInfo.addField(field.name, field.value, true);
+    if (basicInfo.unreleased) {
+        basicInfo.addField("Preview/Unreleased", true);
+        return basicInfo;
+    }
     basicInfo.setDescription(assessment.markdown + (assessment.achievements.length > 0 ? "\n**Achievements**:\n" + assessment.achievements.map(a => `**${a.name}** ${a.description}`).join("\n") : ""));
-    for (let field of assessment.fields)
-        basicInfo.addField(field.name, field.value, true);
     basicInfo.addField("Auto Graded", assessment.autograded ? "Yes" : "Manual", true);
     basicInfo.addField("Number of Questions", assessment.questions, true);
     if (assessment.files.length > 0) basicInfo.addField("Files", assessment.files.map(file => `[${file.name}](${file.url})`).join(", "));
     if (assessment.achievements.length > 0) basicInfo.addField("Achievements", assessment.achievements.map(achievement => `**${achievement.name}** ${achievement.description}`).join("\n"));
-    basicInfo.setFooter(config.list_presets[assessment.course].name + " • ID: " + assessment.id);
-    basicInfo.setColor(0x00ffff);
     return basicInfo;
 }
 
