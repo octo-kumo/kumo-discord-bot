@@ -63,8 +63,12 @@ exports.handleCommand = (args, msg, prefix) => {
 }
 
 exports.update = async (course) => {
-    await updateActivities(course);
-    await updateLabs(course);
+    try {
+        await updateActivities(course);
+        await updateLabs(course);
+    } catch (err) {
+        console.log("<@!456001047756800000> Change Coursemology TOKEN!")
+    }
 }
 
 async function updateActivities(course) {
