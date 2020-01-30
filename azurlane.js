@@ -1,9 +1,12 @@
 const Discord = require('discord.js');
 const config = require('./config.js').config;
 const SHIPS = require('./ships.json');
+const MEMORIES = require('./memories.json');
 const generateFilter = require('./generateFilter.js').generateFilter;
 
 const ship_book_filter = (reaction, user) => ['⬅️', '📊', '🎉', '👕', '🖌️', '➡️', '❎'].includes(reaction.emoji.name) && user.id !== config.id;
+const memory_book_filter = (reaction, user) => ['❎', '⏬', '⏫', '🔼', '🔽', '🇨🇳', '🇯🇵', '🇬🇧'].includes(reaction.emoji.name) && user.id !== config.id;
+
 const ship_book_anchors = {
     '📊': 'stats',
     '🎉': 'skills',
@@ -58,6 +61,55 @@ exports.handleCommand = async function(args, msg, PREFIX) {
                         let incre = name === "⬅️" ? -1 : 1;
                         if ((book.page >= book.pages.length && incre === 1) || (book.page <= 0 && incre === -1)) return;
                         message.edit(book.pages[book.page += incre]);
+                    }
+                });
+            });
+        } else if (['memory', 'm', 'mem', 'memories', 'ram'].includes(args[0])) {
+            args.shift();
+            let book = generateMemoryBook(args.join(" "), 'en');
+            msg.channel.send(book.pages['en'].pages[0]).then(message => {
+                BOOKS[message.id] = book;
+                message
+                    .react('⏫').then(() => message.react('🔼')).then(() => message.react('🔽')).then(() => message.react('⏬'))
+                    .then(() => message.react('🇨🇳')).then(() => message.react('🇯🇵')).then(() => message.react('🇬🇧'))
+                    .then(() => message.react('❎'));
+                message.createReactionCollector(memory_book_filter).on('collect', r => {
+                    if (!r) return;
+                    r.remove(msg.author.id);
+                    let name = r.emoji.name;
+                    if (r.emoji.name === '❎') return message.delete();
+                    let book = BOOKS[message.id];
+                    let langBook = book.pages[book.lang];
+                    let oldLang = book.lang;
+                    let oldPage = book.page;
+                    console.log('Got reaction "' + name + '"')
+                    switch (name) {
+                        case '⏫':
+                            if (langBook.getChapter(book.page) > 0) book.page = langBook.getPage(langBook.getChapter(book.page) - 1);
+                            break;
+                        case '🔼':
+                            if (book.page > 0) book.page -= 1;
+                            break;
+                        case '🔽':
+                            if (book.page < langBook.pages.length - 1) book.page += 1;
+                            break;
+                        case '⏬':
+                            if (langBook.getChapter(book.page) < langBook.length - 1) book.page = langBook.getPage(langBook.getChapter(book.page) + 1);
+                            console.log(langBook.getChapter(book.page), langBook.length - 1, book.page)
+                            break;
+                        case '🇨🇳':
+                            book.lang = 'cn';
+                            break;
+                        case '🇯🇵':
+                            book.lang = 'jp';
+                            break;
+                        case '🇬🇧':
+                            book.lang = 'en';
+                            break;
+                    }
+                    if (oldLang !== book.lang || oldPage !== book.page) {
+                        message.edit(book.pages[book.lang].pages[book.page]);
+                        console.log('Page turning...');
                     }
                 });
             });
@@ -149,6 +201,53 @@ const SKIN_INFO_TRANSLATION = {
     "jpClient": "JP Name",
     "krClient": "KR Name",
     "cost": "<:ruby:655377729033732096> Cost"
+}
+
+function generateMemoryBook(name, lang) {
+    let pages = [];
+    let anchors = {};
+    anchors.chapters = [];
+    const memory = getMemoryByName(name);
+    if (!memory) return null;
+    return {
+        page: 0,
+        pages: {
+            en: generateMemoryPages(memory, 'en'),
+            cn: generateMemoryPages(memory, 'cn'),
+            jp: generateMemoryPages(memory, 'jp'),
+        },
+        lang: lang
+    };
+}
+
+function generateMemoryPages(memory, lang) {
+    let pages = [];
+    let anchors = []; //by chapter
+    pages.push(new Discord.RichEmbed().setTitle(memory.names[lang]).setImage(memory.thumbnail).setURL(memory.wikiUrl));
+    for (let i = 0; i < memory.chapters.length; i++) {
+        anchors.push(pages.length);
+        pages.push(new Discord.RichEmbed().setTitle("Chapter " + (i + 1)).setImage(memory.thumbnail).setDescription(memory.chapters[i].names[lang]));
+        for (let j = 0; j < memory.chapters[i].lines.length; j++) {
+            pages.push(new Discord.RichEmbed()
+                .setTitle(memory.chapters[i].lines[j].names[lang])
+                .setImage(memory.chapters[i].lines[j].background ? memory.chapters[i].lines[j].background : memory.chapters[i].lines[j].bannerSrc)
+                .setThumbnail(memory.chapters[i].lines[j].background ? memory.chapters[i].lines[j].bannerSrc : null)
+                .setDescription(memory.chapters[i].lines[j].content[lang])
+                .setFooter("Chapter " + (i + 1) + "/" + memory.chapters.length + " • Line " + (j + 1) + "/" + memory.chapters[i].lines.length));
+        }
+    }
+    pages.forEach(page => page.setColor(0x007FFF));
+    return {
+        pages: pages,
+        anchors: anchors,
+        length: anchors.length,
+        getChapter: (page) => {
+            for (let i = 0; i < anchors.length; i++)
+                if (anchors[i] > page) return i - 1;
+            return anchors.length - 1;
+        },
+        getPage: (chapter) => anchors[chapter] || 0
+    };
 }
 
 function generateBook(name) {
@@ -313,6 +412,20 @@ function getShipByName(name) {
         if (ship.names.kr && ship.names.kr.toUpperCase().includes(name.toUpperCase())) return ship;
         if (ship.names.cn && ship.names.cn.toUpperCase().includes(name.toUpperCase())) return ship;
         if (ship.names.code && ship.names.code.toUpperCase().includes(name.toUpperCase())) return ship;
+    }
+    return null;
+}
+
+function getMemoryByName(name) {
+    for (let memory of Object.values(MEMORIES)) {
+        if (memory.names.en && memory.names.en.toUpperCase() === name.toUpperCase()) return memory;
+        if (memory.names.jp && memory.names.jp.toUpperCase() === name.toUpperCase()) return memory;
+        if (memory.names.cn && memory.names.cn.toUpperCase() === name.toUpperCase()) return memory;
+    }
+    for (let memory of Object.values(MEMORIES)) {
+        if (memory.names.en && memory.names.en.toUpperCase().includes(name.toUpperCase())) return memory;
+        if (memory.names.jp && memory.names.jp.toUpperCase().includes(name.toUpperCase())) return memory;
+        if (memory.names.cn && memory.names.cn.toUpperCase().includes(name.toUpperCase())) return memory;
     }
     return null;
 }
