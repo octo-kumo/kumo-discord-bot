@@ -130,9 +130,9 @@ async function updateLabs(course) {
     let LABS = assessments.LABS;
     let ASSIGNMENTS = assessments.ASSIGNMENTS;
     let PROJECTS = assessments.PROJECTS;
-    eliminateUnreleasedAssessments(LABS);
-    eliminateUnreleasedAssessments(ASSIGNMENTS);
-    eliminateUnreleasedAssessments(PROJECTS);
+    await eliminateUnreleasedAssessments(LABS);
+    await eliminateUnreleasedAssessments(ASSIGNMENTS);
+    await eliminateUnreleasedAssessments(PROJECTS);
 
     const preset = config.list_presets[course];
     const NEW_LABS = await loadAssessmentsList(course, preset.labs.cat, preset.labs.tab);
@@ -465,7 +465,7 @@ function deepToString(element, markdown) {
     return str;
 }
 
-const eliminateUnreleasedAssessments = (list) => {
+const eliminateUnreleasedAssessments = async (list) => {
     for (let ass of Object.keys(list))
         if (list[ass].unreleased) list[ass] = await loadAssessment(ass.course, ass.id);
 };
