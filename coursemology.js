@@ -425,7 +425,6 @@ function generateAssessmentEmbed(assessment) {
     basicInfo.addField("Attempt", `[Click Me to Attempt](https://nushigh.coursemology.org/courses/${assessment.course}/assessments/${assessment.id}/submissions)`)
     if (assessment.unreleased) {
         basicInfo.setDescription("_This is an unreleased assessment_");
-        basicInfo.addField("Unreleased", true);
         return basicInfo;
     }
     basicInfo.setDescription(assessment.markdown + (assessment.achievements.length > 0 ? "\n**Achievements**:\n" + assessment.achievements.map(a => `**${a.name}** ${a.description}`).join("\n") : ""));
