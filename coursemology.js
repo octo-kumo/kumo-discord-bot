@@ -433,6 +433,7 @@ function generateAssessmentEmbed(assessment) {
     basicInfo.addField("Number of Questions", assessment.questions, true);
     if (assessment.files.length > 0) basicInfo.addField("Files", assessment.files.map(file => `[${file.name}](${file.url})`).join(", "));
     if (assessment.achievements.length > 0) basicInfo.addField("Achievements", assessment.achievements.map(achievement => `**${achievement.name}** ${achievement.description}`).join("\n"));
+    basicInfo.addField("Attempt",`[Click Me to Attempt](https://nushigh.coursemology.org/courses/${assessment.course}/assessments/${assessment.id}/submissions)`)
     return basicInfo;
 }
 
