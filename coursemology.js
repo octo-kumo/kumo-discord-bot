@@ -130,15 +130,9 @@ async function updateLabs(course) {
     let LABS = assessments.LABS;
     let ASSIGNMENTS = assessments.ASSIGNMENTS;
     let PROJECTS = assessments.PROJECTS;
-    for (let ass of LABS) {
-        if (ass.unreleased) ass = await loadAssessment(ass.course, ass.id);
-    }
-    for (let ass of ASSIGNMENTS) {
-        if (ass.unreleased) ass = await loadAssessment(ass.course, ass.id);
-    }
-    for (let ass of PROJECTS) {
-        if (ass.unreleased) ass = await loadAssessment(ass.course, ass.id);
-    }
+    eliminateUnreleasedAssessments(LABS);
+    eliminateUnreleasedAssessments(ASSIGNMENTS);
+    eliminateUnreleasedAssessments(PROJECTS);
 
     const preset = config.list_presets[course];
     const NEW_LABS = await loadAssessmentsList(course, preset.labs.cat, preset.labs.tab);
@@ -424,16 +418,17 @@ function generateAssessmentEmbed(assessment) {
     basicInfo.setFooter(config.list_presets[assessment.course].name + " • ID: " + assessment.id);
     basicInfo.setColor(0x00ffff);
     for (let field of assessment.fields) basicInfo.addField(field.name, field.value, true);
-    if (basicInfo.unreleased) {
-        basicInfo.addField("Preview/Unreleased", true);
-        return basicInfo;
-    }
-    basicInfo.setDescription(assessment.markdown + (assessment.achievements.length > 0 ? "\n**Achievements**:\n" + assessment.achievements.map(a => `**${a.name}** ${a.description}`).join("\n") : ""));
     basicInfo.addField("Auto Graded", assessment.autograded ? "Yes" : "Manual", true);
     basicInfo.addField("Number of Questions", assessment.questions, true);
     if (assessment.files.length > 0) basicInfo.addField("Files", assessment.files.map(file => `[${file.name}](${file.url})`).join(", "));
     if (assessment.achievements.length > 0) basicInfo.addField("Achievements", assessment.achievements.map(achievement => `**${achievement.name}** ${achievement.description}`).join("\n"));
-    basicInfo.addField("Attempt",`[Click Me to Attempt](https://nushigh.coursemology.org/courses/${assessment.course}/assessments/${assessment.id}/submissions)`)
+    basicInfo.addField("Attempt", `[Click Me to Attempt](https://nushigh.coursemology.org/courses/${assessment.course}/assessments/${assessment.id}/submissions)`)
+    if (assessment.unreleased) {
+        basicInfo.setDescription("_This is an unreleased assessment_");
+        basicInfo.addField("Unreleased", true);
+        return basicInfo;
+    }
+    basicInfo.setDescription(assessment.markdown + (assessment.achievements.length > 0 ? "\n**Achievements**:\n" + assessment.achievements.map(a => `**${a.name}** ${a.description}`).join("\n") : ""));
     return basicInfo;
 }
 
@@ -469,3 +464,8 @@ function deepToString(element, markdown) {
     }
     return str;
 }
+
+const eliminateUnreleasedAssessments = (list) => {
+    for (let ass of Object.keys(list))
+        if (list[ass].unreleased) list[ass] = await loadAssessment(ass.course, ass.id);
+};
