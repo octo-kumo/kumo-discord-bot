@@ -67,7 +67,7 @@ exports.update = async (course) => {
         await updateActivities(course);
         await updateLabs(course);
     } catch (err) {
-        console.log("<@!456001047756800000> Change Coursemology TOKEN!")
+        console.log("<@!456001047756800000> Change Coursemology TOKEN!\n" + err.stack)
     }
 }
 
@@ -467,5 +467,5 @@ function deepToString(element, markdown) {
 
 const eliminateUnreleasedAssessments = async (list) => {
     for (let ass of Object.keys(list))
-        if (list[ass].unreleased) list[ass] = await loadAssessment(ass.course, ass.id);
+        if (list[ass].unreleased) list[ass] = await loadAssessment(list[ass].course, list[ass].id);
 };
