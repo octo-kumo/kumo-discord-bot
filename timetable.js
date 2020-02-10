@@ -47,8 +47,7 @@ exports.update = () => {
             } else lessonNow[i] = code;
         }
     }
-}
-for (let lessonName of Object.keys(lessonDiff)) config.HOOK2.send("@" + callClasses(lessonDiff[lessonName]) + ", its **" + lessonName + "** now!");
+    for (let lessonName of Object.keys(lessonDiff)) config.HOOK2.send("@" + callClasses(lessonDiff[lessonName]) + ", its **" + lessonName + "** now!");
 }
 
 function callClasses(classList) {
