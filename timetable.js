@@ -18,7 +18,7 @@ exports.update = () => {
         let newLesson = getLessonNow("M2040" + i);
         if (lessonNow[i] !== newLesson.subject) {
             lessonNow[i] = newLesson.subject;
-            config.HOOK2.send("@" + "M2040" + i + ", its '" + lessonNow[i] + "' now!", getLessonEmbed(newLesson));
+            config.HOOK2.send("@" + "M2040" + i + ", its **" + lessonNow[i] + "** now!", getLessonEmbed(newLesson));
         }
     }
 }
