@@ -86,10 +86,10 @@ function getLessonsNext(className) {
     let now = new Date(new Date().getTime() + config.offset * 3600 * 1000);
     let hour = now.getHours();
     let minute = now.getMinutes();
-    let lesson = getLessonExact(className || "M20403", WEEKDAYS[now.getDay()], hour, minute);
-    if (hour < 8) return getLessonExact(className || "M20403", WEEKDAYS[now.getDay()], 8, 0);
+    let lesson = getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], hour, minute);
+    if (hour < 8) return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], 8, 0);
     if ((typeof lesson) === "string") return "Nothing";
-    return getLessonExact(className || "M20403", WEEKDAYS[now.getDay()], lesson.end.hour, lesson.end.minute);
+    return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], lesson.end.hour, lesson.end.minute);
 }
 
 function getLessonsEmbed(lesson) {
