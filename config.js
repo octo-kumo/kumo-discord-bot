@@ -53,6 +53,7 @@ exports.config = {
     debug: process.env.LOCAL === true,
     leaderboard: {},
     leaderboard_feed_channel: null,
+    offset: 0,
     id: "",
     PRESENCE: {
         game: {
