@@ -478,12 +478,12 @@
                 "subject": "Physics",
                 "day": "tue",
                 "timeStart": "800",
-                "timeEnd": "900"
+                "timeEnd": "1000"
             },
             {
                 "subject": "Biology",
                 "day": "tue",
-                "timeStart": "900",
+                "timeStart": "800",
                 "timeEnd": "1000"
             },
             {
@@ -562,12 +562,12 @@
                 "subject": "Physics",
                 "day": "thu",
                 "timeStart": "800",
-                "timeEnd": "900"
+                "timeEnd": "1000"
             },
             {
                 "subject": "Biology",
                 "day": "thu",
-                "timeStart": "900",
+                "timeStart": "800",
                 "timeEnd": "1000"
             },
             {
