@@ -27,7 +27,7 @@ client.on('ready', () => {
     console.log("=> Bot Running in " + client.guilds.keyArray().length + " servers!");
     client.guilds.get('665471208757657620').channels.get('665471209277882400').send("READY!");
     client.user.setPresence(config.PRESENCE);
-    config.offset = +9 + new Date().getTimezoneOffset() / 60;
+    config.offset = 8 + new Date().getTimezoneOffset() / 60;
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     config.HOOK2 = new Discord.WebhookClient('676309488021798912', process.env.HKTOKEN2);
     config.id = client.user.id;
