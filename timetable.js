@@ -12,16 +12,17 @@ const WEEKDAYS = [
     'sun'
 ];
 
-let lessonNow = [];
+let lessonNow = {};
 exports.update = () => {
     for (let i = 1; i <= 7; i++) {
         let newLesson = getLessonNow("M2040" + i);
         let lessonName = (typeof newLesson) === "object" ? newLesson.subject : newLesson;
-        if (!(!lessonNow[i]) && lessonNow[i] !== lessonName) {
+        if (lessonNow[i] && lessonNow[i] !== lessonName) {
             lessonNow[i] = lessonName;
             config.HOOK2.send("@" + "M2040" + i + ", its **" + lessonName + "** now!", (typeof newLesson) === "object" ? getLessonEmbed(newLesson) : null);
-        }
+        } else lessonNow[i] = lessonName;
     }
+    console.log(JSON.stringify(lessonNow));
 }
 
 exports.handleCommand = (args, msg, PREFIX) => {
