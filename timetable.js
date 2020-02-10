@@ -17,8 +17,8 @@ exports.update = () => {
     for (let i = 1; i <= 7; i++) {
         let newLesson = getLessonNow("M2040" + i);
         if (lessonNow[i] !== newLesson.subject) {
-            lessonNow[i] = newLesson.subject;
-            config.HOOK2.send("@" + "M2040" + i + ", its **" + lessonNow[i] + "** now!", getLessonEmbed(newLesson));
+            lessonNow[i] = (typeof newLesson) === "object" ? newLesson.subject : newLesson;
+            config.HOOK2.send("@" + "M2040" + i + ", its **" + lessonNow[i] + "** now!", (typeof newLesson) === "object" ? getLessonEmbed(newLesson) : null);
         }
     }
 }
