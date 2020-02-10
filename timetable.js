@@ -36,17 +36,19 @@ exports.update = () => {
                 else lessonDiff[newLessons] = ["M2040" + i];
             } else lessonNow[i] = newLessons;
         } else {
-            for (let newLesson of newLessons) {
-                let lessonName = (typeof newLesson) === "object" ? newLesson.subject : newLesson;
-                if (lessonNow[i] && lessonNow[i] !== lessonName) {
-                    lessonNow[i] = lessonName;
+            let code = newLessons.map(l => l.subject).join(",");
+            if (lessonNow[i] && lessonNow[i] !== code) {
+                lessonNow[i] = code;
+                for (let newLesson of newLessons) {
+                    let lessonName = (typeof newLesson) === "object" ? newLesson.subject : newLesson;
                     if (lessonDiff[lessonName]) lessonDiff[lessonName].push("M2040" + i);
                     else lessonDiff[lessonName] = ["M2040" + i];
-                } else lessonNow[i] = lessonName;
-            }
+                }
+            } else lessonNow[i] = code;
         }
     }
-    for (let lessonName of Object.keys(lessonDiff)) config.HOOK2.send("@" + callClasses(lessonDiff[lessonName]) + ", its **" + lessonName + "** now!");
+}
+for (let lessonName of Object.keys(lessonDiff)) config.HOOK2.send("@" + callClasses(lessonDiff[lessonName]) + ", its **" + lessonName + "** now!");
 }
 
 function callClasses(classList) {
