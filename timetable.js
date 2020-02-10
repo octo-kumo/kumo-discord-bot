@@ -92,11 +92,11 @@ function getLessonsNext(className) {
     return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], lesson.end.hour, lesson.end.minute);
 }
 
-function getLessonsEmbed(lesson) {
-    if ((typeof lesson) === "string") return lesson;
-    return new Discord.RichEmbed().setColor(0x009a90).setTitle(lesson.map(l => l.subject).join(" & "))
-        .addField("Start", lesson.map(l => l.start.hour.toString().padStart(2, '0') + ":" + l.start.minute.toString().padStart(2, '0')).filter(onlyUnique).join(", "), true)
-        .addField("End", lesson.map(l => l.end.hour.toString().padStart(2, '0') + ":" + l.end.minute.toString().padStart(2, '0')).filter(onlyUnique).join(", "), true);
+function getLessonsEmbed(lessons) {
+    if ((typeof lessons) === "string") return lessons;
+    return new Discord.RichEmbed().setColor(0x009a90).setTitle(lessons.map(l => l.subject).join(" & "))
+        .addField("Start", lessons.map(l => l.start.hour.toString().padStart(2, '0') + ":" + l.start.minute.toString().padStart(2, '0')).filter(onlyUnique).join(", "), true)
+        .addField("End", lessons.map(l => l.end.hour.toString().padStart(2, '0') + ":" + l.end.minute.toString().padStart(2, '0')).filter(onlyUnique).join(", "), true);
 }
 
 function onlyUnique(value, index, self) {
