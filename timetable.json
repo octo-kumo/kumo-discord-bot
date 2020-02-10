@@ -1,0 +1,1483 @@
+[
+    {
+        "name": "M20401",
+        "lessons": [
+            {
+                "subject": "MT",
+                "day": "mon",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "PE",
+                "day": "mon",
+                "timeStart": "900",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "mon",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Biology",
+                "day": "mon",
+                "timeStart": "1030",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "Math",
+                "day": "mon",
+                "timeStart": "1230",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "Lunch",
+                "day": "mon",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Assembly",
+                "day": "mon",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "CCA",
+                "day": "mon",
+                "timeStart": "1600",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Physics",
+                "day": "tue",
+                "timeStart": "800",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "tue",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "tue",
+                "timeStart": "1030",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "EL",
+                "day": "tue",
+                "timeStart": "1230",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "Lunch",
+                "day": "tue",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Electives",
+                "day": "tue",
+                "timeStart": "1500",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "MT",
+                "day": "wed",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "Recess",
+                "day": "wed",
+                "timeStart": "900",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "EL",
+                "day": "wed",
+                "timeStart": "930",
+                "timeEnd": "1100"
+            },
+            {
+                "subject": "Math",
+                "day": "wed",
+                "timeStart": "1100",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Lunch",
+                "day": "wed",
+                "timeStart": "1200",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "CCE",
+                "day": "wed",
+                "timeStart": "1300",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "DV",
+                "day": "wed",
+                "timeStart": "1400",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "thu",
+                "timeStart": "800",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "thu",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Physics",
+                "day": "thu",
+                "timeStart": "1030",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "Lunch",
+                "day": "thu",
+                "timeStart": "1230",
+                "timeEnd": "1330"
+            },
+            {
+                "subject": "Math",
+                "day": "thu",
+                "timeStart": "1330",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "PE",
+                "day": "thu",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "Mentoring",
+                "day": "fri",
+                "timeStart": "800",
+                "timeEnd": "830"
+            },
+            {
+                "subject": "MT",
+                "day": "fri",
+                "timeStart": "830",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "Recess",
+                "day": "fri",
+                "timeStart": "930",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Biology",
+                "day": "fri",
+                "timeStart": "1000",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Math",
+                "day": "fri",
+                "timeStart": "1200",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "Lunch",
+                "day": "fri",
+                "timeStart": "1300",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "3rd Lang",
+                "day": "fri",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "CCA",
+                "day": "fri",
+                "timeStart": "1600",
+                "timeEnd": "1630"
+            }
+        ]
+    },
+    {
+        "name": "M20402",
+        "lessons": [
+            {
+                "subject": "MT",
+                "day": "mon",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "PE",
+                "day": "mon",
+                "timeStart": "900",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "mon",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "mon",
+                "timeStart": "1030",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "Lunch",
+                "day": "mon",
+                "timeStart": "1230",
+                "timeEnd": "1330"
+            },
+            {
+                "subject": "EL",
+                "day": "mon",
+                "timeStart": "1330",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Assembly",
+                "day": "mon",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "CCA",
+                "day": "mon",
+                "timeStart": "1600",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Biology",
+                "day": "tue",
+                "timeStart": "800",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "tue",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Physics",
+                "day": "tue",
+                "timeStart": "1030",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "Math",
+                "day": "tue",
+                "timeStart": "1230",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "Lunch",
+                "day": "tue",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Electives",
+                "day": "tue",
+                "timeStart": "1500",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "MT",
+                "day": "wed",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "Recess",
+                "day": "wed",
+                "timeStart": "900",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "EL",
+                "day": "wed",
+                "timeStart": "930",
+                "timeEnd": "1100"
+            },
+            {
+                "subject": "Math",
+                "day": "wed",
+                "timeStart": "1100",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Lunch",
+                "day": "wed",
+                "timeStart": "1200",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "CCE",
+                "day": "wed",
+                "timeStart": "1300",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "DV",
+                "day": "wed",
+                "timeStart": "1400",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Biology",
+                "day": "thu",
+                "timeStart": "800",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "thu",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Physics",
+                "day": "thu",
+                "timeStart": "1030",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "Lunch",
+                "day": "thu",
+                "timeStart": "1230",
+                "timeEnd": "1330"
+            },
+            {
+                "subject": "Math",
+                "day": "thu",
+                "timeStart": "1330",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "PE",
+                "day": "thu",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "Mentoring",
+                "day": "fri",
+                "timeStart": "800",
+                "timeEnd": "830"
+            },
+            {
+                "subject": "MT",
+                "day": "fri",
+                "timeStart": "830",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "Recess",
+                "day": "fri",
+                "timeStart": "930",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "fri",
+                "timeStart": "1000",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Lunch",
+                "day": "fri",
+                "timeStart": "1200",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "3rd Lang",
+                "day": "fri",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Math",
+                "day": "fri",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            }
+        ]
+    },
+    {
+        "name": "M20403",
+        "lessons": [
+            {
+                "subject": "MT",
+                "day": "mon",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "PE",
+                "day": "mon",
+                "timeStart": "900",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "mon",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Math",
+                "day": "mon",
+                "timeStart": "1030",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "EL",
+                "day": "mon",
+                "timeStart": "1200",
+                "timeEnd": "1330"
+            },
+            {
+                "subject": "Lunch",
+                "day": "mon",
+                "timeStart": "1330",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Assembly",
+                "day": "mon",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "CCA",
+                "day": "mon",
+                "timeStart": "1600",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Physics",
+                "day": "tue",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "Biology",
+                "day": "tue",
+                "timeStart": "900",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "tue",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "tue",
+                "timeStart": "1030",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "Math",
+                "day": "tue",
+                "timeStart": "1230",
+                "timeEnd": "1330"
+            },
+            {
+                "subject": "Lunch",
+                "day": "tue",
+                "timeStart": "1330",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Electives",
+                "day": "tue",
+                "timeStart": "1500",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "MT",
+                "day": "wed",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "Recess",
+                "day": "wed",
+                "timeStart": "900",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "CS",
+                "day": "wed",
+                "timeStart": "930",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Math",
+                "day": "wed",
+                "timeStart": "1030",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Lunch",
+                "day": "wed",
+                "timeStart": "1200",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "CCE",
+                "day": "wed",
+                "timeStart": "1300",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "DV",
+                "day": "wed",
+                "timeStart": "1400",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Physics",
+                "day": "thu",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "Biology",
+                "day": "thu",
+                "timeStart": "900",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "thu",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "CS",
+                "day": "thu",
+                "timeStart": "1030",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "Lunch",
+                "day": "thu",
+                "timeStart": "1230",
+                "timeEnd": "1330"
+            },
+            {
+                "subject": "EL",
+                "day": "thu",
+                "timeStart": "1330",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "PE",
+                "day": "thu",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "Mentoring",
+                "day": "fri",
+                "timeStart": "800",
+                "timeEnd": "830"
+            },
+            {
+                "subject": "MT",
+                "day": "fri",
+                "timeStart": "830",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "Recess",
+                "day": "fri",
+                "timeStart": "930",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "fri",
+                "timeStart": "1000",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Math",
+                "day": "fri",
+                "timeStart": "1200",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "Lunch",
+                "day": "fri",
+                "timeStart": "1300",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "3rd Lang",
+                "day": "fri",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            }
+        ]
+    },
+    {
+        "name": "M20404",
+        "lessons": [
+            {
+                "subject": "MT",
+                "day": "mon",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "PE",
+                "day": "mon",
+                "timeStart": "900",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "mon",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Physics",
+                "day": "mon",
+                "timeStart": "1030",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "Math",
+                "day": "mon",
+                "timeStart": "1230",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "Lunch",
+                "day": "mon",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Assembly",
+                "day": "mon",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "CCA",
+                "day": "mon",
+                "timeStart": "1600",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "tue",
+                "timeStart": "800",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "tue",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "EL",
+                "day": "tue",
+                "timeStart": "1030",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Math",
+                "day": "tue",
+                "timeStart": "1200",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "Lunch",
+                "day": "tue",
+                "timeStart": "1300",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Electives",
+                "day": "tue",
+                "timeStart": "1500",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "MT",
+                "day": "wed",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "Recess",
+                "day": "wed",
+                "timeStart": "900",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "Math",
+                "day": "wed",
+                "timeStart": "930",
+                "timeEnd": "1100"
+            },
+            {
+                "subject": "CS",
+                "day": "wed",
+                "timeStart": "1100",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Lunch",
+                "day": "wed",
+                "timeStart": "1200",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "CCE",
+                "day": "wed",
+                "timeStart": "1300",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "DV",
+                "day": "wed",
+                "timeStart": "1400",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Physics",
+                "day": "thu",
+                "timeStart": "800",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "thu",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "EL",
+                "day": "thu",
+                "timeStart": "1030",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Lunch",
+                "day": "thu",
+                "timeStart": "1200",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "CS",
+                "day": "thu",
+                "timeStart": "1300",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "PE",
+                "day": "thu",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "Mentoring",
+                "day": "fri",
+                "timeStart": "800",
+                "timeEnd": "830"
+            },
+            {
+                "subject": "MT",
+                "day": "fri",
+                "timeStart": "830",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "Recess",
+                "day": "fri",
+                "timeStart": "930",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "fri",
+                "timeStart": "1000",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Math",
+                "day": "fri",
+                "timeStart": "1200",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "Lunch",
+                "day": "fri",
+                "timeStart": "1300",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "3rd Lang",
+                "day": "fri",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            }
+        ]
+    },
+    {
+        "name": "M20405",
+        "lessons": [
+            {
+                "subject": "Math",
+                "day": "mon",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "PE",
+                "day": "mon",
+                "timeStart": "900",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "mon",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "MT",
+                "day": "mon",
+                "timeStart": "1030",
+                "timeEnd": "1130"
+            },
+            {
+                "subject": "Physics",
+                "day": "mon",
+                "timeStart": "1130",
+                "timeEnd": "1330"
+            },
+            {
+                "subject": "Lunch",
+                "day": "mon",
+                "timeStart": "1330",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Assembly",
+                "day": "mon",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "CCA",
+                "day": "mon",
+                "timeStart": "1600",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "tue",
+                "timeStart": "800",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "tue",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "MT",
+                "day": "tue",
+                "timeStart": "1030",
+                "timeEnd": "1130"
+            },
+            {
+                "subject": "Math",
+                "day": "tue",
+                "timeStart": "1130",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "Lunch",
+                "day": "tue",
+                "timeStart": "1300",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Electives",
+                "day": "tue",
+                "timeStart": "1500",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Math",
+                "day": "wed",
+                "timeStart": "800",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "Recess",
+                "day": "wed",
+                "timeStart": "930",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Physics",
+                "day": "wed",
+                "timeStart": "1000",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Lunch",
+                "day": "wed",
+                "timeStart": "1200",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "CCE",
+                "day": "wed",
+                "timeStart": "1300",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "DV",
+                "day": "wed",
+                "timeStart": "1400",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Math",
+                "day": "thu",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "MT",
+                "day": "thu",
+                "timeStart": "900",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "thu",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "thu",
+                "timeStart": "1030",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "Lunch",
+                "day": "thu",
+                "timeStart": "1230",
+                "timeEnd": "1330"
+            },
+            {
+                "subject": "EL",
+                "day": "thu",
+                "timeStart": "1330",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "PE",
+                "day": "thu",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "Mentoring",
+                "day": "fri",
+                "timeStart": "800",
+                "timeEnd": "830"
+            },
+            {
+                "subject": "EL",
+                "day": "fri",
+                "timeStart": "830",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "fri",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Lunch",
+                "day": "fri",
+                "timeStart": "1230",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "3rd Lang",
+                "day": "fri",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            }
+        ]
+    },
+    {
+        "name": "M20406",
+        "lessons": [
+            {
+                "subject": "MT",
+                "day": "mon",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "Math",
+                "day": "mon",
+                "timeStart": "900",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "PE",
+                "day": "mon",
+                "timeStart": "1000",
+                "timeEnd": "1100"
+            },
+            {
+                "subject": "Recess",
+                "day": "mon",
+                "timeStart": "1100",
+                "timeEnd": "1130"
+            },
+            {
+                "subject": "EL",
+                "day": "mon",
+                "timeStart": "1130",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "Lunch",
+                "day": "mon",
+                "timeStart": "1300",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Assembly",
+                "day": "mon",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "CCA",
+                "day": "mon",
+                "timeStart": "1600",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Literature / Geography / History / Econs / Music / Art",
+                "day": "tue",
+                "timeStart": "800",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "tue",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Math",
+                "day": "tue",
+                "timeStart": "1030",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Physics",
+                "day": "tue",
+                "timeStart": "1200",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "Lunch",
+                "day": "tue",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Electives",
+                "day": "tue",
+                "timeStart": "1500",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "MT",
+                "day": "wed",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "Recess",
+                "day": "wed",
+                "timeStart": "900",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "Math",
+                "day": "wed",
+                "timeStart": "930",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "wed",
+                "timeStart": "1030",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "Lunch",
+                "day": "wed",
+                "timeStart": "1230",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "CCE",
+                "day": "wed",
+                "timeStart": "1300",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "DV",
+                "day": "wed",
+                "timeStart": "1400",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "thu",
+                "timeStart": "800",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "thu",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "Math",
+                "day": "thu",
+                "timeStart": "1030",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Lunch",
+                "day": "thu",
+                "timeStart": "1200",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "EL",
+                "day": "thu",
+                "timeStart": "1300",
+                "timeEnd": "1430"
+            },
+            {
+                "subject": "EN / GE / HY / EC / MU / AR",
+                "day": "thu",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "PE",
+                "day": "thu",
+                "timeStart": "1600",
+                "timeEnd": "1700"
+            },
+            {
+                "subject": "Mentoring",
+                "day": "fri",
+                "timeStart": "800",
+                "timeEnd": "830"
+            },
+            {
+                "subject": "MT",
+                "day": "fri",
+                "timeStart": "830",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "Recess",
+                "day": "fri",
+                "timeStart": "930",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Physics",
+                "day": "fri",
+                "timeStart": "1000",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Lunch",
+                "day": "fri",
+                "timeStart": "1200",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "Lunch",
+                "day": "fri",
+                "timeStart": "1300",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "3rd Lang",
+                "day": "fri",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            }
+        ]
+    },
+    {
+        "name": "M20407",
+        "lessons": [
+            {
+                "subject": "MT",
+                "day": "mon",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "Math",
+                "day": "mon",
+                "timeStart": "900",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "PE",
+                "day": "mon",
+                "timeStart": "1000",
+                "timeEnd": "1100"
+            },
+            {
+                "subject": "Recess",
+                "day": "mon",
+                "timeStart": "1100",
+                "timeEnd": "1130"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "mon",
+                "timeStart": "1130",
+                "timeEnd": "1330"
+            },
+            {
+                "subject": "Lunch",
+                "day": "mon",
+                "timeStart": "1330",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Assembly",
+                "day": "mon",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "CCA",
+                "day": "mon",
+                "timeStart": "1600",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Literature / Geography / History / Econs / Music / Art",
+                "day": "tue",
+                "timeStart": "800",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Recess",
+                "day": "tue",
+                "timeStart": "1000",
+                "timeEnd": "1030"
+            },
+            {
+                "subject": "EL",
+                "day": "tue",
+                "timeStart": "1030",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Biology",
+                "day": "tue",
+                "timeStart": "1200",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "Lunch",
+                "day": "tue",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "Electives",
+                "day": "tue",
+                "timeStart": "1500",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "MT",
+                "day": "wed",
+                "timeStart": "800",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "Recess",
+                "day": "wed",
+                "timeStart": "900",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "Math",
+                "day": "wed",
+                "timeStart": "930",
+                "timeEnd": "1100"
+            },
+            {
+                "subject": "EL",
+                "day": "wed",
+                "timeStart": "1100",
+                "timeEnd": "1230"
+            },
+            {
+                "subject": "Lunch",
+                "day": "wed",
+                "timeStart": "1230",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "CCE",
+                "day": "wed",
+                "timeStart": "1300",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "DV",
+                "day": "wed",
+                "timeStart": "1400",
+                "timeEnd": "1800"
+            },
+            {
+                "subject": "Break",
+                "day": "thu",
+                "timeStart": "800",
+                "timeEnd": "830"
+            },
+            {
+                "subject": "Recess",
+                "day": "thu",
+                "timeStart": "830",
+                "timeEnd": "900"
+            },
+            {
+                "subject": "Math",
+                "day": "thu",
+                "timeStart": "900",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Biology",
+                "day": "thu",
+                "timeStart": "1000",
+                "timeEnd": "1200"
+            },
+            {
+                "subject": "Lunch",
+                "day": "thu",
+                "timeStart": "1200",
+                "timeEnd": "1300"
+            },
+            {
+                "subject": "Chemistry",
+                "day": "thu",
+                "timeStart": "1300",
+                "timeEnd": "1500"
+            },
+            {
+                "subject": "EN / GE / HY / EC / MU / AR",
+                "day": "thu",
+                "timeStart": "1500",
+                "timeEnd": "1600"
+            },
+            {
+                "subject": "PE",
+                "day": "thu",
+                "timeStart": "1600",
+                "timeEnd": "1700"
+            },
+            {
+                "subject": "Mentoring",
+                "day": "fri",
+                "timeStart": "800",
+                "timeEnd": "830"
+            },
+            {
+                "subject": "MT",
+                "day": "fri",
+                "timeStart": "830",
+                "timeEnd": "930"
+            },
+            {
+                "subject": "Recess",
+                "day": "fri",
+                "timeStart": "930",
+                "timeEnd": "1000"
+            },
+            {
+                "subject": "Math",
+                "day": "fri",
+                "timeStart": "1000",
+                "timeEnd": "1130"
+            },
+            {
+                "subject": "Lunch",
+                "day": "fri",
+                "timeStart": "1300",
+                "timeEnd": "1400"
+            },
+            {
+                "subject": "3rd Lang",
+                "day": "fri",
+                "timeStart": "1400",
+                "timeEnd": "1500"
+            }
+        ]
+    }
+]

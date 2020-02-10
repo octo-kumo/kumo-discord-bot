@@ -5,6 +5,7 @@ const coursemology = require('./coursemology.js');
 const azurlane = require('./azurlane.js');
 const music = require('./music.js');
 const waifulabs = require('./waifulabs.js');
+const timetable = require('./timetable.js');
 
 // Constants
 const PREFIX = process.env.PREFIX || "!";
@@ -27,9 +28,12 @@ client.on('ready', () => {
     client.guilds.get('665471208757657620').channels.get('665471209277882400').send("READY!");
     client.user.setPresence(config.PRESENCE);
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
+    config.HOOK2 = new Discord.WebhookClient('676309488021798912', process.env.HKTOKEN2);
     config.id = client.user.id;
     coursemology.update(config.DEFAULT_COURSE);
     setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
+    timetable.update();
+    setInterval(timetable.update, 60000);
 });
 
 client.on('message', async msg => {
@@ -45,7 +49,7 @@ client.on('message', async msg => {
         if (msg.content.includes(key)) return msg.channel.send(config.CONTAINS_REPLIES[key]);
     if (msg.content.indexOf(PREFIX) !== 0) return;
     console.log(`====== Message is a valid command.`);
-    let args = msg.content.slice(1).trim().split(/ +/g);
+    let args = msg.content.slice(1).trim().split(/\s+/g);
     const command = args.shift().toLowerCase();
     console.log(`running "${command}", args = [${args.join(", ")}]...`);
     if (command === "help") msg.channel.send(HELP_EMBED);
@@ -63,6 +67,7 @@ client.on('message', async msg => {
     if (command === "music" || command === "am" || command === "m" || command === "song") await music.handleCommand(args, msg, PREFIX);
     if (command.startsWith("!")) await music.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
     if (command === "waifulabs" || command === "wl" || command === "waifu") waifulabs.newBatch(msg);
+    if (command === "timetable" || command === "tt" || command === "t" || command === "c" || command === "class") timetable.handleCommand(args, msg, PREFIX);
     if (msg.author.id === "456001047756800000" && (command === "toggledebug" || command === "td")) {
         config.debug = !config.debug;
         console.log("DEBUG TOGGLED, debug = " + config.debug)
