@@ -12,17 +12,38 @@ const WEEKDAYS = [
     'sun'
 ];
 
+const CLASSES = [
+    'M20401',
+    'M20402',
+    'M20403',
+    'M20404',
+    'M20405',
+    'M20406',
+    'M20407'
+];
+
 let lessonNow = {};
+let lessonDiff = {};
 exports.update = () => {
+    lessonDiff = {};
     for (let i = 1; i <= 7; i++) {
         let newLesson = getLessonNow("M2040" + i);
         let lessonName = (typeof newLesson) === "object" ? newLesson.subject : newLesson;
         if (lessonNow[i] && lessonNow[i] !== lessonName) {
             lessonNow[i] = lessonName;
-            config.HOOK2.send("@" + "M2040" + i + ", its **" + lessonName + "** now!", (typeof newLesson) === "object" ? getLessonEmbed(newLesson) : null);
+            if (lessonDiff[lessonName]) lessonDiff[lessonName].push("M2040" + i);
+            else lessonDiff[lessonName] = ["M2040" + i];
         } else lessonNow[i] = lessonName;
     }
-    console.log(JSON.stringify(lessonNow));
+    for (let lessonName of Object.keys(lessonDiff)) config.HOOK2.send("@" + callClasses(lessonDiff[lessonName]) + ", its **" + lessonName + "** now!");
+}
+
+function callClasses(classList) {
+    if (classList.length === 7) return "all classes";
+    if (classList.length === 6)
+        for (let i = 0; i < CLASSES.length; i++)
+            if (!classList.includes(CLASSES[i])) return "all except " + CLASSES[i];
+    return classList.join(", ");
 }
 
 exports.handleCommand = (args, msg, PREFIX) => {
