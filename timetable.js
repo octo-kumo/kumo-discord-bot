@@ -28,7 +28,6 @@ exports.update = () => {
     lessonDiff = {};
     for (let i = 1; i <= 7; i++) {
         let newLessons = getLessonsNow("M2040" + i);
-        console.log(newLessons);
         if ((typeof newLessons) === "string") {
             if (lessonNow[i] && lessonNow[i] !== newLessons) {
                 lessonNow[i] = newLessons;
@@ -78,7 +77,6 @@ function getLessonsNow(className) {
     let now = new Date(new Date().getTime() + config.offset * 3600 * 1000);
     let hour = now.getHours();
     let minute = now.getMinutes();
-    console.log("Hour", hour, "Minute", minute, 'Day', WEEKDAYS[now.getDay()]);
     return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], hour, minute);
 }
 
@@ -89,7 +87,7 @@ function getLessonsNext(className) {
     let lesson = getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], hour, minute);
     if (hour < 8) return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], 8, 0);
     if ((typeof lesson) === "string") return "Nothing";
-    return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], lesson.end.hour, lesson.end.minute);
+    return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], lesson[0].end.hour, lesson[0].end.minute);
 }
 
 function getLessonsEmbed(lessons) {
