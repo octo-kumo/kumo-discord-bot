@@ -57,7 +57,7 @@ exports.handleCommand = (args, msg, prefix) => {
             });
             break;
         default:
-            return handleCommand(['info', command].concat(args).concat(json ? ['--json'] : []), msg, prefix);
+            return exports.handleCommand(['info', command].concat(args).concat(json ? ['--json'] : []), msg, prefix);
             break;
     }
 }
@@ -376,7 +376,7 @@ function loadAssessment(course, assessment_id) {
                     }
                 }
                 let json = null;
-                if (doc.querySelector(".page-header .btn-info")) json = await (fetch("https://nushigh.coursemology.org" + doc.querySelector(".page-header .btn-info").href + "?format=json", {
+                if (doc.querySelector(".page-header .btn-info") && doc.querySelector(".page-header .btn-info").textContent !== "Attempt") json = await (fetch("https://nushigh.coursemology.org" + doc.querySelector(".page-header .btn-info").href + "?format=json", {
                     headers: headers,
                     method: 'GET'
                 }).then(res => res.json()));
@@ -465,6 +465,6 @@ function deepToString(element, markdown) {
 }
 
 const eliminateUnreleasedAssessments = async (list) => {
-    for (let ass of Object.keys(list))
+    for (let ass = 0; ass < list.length; ass++)
         if (list[ass].unreleased) list[ass] = await loadAssessment(list[ass].course, list[ass].id);
 };
