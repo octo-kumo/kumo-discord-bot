@@ -74,6 +74,10 @@ client.on('message', async msg => {
         console.log("DEBUG TOGGLED, debug = " + config.debug)
         msg.channel.send(`DEBUG: debug output has been turned ${config.debug?"on":"off"}!`);
     }
+    if (msg.author.id === "456001047756800000" && (command === "forcestop" || command === "fs" || command === "restart" || command === "rs")) {
+        msg.channel.send("Forcing a **Restart**...");
+        process.exit(1);
+    }
     if (command === "shouldisleep" || command === "sleep" || command === "sis" || command === "zzz") {
         var currentHour = (new Date().getHours() + 8) % 24;
         console.log("current hour = " + currentHour);
