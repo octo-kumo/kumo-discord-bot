@@ -75,7 +75,8 @@ client.on('message', async msg => {
         msg.channel.send(`DEBUG: debug output has been turned ${config.debug?"on":"off"}!`);
     }
     if (msg.author.id === "456001047756800000" && (command === "forcestop" || command === "fs" || command === "restart" || command === "rs")) {
-        msg.channel.send("Forcing a **Restart**...");
+        console.log("Restarting program due to request from owner...");
+        await msg.channel.send("Forcing a **Restart**...");
         process.exit(1);
     }
     if (command === "shouldisleep" || command === "sleep" || command === "sis" || command === "zzz") {
