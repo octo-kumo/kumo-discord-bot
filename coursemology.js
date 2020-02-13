@@ -52,7 +52,7 @@ exports.handleCommand = (args, msg, prefix) => {
                 ALL_ASSESSMENTS.push(a);
                 sendAssessment(a);
             }).catch(err => {
-                msg.reply("**ERROR, ERROR** _Recalibrating..._");
+                msg.channel.send("_Was it ever there?_ ||(Hint: use numbers)||");
                 console.log(err.stack)
             });
             break;
