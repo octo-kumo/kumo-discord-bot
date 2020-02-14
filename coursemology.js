@@ -8,10 +8,20 @@ const fetch = require('node-fetch');
 let COURSES = {};
 let ALL_ASSESSMENTS = [];
 
+let USERS = {};
+
 const headers = {
     "Cookie": "remember_user_token=" + process.env.CMTOKEN,
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"
 };
+
+exports.init = async () => {
+    console.log("Coursemology Init...");
+    USERS = await loadUsersList(config.DEFAULT_COURSE);
+    await exports.update(config.DEFAULT_COURSE);
+    console.log("Coursemology Init Done");
+};
+
 exports.handleCommand = (args, msg, prefix) => {
     if (args.length === 0) return msg.reply("_Coursemology autograding is lagging..._");
     let json = false;
@@ -55,6 +65,36 @@ exports.handleCommand = (args, msg, prefix) => {
                 msg.channel.send("_Was it ever there?_ ||(Hint: use numbers)||");
                 console.log(err.stack)
             });
+            break;
+        case 'u':
+        case 'user':
+        case 'userinfo':
+        case 'stalk':
+        case 's':
+            if (args.length === 0) return msg.reply("_How in the world would I know 'nobody'?_");
+            let found = [];
+            for (let user of USERS) {
+                wordLoop:
+                    for (let word of user.username.replace(/[^a-zA-Z\s]+/g, ' ').trim().split(/\s+/g)) {
+                        for (let arg of args) {
+                            if (word.toUpperCase() === arg.toUpperCase()) found.push(user);
+                            break wordLoop;
+                        }
+                    }
+            }
+            if (found.length === 0) return msg.channel.send("_Maybe that person exists,_ ***in a different place, in a different time.***")
+            if (json) {
+                let json_text = JSON.stringify(found, null, 4);
+                if (json_text.length > 2000 - 13) {
+                    json_text = JSON.stringify(found);
+                    if (json_text.length > 2000 - 13) msg.channel.send('_It is too long for discord to accept_');
+                    else msg.channel.send('```json\n' + json_text + '\n```');
+                } else msg.channel.send('```json\n' + json_text + '\n```');
+            } else if (found.length === 1) {
+                loadUser(found[0].course, found[0].id).then(user => msg.channel.send(generateUserEmbed(user)));
+            } else {
+                loadUser(found[0].course, found[0].id).then(user => msg.channel.send('_There are more (' + found.length + '), but only 1 is shown_', generateUserEmbed(user)));
+            }
             break;
         default:
             return exports.handleCommand(['info', command].concat(args).concat(json ? ['--json'] : []), msg, prefix);
@@ -428,6 +468,18 @@ function generateAssessmentEmbed(assessment) {
         return basicInfo;
     }
     basicInfo.setDescription(assessment.markdown + (assessment.achievements.length > 0 ? "\n**Achievements**:\n" + assessment.achievements.map(a => `**${a.name}** ${a.description}`).join("\n") : ""));
+    return basicInfo;
+}
+
+function generateUserEmbed(user) {
+    let basicInfo = new Discord.RichEmbed();
+    basicInfo.setTitle(user.username);
+    basicInfo.setFooter("ID: " + user.id);
+    basicInfo.setColor(0x00ffff);
+    basicInfo.setThumbnail(user.icon);
+    basicInfo.addField("Email", user.email, true);
+    basicInfo.addField("Role", user.role, true);
+    basicInfo.addField("Achievements", user.achievements.length > 0 ? user.achievements.map(a => a.name).join(", ") : "_None_");
     return basicInfo;
 }
 

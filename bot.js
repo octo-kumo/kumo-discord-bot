@@ -17,7 +17,7 @@ const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
     .addField(`${PREFIX}ping`, "Get the bot's ping")
     .addField(`${PREFIX}azurlane [ship name]`, "Access data from Azur Lane")
     .addField(`${PREFIX}azurlane finds [name/? =/? data]+`, "Query for ships")
-    .addField(`${PREFIX}coursemology`, `Access Coursemology.\nUsage: \`${PREFIX}coursemology (info|list|leaderboard|listusers|user) [args]\``)
+    .addField(`${PREFIX}coursemology`, `Access Coursemology.\nUsage: \`${PREFIX}coursemology (info|list|user) [args]\``)
     .addField(`${PREFIX}sleep`, "Tell you whether or not you should sleep.")
 chainUpStdOut();
 console.log('====== ZY Discord Bot Started! ======');
@@ -31,7 +31,7 @@ client.on('ready', () => {
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     config.HOOK2 = new Discord.WebhookClient('676309488021798912', process.env.HKTOKEN2);
     config.id = client.user.id;
-    coursemology.update(config.DEFAULT_COURSE);
+    coursemology.init();
     setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
     timetable.update();
     setInterval(timetable.update, 60000);
