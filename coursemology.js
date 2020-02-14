@@ -77,8 +77,11 @@ exports.handleCommand = (args, msg, prefix) => {
                 wordLoop:
                     for (let word of user.username.replace(/[^a-zA-Z\s]+/g, ' ').trim().split(/\s+/g)) {
                         for (let arg of args) {
-                            if (word.toUpperCase().includes(arg.toUpperCase())) found.push(user);
-                            break wordLoop;
+                            console.log(word, "=?=", arg);
+                            if (word.toUpperCase().includes(arg.toUpperCase())) {
+                                found.push(user);
+                                break wordLoop;
+                            }
                         }
                     }
             }
@@ -482,7 +485,9 @@ function generateUserEmbed(user) {
     basicInfo.setURL(user.url);
     basicInfo.setFooter("ID: " + user.id);
     basicInfo.setColor(0x00ffff);
-    basicInfo.setThumbnail(user.icon.endsWith('.svg') ? "https://res.cloudinary.com/chatboxzy/image/upload/v1581647335/avatar.png" : "https://nushigh.coursemology.org" + user.icon);
+    let thumbnail = user.icon.includes('svg') ? "https://res.cloudinary.com/chatboxzy/image/upload/v1581647335/avatar.png" : user.icon;
+    console.log(thumbnail);
+    basicInfo.setThumbnail(thumbnail);
     basicInfo.addField("Email", user.email, true);
     basicInfo.addField("Role", user.role, true);
     basicInfo.addField("Achievements", user.achievements.length > 0 ? user.achievements.map(a => a.name).join(", ") : "_None_");
