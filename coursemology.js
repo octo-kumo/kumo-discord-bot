@@ -83,18 +83,20 @@ exports.handleCommand = (args, msg, prefix) => {
                     }
             }
             if (found.length === 0) return msg.channel.send("_Maybe that person exists,_ ***in a different place, in a different time.***")
-            if (json) {
-                let json_text = JSON.stringify(found, null, 4);
-                if (json_text.length > 2000 - 13) {
-                    json_text = JSON.stringify(found);
-                    if (json_text.length > 2000 - 13) msg.channel.send('_It is too long for discord to accept_');
-                    else msg.channel.send('```json\n' + json_text + '\n```');
-                } else msg.channel.send('```json\n' + json_text + '\n```');
-            } else if (found.length === 1) {
-                loadUser(found[0].course, found[0].id).then(user => msg.channel.send(generateUserEmbed(user)));
-            } else {
-                loadUser(found[0].course, found[0].id).then(user => msg.channel.send('_There are more (' + found.length + '), but only 1 is shown_', generateUserEmbed(user)));
-            }
+            loadUser(found[0].course, found[0].id).then(user => {
+                if (json) {
+                    let json_text = JSON.stringify(user, null, 4);
+                    if (json_text.length > 2000 - 13) {
+                        json_text = JSON.stringify(user);
+                        if (json_text.length > 2000 - 13) msg.channel.send('_It is too long for discord to accept_');
+                        else msg.channel.send('```json\n' + json_text + '\n```');
+                    } else msg.channel.send('```json\n' + json_text + '\n```');
+                } else if (found.length === 1) {
+                    msg.channel.send(generateUserEmbed(user));
+                } else {
+                    msg.channel.send('_There are more (' + found.length + '), but only 1 is shown_', generateUserEmbed(user));
+                }
+            });
             break;
         default:
             return exports.handleCommand(['info', command].concat(args).concat(json ? ['--json'] : []), msg, prefix);
@@ -303,6 +305,7 @@ function loadUser(course, user_id) {
                 });
             }
             let user = {
+                url: `https://nushigh.coursemology.org/courses/${course}/users/${user_id}`,
                 id: user_id,
                 course: course,
                 icon: doc.querySelector(".profile-box img").src,
@@ -421,6 +424,7 @@ function loadAssessment(course, assessment_id) {
                     method: 'GET'
                 }).then(res => res.json()));
                 const assessment = {
+                    url: `https://nushigh.coursemology.org/courses/${course}/assessments/${assessment_id}`,
                     id: assessment_id,
                     course: course,
                     category: json ? json.assessment.categoryId : null,
@@ -455,6 +459,7 @@ function loadAssessment(course, assessment_id) {
 function generateAssessmentEmbed(assessment) {
     let basicInfo = new Discord.RichEmbed();
     basicInfo.setTitle(assessment.name);
+    basicInfo.setURL(assessment.url);
     basicInfo.setFooter(config.list_presets[assessment.course].name + " • ID: " + assessment.id);
     basicInfo.setColor(0x00ffff);
     for (let field of assessment.fields) basicInfo.addField(field.name, field.value, true);
@@ -474,9 +479,10 @@ function generateAssessmentEmbed(assessment) {
 function generateUserEmbed(user) {
     let basicInfo = new Discord.RichEmbed();
     basicInfo.setTitle(user.username);
+    basicInfo.setURL(user.url);
     basicInfo.setFooter("ID: " + user.id);
     basicInfo.setColor(0x00ffff);
-    basicInfo.setThumbnail(user.icon);
+    basicInfo.setThumbnail(user.icon.endsWith('.svg') ? "https://res.cloudinary.com/chatboxzy/image/upload/v1581647335/avatar.png" : "https://nushigh.coursemology.org" + user.icon);
     basicInfo.addField("Email", user.email, true);
     basicInfo.addField("Role", user.role, true);
     basicInfo.addField("Achievements", user.achievements.length > 0 ? user.achievements.map(a => a.name).join(", ") : "_None_");
