@@ -486,7 +486,6 @@ function generateUserEmbed(user) {
     basicInfo.setFooter("ID: " + user.id);
     basicInfo.setColor(0x00ffff);
     let thumbnail = user.icon.includes('svg') ? "https://res.cloudinary.com/chatboxzy/image/upload/v1581647335/avatar.png" : user.icon;
-    console.log(thumbnail);
     basicInfo.setThumbnail(thumbnail);
     basicInfo.addField("Email", user.email, true);
     basicInfo.addField("Role", user.role, true);
