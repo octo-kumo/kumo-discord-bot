@@ -77,7 +77,7 @@ exports.handleCommand = (args, msg, prefix) => {
                 wordLoop:
                     for (let word of user.username.replace(/[^a-zA-Z\s]+/g, ' ').trim().split(/\s+/g)) {
                         for (let arg of args) {
-                            if (word.toUpperCase() === arg.toUpperCase()) found.push(user);
+                            if (word.toUpperCase().includes(arg.toUpperCase())) found.push(user);
                             break wordLoop;
                         }
                     }
