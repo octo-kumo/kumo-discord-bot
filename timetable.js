@@ -85,7 +85,9 @@ function getLessonsNext(className) {
     let hour = now.getHours();
     let minute = now.getMinutes();
     let lesson = getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], hour, minute);
+    if (hour >= 22 || hour <= 5) return "Sleep Period";
     if (hour < 8) return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], 8, 0);
+    if (hour >= 18) return getLessonsExact(className || "M20403", WEEKDAYS[(now.getDay() + 1) % 7], 8, 0);
     if ((typeof lesson) === "string") return "Nothing";
     return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], lesson[0].end.hour, lesson[0].end.minute);
 }
