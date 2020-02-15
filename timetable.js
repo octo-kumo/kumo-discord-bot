@@ -78,6 +78,7 @@ function getLessonsNow(className) {
     let hour = now.getHours();
     let minute = now.getMinutes();
     if (hour >= 22 || hour <= 5) return "Sleep Period";
+    if (WEEKDAYS[now.getDay()] === "sun" || WEEKDAYS[now.getDay()] === "sat") return "Weekends";
     return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], hour, minute);
 }
 
