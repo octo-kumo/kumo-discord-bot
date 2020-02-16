@@ -102,7 +102,7 @@ function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
 
-const CLASS_NAME_REGEX = /^(M?20)?40[1-7]$/i;
+const CLASS_NAME_REGEX = /^((M20)?4)?0[1-7]$/i;
 
 function getLessonsExact(className, day, hour, min) {
     if (typeof className === "number") className = className.toString();
