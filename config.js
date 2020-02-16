@@ -126,5 +126,8 @@ exports.config = {
     CONTAINS_REPLIES: {
         '<@!456001047756800000>': 'I will notify my human self',
         '<@!643028637112860682>': 'I will notif- wait, you are calling me, what is it?'
-    }
+    },
+    TIMETABLE_NON_EXIST: [
+        "_Existential Crisis_: **YES**",
+    ]
 }
