@@ -110,7 +110,7 @@ function getLessonsExact(className, day, hour, min) {
     if (hour >= 22 || hour <= 5) return "Sleep Period";
     if (day === "sun" || day === "sat") return "Weekends";
     for (let c of TIMETABLE) {
-        if (c.name === className || c.name.substr(3) === className || c.name.substr(5) === className) {
+        if (c.name === className || c.name.substr(3) === className || c.name.substr(4) === className) {
             let lessons = [];
             for (let lesson of c.lessons) {
                 lesson.start = getHourAndMinute(lesson.timeStart);
