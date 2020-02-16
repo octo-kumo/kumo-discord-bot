@@ -79,8 +79,6 @@ function getLessonsNow(className) {
     let now = new Date(new Date().getTime() + config.offset * 3600 * 1000);
     let hour = now.getHours();
     let minute = now.getMinutes();
-    if (hour >= 22 || hour <= 5) return "Sleep Period";
-    if (WEEKDAYS[now.getDay()] === "sun" || WEEKDAYS[now.getDay()] === "sat") return "Weekends";
     return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], hour, minute);
 }
 
@@ -109,6 +107,8 @@ function onlyUnique(value, index, self) {
 function getLessonsExact(className, day, hour, min) {
     if (typeof className === "number") className = className.toString();
     if (!CLASS_NAME_REGEX.test(className)) return "_Existential Crisis_: **YES**";
+    if (hour >= 22 || hour <= 5) return "Sleep Period";
+    if (day === "sun" || day === "sat") return "Weekends";
     for (let c of TIMETABLE) {
         if (c.name === className || c.name.substr(3) === className || c.name.substr(5) === className) {
             let lessons = [];
