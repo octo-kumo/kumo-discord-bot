@@ -106,7 +106,7 @@ const CLASS_NAME_REGEX = /^((M20)?4)?0[1-7]$/i;
 
 function getLessonsExact(className, day, hour, min) {
     if (typeof className === "number") className = className.toString();
-    if (!CLASS_NAME_REGEX.test(className)) return "_Existential Crisis_: **YES**";
+    if (!CLASS_NAME_REGEX.test(className)) return config.TIMETABLE_NON_EXIST[Math.random() * TIMETABLE_NON_EXIST.length];
     if (hour >= 22 || hour <= 5) return "Sleep Period";
     if (day === "sun" || day === "sat") return "Weekends";
     for (let c of TIMETABLE) {

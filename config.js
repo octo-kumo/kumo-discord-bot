@@ -129,5 +129,8 @@ exports.config = {
     },
     TIMETABLE_NON_EXIST: [
         "_Existential Crisis_: **YES**",
+        "Are you perhaps accelerated?",
+        "Only **Year 4** classes please!",
+        "Me: What is your class?\nYou: ***Yes***"
     ]
 }
