@@ -15,9 +15,10 @@ const client = new Discord.Client();
 const PING_EMBED = new Discord.RichEmbed().setTitle("Ping Results").setColor(0x21f8ff).addField("Latency", 0).addField("Discord API Latency", 0);
 const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
     .addField(`${PREFIX}ping`, "Get the bot's ping")
-    .addField(`${PREFIX}azurlane [ship name]`, "Access data from Azur Lane")
-    .addField(`${PREFIX}azurlane finds [name/? =/? data]+`, "Query for ships")
+    .addField(`${PREFIX}azurlane`, `Find information on your ship waifu\nUsage: \`${PREFIX}azurlane (ship-name)\``)
+    .addField(`${PREFIX}azurlane find`, `Query for a list of ships\nUsage: \`${PREFIX}azurlane find (field=value)/(field>value)+\`\nSeperated by ',' (comma)`)
     .addField(`${PREFIX}coursemology`, `Access Coursemology.\nUsage: \`${PREFIX}coursemology (info|list|user) [args]\``)
+    .addField(`${PREFIX}timetable`, `Access time table\nUsage: \`${PREFIX}timetable [next|now]? [classname]?\``)
     .addField(`${PREFIX}sleep`, "Tell you whether or not you should sleep.")
 chainUpStdOut();
 console.log('====== ZY Discord Bot Started! ======');
@@ -64,7 +65,7 @@ client.on('message', async msg => {
     }
     //if (command === "coursemology" || command === "cm") msg.reply("Coursemology command is currently disabled.\nHelp me design some embed and send it to me! (The data side is perfectly fine, just the design)")
     if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
-    if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
+    if (msg.channel.id === "676313313277378560" && command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
     if (command === "music" || command === "am" || command === "m" || command === "song") await music.handleCommand(args, msg, PREFIX);
     if (command.startsWith("!")) await music.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
     if (command === "waifulabs" || command === "wl" || command === "waifu") waifulabs.newBatch(msg);
