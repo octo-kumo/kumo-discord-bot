@@ -60,7 +60,7 @@ function callClasses(classList) {
 exports.handleCommand = (args, msg, PREFIX) => {
     if (args.length === 0) {
         msg.channel.send(getLessonsEmbed(getLessonsNow("M20403")));
-    } else if (args.length === 1 && (/^((?:(?:M?)?20)?40\d)$/i).test(args[0])) {
+    } else if (args.length === 1 && CLASS_NAME_REGEX.test(args[0])) {
         msg.channel.send(getLessonsEmbed(getLessonsNow(args[0])));
     } else if (args.length === 1) {
         if (args[0] === "now") msg.channel.send(getLessonsEmbed(getLessonsNow("M20403")));
