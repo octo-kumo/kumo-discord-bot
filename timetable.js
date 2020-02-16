@@ -73,6 +73,8 @@ exports.handleCommand = (args, msg, PREFIX) => {
     } else msg.channel.send("_Perhaps you lost your magic._");
 };
 
+const CLASS_NAME_REGEX = /^((M?(?:20))?4)?0\d$/i;
+
 function getLessonsNow(className) {
     let now = new Date(new Date().getTime() + config.offset * 3600 * 1000);
     let hour = now.getHours();
@@ -106,6 +108,7 @@ function onlyUnique(value, index, self) {
 
 function getLessonsExact(className, day, hour, min) {
     if (typeof className === "number") className = className.toString();
+    if (!CLASS_NAME_REGEX.test(className)) return "_Existential Crisis_: **YES**";
     for (let c of TIMETABLE) {
         if (c.name === className || c.name.substr(3) === className || c.name.substr(5) === className) {
             let lessons = [];
