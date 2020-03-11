@@ -66,7 +66,7 @@ client.on('message', async msg => {
     //if (command === "coursemology" || command === "cm") msg.reply("Coursemology command is currently disabled.\nHelp me design some embed and send it to me! (The data side is perfectly fine, just the design)")
     if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
 
-    if ((msg.channel.id === "676313313277378560" || msg.guild.id !== "642273802520231936") && (command === "azurlane" || command === "al" || command === "azur" || command === "az")) azurlane.handleCommand(args, msg, PREFIX);
+    if ((msg.channel.id === "644112354879078411" || msg.guild.id !== "642273802520231936") && (command === "azurlane" || command === "al" || command === "azur" || command === "az")) azurlane.handleCommand(args, msg, PREFIX);
     if (command === "music" || command === "am" || command === "m" || command === "song") await music.handleCommand(args, msg, PREFIX);
     if (command.startsWith("!")) await music.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
     if (command === "waifulabs" || command === "wl" || command === "waifu") waifulabs.newBatch(msg);
