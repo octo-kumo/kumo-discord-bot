@@ -20,7 +20,12 @@ exports.handleCommand = async (args, msg, prefix) => {
     switch (args.shift()) {
         case "p":
         case "play":
-            await play(args, msg);
+            play(args, msg);
+            break;
+        case "im":
+        case "import":
+        case "playlist":
+            importList(args, msg);
             break;
         case "np":
         case "status":
@@ -78,7 +83,7 @@ async function play(args, msg) {
     }
 }
 
-async function playSong(voiceChannel, song, msg) {
+async function playSong(voiceChannel, song, msg, suppress) {
     let queue = queues[msg.guild.id];
     if (!queue) {
         queues[msg.guild.id] = queue = {
@@ -91,15 +96,39 @@ async function playSong(voiceChannel, song, msg) {
         };
         progressQueue(msg.guild, song);
     } else {
-        msg.channel.send("Song \"**" + song.title + "**\" has been added to the queue :notes:");
+        if (!suppress) msg.channel.send("Song \"**" + song.title + "**\" has been added to the queue :notes:");
         if (!queue.connection) queue.connection = await voiceChannel.join();
         if (!queue.playing) queue.playing = true;
         queue.songs.push(song);
     }
 }
 
+async function importList(args, msg) {
+    if (args.length === 0) return msg.reply("Looking for something?");
+
+    const voiceChannel = msg.member.voiceChannel;
+    if (!voiceChannel) return msg.reply('I don\'t see you');
+    if (msg.client.voiceConnections.get(msg.guild.id) && msg.client.voiceConnections.get(msg.guild.id).channel.id !== voiceChannel.id) return msg.reply('I am busy, come to #' + msg.client.voiceConnections.get(msg.guild.id).channel.name);
+    const permissions = voiceChannel.permissionsFor(msg.client.user);
+    if (!permissions.has('CONNECT') || !permissions.has('SPEAK')) return msg.reply('Your room seems to be air tight.');
+
+    let listId = args[0].replace(/.+[&?]list=([^&]+).*/i, '$1');
+    if (!listId) return msg.reply("Use play list link plz");
+    let queue = queues[msg.guild.id];
+    yts({
+        listId: listId
+    }, async function(err, r) {
+        msg.channel.send("Importing《" + r.title + "》 by " + r.author.name + " of " + r.videoCount + "songs");
+        for (let i = 0; i < r.items.length; i++) {
+            let song = (await search(r.items[i].videoId))[0];
+            await playSong(voiceChannel, song, msg, true);
+        }
+    });
+}
+
 function progressQueue(guild, song) {
     const queue = queues[guild.id];
+    if (!queue) return;
     console.log("progressQueue()");
     if (!song) {
         console.log("No more songs!");
@@ -108,7 +137,7 @@ function progressQueue(guild, song) {
         delete queues[guild.id];
         return;
     }
-    queue.textChannel.send("Onto **" + song.title + "** :notes:", genVideoEmbed(song));
+    queue.textChannel.send("Onto **" + song.title + "** :notes:");
     console.log('Playing ' + song.title);
     const dispatcher = queue.connection.playStream(ytdl(song.url, ytdlOptions)).on('end', () => {
         console.log('Music ended!');
@@ -125,11 +154,15 @@ function list(msg) {
     let embed = new Discord.RichEmbed();
     embed.setTitle("Queue");
     let finalText = [];
+    let total = 0;
     for (let i = 0; i < queue.songs.length; i++) {
+        total += queue.songs.seconds;
+        if (i > 19) continue;
         finalText.push('#' + ((i + 1) + "").padStart(3, ' ') + " " + queue.songs[i].title + " (" + queue.songs[i].timestamp + ")");
     }
+    if (queue.songs.length > 20) finalText.push("And " + (queue.songs.length - 20) + " more!");
     embed.setDescription("```\n" + finalText.join("\n") + "\n```");
-    embed.setFooter("Total " + queue.songs.length + " songs");
+    embed.setFooter("Total " + queue.songs.length + " songs • " + total + " seconds");
     msg.channel.send(embed);
 }
 
