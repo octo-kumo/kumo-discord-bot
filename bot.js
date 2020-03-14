@@ -68,7 +68,10 @@ client.on('message', async msg => {
 
     if ((msg.channel.id === "644112354879078411" || msg.guild.id !== "642273802520231936") && (command === "azurlane" || command === "al" || command === "azur" || command === "az")) azurlane.handleCommand(args, msg, PREFIX);
     if (command === "music" || command === "am" || command === "m" || command === "song") await music.handleCommand(args, msg, PREFIX);
-    if (command.startsWith("!")) await music.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
+    if (command.startsWith("!")) {
+        console.log("Double !!: end command = " + command.substring(1));
+        await music.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
+    }
     if (command === "waifulabs" || command === "wl" || command === "waifu") waifulabs.newBatch(msg);
     if (command === "timetable" || command === "tt" || command === "t" || command === "c" || command === "class") timetable.handleCommand(args, msg, PREFIX);
     if (msg.author.id === "456001047756800000" && (command === "toggledebug" || command === "td")) {
