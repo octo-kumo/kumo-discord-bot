@@ -48,12 +48,17 @@ exports.handleCommand = async (args, msg, prefix) => {
         case "list":
             list(msg);
             break;
+        case "shuffle":
+        case "sf":
+        case "shfl":
+            shuffle(msg);
+            break;
     }
     console.log("music sub-command finished");
 }
 
 async function play(args, msg) {
-    if (args.length === 0) return msg.reply("Looking for something?");
+    if (args.length === 0) return resume(msg);
 
     const voiceChannel = msg.member.voiceChannel;
     if (!voiceChannel) return msg.reply('I don\'t see you');
@@ -91,10 +96,9 @@ async function playSong(voiceChannel, song, msg, suppress) {
             voiceChannel: voiceChannel,
             connection: await voiceChannel.join(),
             songs: [song],
-            searchList: [],
             playing: true,
         };
-        progressQueue(msg.guild, song);
+        await progressQueue(msg.guild);
     } else {
         if (!suppress) msg.channel.send("Song \"**" + song.title + "**\" has been added to the queue :notes:");
         if (!queue.connection) queue.connection = await voiceChannel.join();
@@ -114,22 +118,28 @@ async function importList(args, msg) {
 
     let listId = args[0].replace(/.+[&?]list=([^&]+).*/i, '$1');
     if (!listId) return msg.reply("Use play list link plz");
-    let queue = queues[msg.guild.id];
     yts({
         listId: listId
     }, async function(err, r) {
-        msg.channel.send("Importing《" + r.title + "》 by " + r.author.name + " of " + r.videoCount + "songs");
-        for (let i = 0; i < r.items.length; i++) {
-            let song = (await search(r.items[i].videoId))[0];
-            await playSong(voiceChannel, song, msg, true);
-        }
+        if (!r) msg.reply("Nothing received.");
+        try {
+            msg.channel.send("Importing《" + r.title + "》 by " + r.author.name + " of " + r.videoCount + " songs");
+            r.items[0].infoNotLoaded = true;
+            await playSong(voiceChannel, r.items[0], msg, true);
+            let queue = queues[msg.guild.id];
+            for (let i = 1; i < r.items.length; i++) {
+                r.items[i].infoNotLoaded = true;
+                queue.songs.push(r.items[i]);
+            }
+        } catch (err) {}
     });
 }
 
-function progressQueue(guild, song) {
+async function progressQueue(guild) {
     const queue = queues[guild.id];
     if (!queue) return;
     console.log("progressQueue()");
+    let song = queue.songs[0];
     if (!song) {
         console.log("No more songs!");
         queue.textChannel.send("_Bye~_");
@@ -137,14 +147,35 @@ function progressQueue(guild, song) {
         delete queues[guild.id];
         return;
     }
-    queue.textChannel.send("Onto **" + song.title + "** :notes:");
-    console.log('Playing ' + song.title);
-    const dispatcher = queue.connection.playStream(ytdl(song.url, ytdlOptions)).on('end', () => {
-        console.log('Music ended!');
-        queue.songs.shift();
-        progressQueue(guild, queue.songs[0]);
-    }).on('error', error => {
-        console.error(error);
+    console.log("----------------");
+    try {
+        if (song.infoNotLoaded) {
+            console.log("Song not loaded yet, id: " + song.videoId);
+            song = queue.songs[0] = queues[guild.id].songs[0] = await getVideo(song.videoId);
+        }
+        queue.textChannel.send("Playing **" + song.title + "** :notes:", genVideoEmbed(song));
+
+        console.log('Playing ' + song.title);
+        const dispatcher = queue.connection.playStream(ytdl(song.url, ytdlOptions)).on('end', () => {
+            console.log('Music ended!');
+            queue.songs.shift();
+            progressQueue(guild);
+        }).on('error', error => {
+            console.error(error);
+        });
+    } catch (err) {
+        console.log("\n\n", err, "\n\n");
+    }
+}
+
+function getVideo(id) {
+    return new Promise((resolve, reject) => {
+        yts({
+            videoId: id
+        }, function(err, video) {
+            if (err) reject(err);
+            else resolve(video);
+        });
     });
 }
 
@@ -153,35 +184,58 @@ function list(msg) {
     if (!queue) return msg.channel.send("_No Song No Life_");
     let embed = new Discord.RichEmbed();
     embed.setTitle("Queue");
+    embed.setColor(0x99ccff);
     let finalText = [];
     let total = 0;
     for (let i = 0; i < queue.songs.length; i++) {
         total += queue.songs.seconds;
-        if (i > 19) continue;
-        finalText.push('#' + ((i + 1) + "").padStart(3, ' ') + " " + queue.songs[i].title + " (" + queue.songs[i].timestamp + ")");
+        if (i > 9) continue;
+        finalText.push('#' + ((i + 1) + '').padStart(3, ' ') + " " + queue.songs[i].title + " (" + queue.songs[i].timestamp + ")");
     }
-    if (queue.songs.length > 20) finalText.push("And " + (queue.songs.length - 20) + " more!");
+    if (queue.songs.length > 10) finalText.push("And " + (queue.songs.length - 10) + " more!");
     embed.setDescription("```\n" + finalText.join("\n") + "\n```");
-    embed.setFooter("Total " + queue.songs.length + " songs • " + total + " seconds");
+    embed.setFooter("Total " + queue.songs.length + " songs");
     msg.channel.send(embed);
+}
+
+async function shuffle(msg) {
+    let queue = queues[msg.guild.id];
+    if (!queue) return msg.channel.send("_No Song No Life_");
+    queue.songs = [queue.songs[0]].concat(shuffleArray(queue.songs.slice(1)));
+    msg.channel.send("Shuffled!");
+}
+
+function shuffleArray(array) {
+    var currentIndex = array.length,
+        temporaryValue, randomIndex;
+    while (0 !== currentIndex) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+    return array;
 }
 
 function np(msg) {
     let queue = queues[msg.guild.id];
     if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel, lol');
-    if (!queue) return message.channel.send('Nothing is playing');
-    return msg.channel.send(genVideoEmbed(queue.songs[0]));
+    if (!queue) return msg.channel.send('Nothing is playing');
+    console.log("Stream Time: " + queue.connection.dispatcher.time);
+    return msg.channel.send(genVideoEmbed(queue.songs[0], queue.connection.dispatcher.time));
 }
 
 function skip(msg) {
     let queue = queues[msg.guild.id];
     if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel, lol');
-    if (!queue) return message.channel.send(':person_shrugging: There aren\'t any to begin with.');
+    if (!queue) return msg.channel.send(':person_shrugging: There aren\'t any to begin with.');
     queue.connection.dispatcher.end();
 }
 
 function stop(msg) {
     let queue = queues[msg.guild.id];
+    if (!queue) return msg.channel.send('Nothing yet');
     if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel, lol');
     queue.songs = [];
     queue.connection.dispatcher.end();
@@ -204,6 +258,8 @@ function resume(msg) {
 function search(query) {
     if (ytdl.validateURL(query) || ytdl.validateID(query)) return new Promise((resolve, reject) => {
         yts({
+            pageStart: 1,
+            pageEnd: 1,
             videoId: ytdl.getVideoID(query)
         }, function(err, video) {
             if (err) reject(err);
@@ -218,17 +274,28 @@ function search(query) {
     });
 }
 
-function genVideoEmbed(video) {
+function genVideoEmbed(video, playingTime) {
+    console.log("genVideoEmbed()");
     const embed = new Discord.RichEmbed();
     embed.setTitle(video.title);
     embed.setDescription(video.description);
-    embed.addField("Duration", video.timestamp, true);
+    embed.addField("Duration", (playingTime ? getTimeStamp(playingTime) + "/" : "") + video.timestamp, true);
     embed.addField("Views", nicelyFormatLargeNumber(video.views), true);
     embed.setURL(video.url);
     embed.setThumbnail(video.thumbnail);
     embed.setAuthor(video.author.name);
     embed.setColor(0xff0000);
     return embed;
+}
+
+function getTimeStamp(millis) {
+    if (millis < 1) return "0:00";
+    let totalSeconds = Math.round(millis / 1000);
+    let totalMinutes = Math.floor(totalSeconds / 60);
+    let totalHours = Math.floor(totalMinutes / 60);
+    totalSeconds = totalSeconds % 60;
+    totalMinutes = totalMinutes > 0 ? totalMinutes % 60 : 0;
+    return (totalHours > 0 ? totalHours + ":" : "") + (totalMinutes + "").padStart(totalHours > 0 ? 2 : 1, '0') + ":" + (totalSeconds + "").padStart(2, '0');
 }
 
 const NUMBER_POSTFIXES = ['', 'k', 'm', 'g', 't', 'p', 'e', 'z', 'y'];
