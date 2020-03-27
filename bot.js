@@ -2,6 +2,7 @@
 const Discord = require('discord.js');
 const config = require('./config.js').config;
 const coursemology = require('./coursemology.js');
+const covid = require('./covid.js');
 const azurlane = require('./azurlane.js');
 const music = require('./music.js');
 const waifulabs = require('./waifulabs.js');
@@ -34,8 +35,6 @@ client.on('ready', () => {
     config.id = client.user.id;
     coursemology.init();
     setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
-    timetable.update();
-    setInterval(timetable.update, 60000);
 });
 
 client.on('message', async msg => {
@@ -68,14 +67,16 @@ client.on('message', async msg => {
     //if (command === "coursemology" || command === "cm") msg.reply("Coursemology command is currently disabled.\nHelp me design some embed and send it to me! (The data side is perfectly fine, just the design)")
     if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
 
+    if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
+
     if ((msg.channel.id === "644112354879078411" || msg.guild.id !== "642273802520231936") && (command === "azurlane" || command === "al" || command === "azur" || command === "az")) azurlane.handleCommand(args, msg, PREFIX);
     if (command === "music" || command === "am" || command === "m" || command === "song") await music.handleCommand(args, msg, PREFIX);
     if (command.startsWith("!")) {
         console.log("Double !!: end command = " + command.substring(1));
         await music.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
     }
-    if (command === "waifulabs" || command === "wl" || command === "waifu") waifulabs.newBatch(msg);
-    if (command === "timetable" || command === "tt" || command === "t" || command === "c" || command === "class") timetable.handleCommand(args, msg, PREFIX);
+    if (command === "waifulabs") waifulabs.newBatch(msg);
+    if (command === "timetable" || command === "tt") timetable.handleCommand(args, msg, PREFIX);
     if (msg.author.id === "456001047756800000" && (command === "toggledebug" || command === "td")) {
         config.debug = !config.debug;
         console.log("DEBUG TOGGLED, debug = " + config.debug)
@@ -86,7 +87,7 @@ client.on('message', async msg => {
         await msg.channel.send("Forcing a **Restart**...");
         process.exit(1);
     }
-    if (command === "shouldisleep" || command === "sleep" || command === "sis" || command === "zzz") {
+    if (command === "shouldisleep" || command === "sleep") {
         var currentHour = (new Date().getHours() + 8) % 24;
         console.log("current hour = " + currentHour);
         if (currentHour < 6 || currentHour > 21) {

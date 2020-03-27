@@ -22,33 +22,6 @@ const CLASSES = [
     'M20407'
 ];
 
-let lessonNow = {};
-let lessonDiff = {};
-exports.update = () => {
-    lessonDiff = {};
-    for (let i = 1; i <= 7; i++) {
-        let newLessons = getLessonsNow("M2040" + i);
-        if ((typeof newLessons) === "string") {
-            if (lessonNow[i] && lessonNow[i] !== newLessons) {
-                lessonNow[i] = newLessons;
-                if (lessonDiff[newLessons]) lessonDiff[newLessons].push("M2040" + i);
-                else lessonDiff[newLessons] = ["M2040" + i];
-            } else lessonNow[i] = newLessons;
-        } else {
-            let code = newLessons.map(l => l.subject).join(",");
-            if (lessonNow[i] && lessonNow[i] !== code) {
-                lessonNow[i] = code;
-                for (let newLesson of newLessons) {
-                    let lessonName = (typeof newLesson) === "object" ? newLesson.subject : newLesson;
-                    if (lessonDiff[lessonName]) lessonDiff[lessonName].push("M2040" + i);
-                    else lessonDiff[lessonName] = ["M2040" + i];
-                }
-            } else lessonNow[i] = code;
-        }
-    }
-    for (let lessonName of Object.keys(lessonDiff)) config.HOOK2.send("@" + callClasses(lessonDiff[lessonName]) + ", its **" + lessonName + "** now!");
-}
-
 function callClasses(classList) {
     if (classList.length === 7) return "all classes";
     if (classList.length === 6)
