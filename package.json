@@ -18,14 +18,15 @@
     },
     "homepage": "https://github.com/LE0ZY/kumo-discord-bot#readme",
     "dependencies": {
+        "canvas": "^2.6.1",
         "discord.js": "^11.6.2",
         "express": "^4.17.1",
-        "ip": "^1.1.5",
         "jsdom": "^15.2.1",
         "moment": "^2.24.0",
         "node-fetch": "^2.6.0",
         "opusscript": ">=0.0.7",
         "request": "^2.88.2",
+        "vega": "^5.10.0",
         "yt-search": "^1.1.2",
         "ytdl-core": "^1.0.9"
     }

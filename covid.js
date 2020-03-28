@@ -1,9 +1,14 @@
 const fetch = require('node-fetch');
 const Discord = require('discord.js');
 const moment = require('moment');
+const vega = require('vega');
+const fs = require('fs');
 
 let cacheDate = 0;
 let cacheData = null;
+
+let cacheDateGoogle = 0;
+let cacheDataGoogle = null;
 
 let updatingMessage;
 
@@ -23,8 +28,8 @@ exports.update = async (channel) => {
             break;
         }
     }
-    if (!updatingMessage || updatingMessage.deleted) updatingMessage = await channel.send(generateRegionEmbed(location, found));
-    else updatingMessage.edit(generateRegionEmbed(location, found));
+    if (!updatingMessage || updatingMessage.deleted) updatingMessage = await channel.send(await generateRegionEmbed(location, found));
+    else updatingMessage.edit(await generateRegionEmbed(location, found));
 };
 
 exports.handleCommand = async (args, msg, PREFIX) => {
@@ -46,10 +51,10 @@ exports.handleCommand = async (args, msg, PREFIX) => {
             break;
         }
     }
-    msg.channel.send(generateRegionEmbed(location, found, msg));
+    msg.channel.send(await generateRegionEmbed(location, found, msg));
 };
 
-const generateRegionEmbed = (location, region, msg) => {
+const generateRegionEmbed = async (location, region, msg) => {
     const embed = new Discord.RichEmbed();
     embed.setColor(0x0074D9);
     if (msg) embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL);
@@ -78,7 +83,9 @@ const generateRegionEmbed = (location, region, msg) => {
             embed.addField("Dead", `**${today.deaths}** ${(deathIncrease<0?"":"+")+deathIncrease}`, true);
             embed.addField("Cured Rate", (today.recovered === 0 ? 0 : Math.round(today.recovered * 1000 / today.confirmed) / 10) + "%", true);
             embed.addField("Death Rate", (today.deaths === 0 ? 0 : Math.round(today.deaths * 1000 / today.confirmed) / 10) + "%", true);
-            if (!msg) embed.setDescription("_This message is automatically updated every minute_");
+            embed.attachFile(new Discord.Attachment(await drawGraph(region), "attachment.png"))
+            embed.setImage("attachment://attachment.png")
+            if (!msg) embed.setDescription("_This message is automatically updated every 1 hour_");
         } else {
             embed.setTitle("Waiting for Data")
                 .setDescription("Newest data is yet to be released");
@@ -89,3 +96,46 @@ const generateRegionEmbed = (location, region, msg) => {
     }
     return embed;
 };
+
+function drawGraph(region) {
+    return new Promise((resolve, reject) => {
+        const spec = JSON.parse(fs.readFileSync("line-chart.json"));
+        spec.data[0].values = convertToData(region);
+        var view = new vega.View(vega.parse(spec), {
+            renderer: 'none'
+        });
+        view.toCanvas().then(function(canvas) {
+            resolve(canvas.toBuffer("image/png"));
+        }).catch(function(err) {
+            console.error(err);
+            reject(err);
+        });
+    });
+}
+
+function convertToData(region) {
+    let newDataArray = [];
+    for (let day of region) {
+        newDataArray.push({
+            date: day.date.substring(5),
+            value: day.confirmed,
+            c: "Confirmed"
+        });
+        newDataArray.push({
+            date: day.date.substring(5),
+            value: day.confirmed - day.deaths - day.recovered,
+            c: "Active"
+        });
+        newDataArray.push({
+            date: day.date.substring(5),
+            value: day.deaths,
+            c: "Deaths"
+        });
+        newDataArray.push({
+            date: day.date.substring(5),
+            value: day.recovered,
+            c: "Recovered"
+        });
+    }
+    return newDataArray;
+}
