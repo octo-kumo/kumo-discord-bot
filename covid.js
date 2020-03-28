@@ -23,7 +23,7 @@ exports.update = async (channel) => {
             break;
         }
     }
-    if (!updatingMessage) updatingMessage = await channel.send(generateRegionEmbed(location, found));
+    if (!updatingMessage || updatingMessage.deleted) updatingMessage = await channel.send(generateRegionEmbed(location, found));
     else updatingMessage.edit(generateRegionEmbed(location, found));
 };
 
