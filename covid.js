@@ -83,7 +83,7 @@ const generateRegionEmbed = async (location, region, msg) => {
             embed.addField("Dead", `**${today.deaths}** ${(deathIncrease<0?"":"+")+deathIncrease}`, true);
             embed.addField("Cured Rate", (today.recovered === 0 ? 0 : Math.round(today.recovered * 1000 / today.confirmed) / 10) + "%", true);
             embed.addField("Death Rate", (today.deaths === 0 ? 0 : Math.round(today.deaths * 1000 / today.confirmed) / 10) + "%", true);
-            embed.attachFile(new Discord.Attachment(await drawGraph(region), "attachment.png"))
+            embed.attachFile(new Discord.Attachment(await drawGraph(location, region), "attachment.png"))
             embed.setImage("attachment://attachment.png")
             if (!msg) embed.setDescription("_This message is automatically updated every 1 hour_");
         } else {
@@ -97,10 +97,12 @@ const generateRegionEmbed = async (location, region, msg) => {
     return embed;
 };
 
-function drawGraph(region) {
+function drawGraph(location, region) {
     return new Promise((resolve, reject) => {
         const spec = JSON.parse(fs.readFileSync("line-chart.json"));
         spec.data[0].values = convertToData(region);
+        spec.title.text = spec.title.text.replace("${{REGION_NAME}}", location);
+        spec.title.subtitle = spec.title.subtitle.replace("${{REGION_NAME}}", location);
         var view = new vega.View(vega.parse(spec), {
             renderer: 'none'
         });

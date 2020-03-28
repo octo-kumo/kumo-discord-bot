@@ -1,8 +1,8 @@
 {
     "$schema": "https://vega.github.io/schema/vega/v5.json",
     "title": {
-        "text": "Total Cases in Singapore",
-        "subtitle": "Total cases of COVID-19 in Singapore, graphed by date",
+        "text": "Total Cases in ${{REGION_NAME}}",
+        "subtitle": "Total cases of COVID-19 in ${{REGION_NAME}}, graphed by date",
         "encode": {
             "title": {
                 "enter": {
