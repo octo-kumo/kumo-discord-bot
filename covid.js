@@ -78,7 +78,7 @@ const generateRegionEmbed = (location, region, msg) => {
             embed.addField("Dead", `**${today.deaths}** ${(deathIncrease<0?"":"+")+deathIncrease}`, true);
             embed.addField("Cured Rate", (today.recovered === 0 ? 0 : Math.round(today.recovered * 1000 / today.confirmed) / 10) + "%", true);
             embed.addField("Death Rate", (today.deaths === 0 ? 0 : Math.round(today.deaths * 1000 / today.confirmed) / 10) + "%", true);
-            if (!msg) embed.setDescription("_This message is automatically updated every 30 minutes_");
+            if (!msg) embed.setDescription("_This message is automatically updated every minute_");
         } else {
             embed.setTitle("Waiting for Data")
                 .setDescription("Newest data is yet to be released");
