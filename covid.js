@@ -45,12 +45,20 @@ exports.handleCommand = async (args, msg, PREFIX) => {
     let found = null;
     let location = null;
     for (let key of Object.keys(cacheData)) {
-        if (key.toLowerCase().includes(region)) {
+        if (key.toLowerCase() === region) {
             found = cacheData[key];
             location = key;
             break;
         }
     }
+    if (!found)
+        for (let key of Object.keys(cacheData)) {
+            if (key.toLowerCase().includes(region)) {
+                found = cacheData[key];
+                location = key;
+                break;
+            }
+        }
     msg.channel.send(await generateRegionEmbed(location, found, msg));
 };
 
