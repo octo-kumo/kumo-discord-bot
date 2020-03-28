@@ -35,6 +35,9 @@ client.on('ready', () => {
     config.id = client.user.id;
     coursemology.init();
     setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
+    const covidChannel = client.guilds.get('642273802520231936').channels.get('693051246885470209');
+    covid.update(covidChannel);
+    setInterval(() => covid.update(covidChannel), 20000);
 });
 
 client.on('message', async msg => {
