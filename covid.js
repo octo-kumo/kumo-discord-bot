@@ -126,6 +126,7 @@ function drawGraph(location, region) {
 function convertToData(region) {
     let newDataArray = [];
     for (let day of region) {
+        if (day.confirmed === 0) continue;
         newDataArray.push({
             date: day.date.substring(5),
             value: day.confirmed,
