@@ -65,7 +65,8 @@
         },
         {
             "name": "y",
-            "type": "linear",
+            "type":"pow",
+            "exponent":0.5,
             "range": "height",
             "nice": true,
             "zero": true,
