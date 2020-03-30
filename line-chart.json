@@ -65,8 +65,8 @@
         },
         {
             "name": "y",
-            "type":"pow",
-            "exponent":0.5,
+            "type": "pow",
+            "exponent": 0.5,
             "range": "height",
             "nice": true,
             "zero": true,
@@ -98,7 +98,7 @@
             "domainColor": "grey"
         },
         {
-            "orient": "left",
+            "orient": "right",
             "scale": "y",
             "title": "Value",
             "titleColor": "white",
@@ -198,6 +198,15 @@
                     },
                     "fill": {
                         "value": "#fff"
+                    },
+                    "angle": {
+                        "value": -30
+                    },
+                    "align": {
+                        "value": "center"
+                    },
+                    "zindex": {
+                        "value": 10
                     },
                     "dx": {
                         "value": 0
