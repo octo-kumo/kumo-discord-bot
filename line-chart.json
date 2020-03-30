@@ -117,35 +117,6 @@
             }
         },
         "marks": [{
-            "type": "text",
-            "from": {
-                "data": "series"
-            },
-            "encode": {
-                "enter": {
-                    "text": {
-                        "field": "value"
-                    },
-                    "x": {
-                        "scale": "x",
-                        "field": "date"
-                    },
-                    "y": {
-                        "scale": "y",
-                        "field": "value"
-                    },
-                    "fill": {
-                        "value": "#fff"
-                    },
-                    "dx": {
-                        "value": 0
-                    },
-                    "dy": {
-                        "value": -5
-                    }
-                }
-            }
-        }, {
             "type": "line",
             "from": {
                 "data": "series"
@@ -203,6 +174,35 @@
                     },
                     "fillOpacity": {
                         "value": 0.7
+                    }
+                }
+            }
+        }, {
+            "type": "text",
+            "from": {
+                "data": "series"
+            },
+            "encode": {
+                "enter": {
+                    "text": {
+                        "field": "value"
+                    },
+                    "x": {
+                        "scale": "x",
+                        "field": "date"
+                    },
+                    "y": {
+                        "scale": "y",
+                        "field": "value"
+                    },
+                    "fill": {
+                        "value": "#fff"
+                    },
+                    "dx": {
+                        "value": 0
+                    },
+                    "dy": {
+                        "value": -5
                     }
                 }
             }
