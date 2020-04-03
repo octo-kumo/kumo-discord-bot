@@ -1,7 +1,7 @@
 // Required dependencies
 const Discord = require('discord.js');
 const config = require('./config.js').config;
-const coursemology = require('./coursemology.js');
+// const coursemology = require('./coursemology.js');
 const covid = require('./covid.js');
 const azurlane = require('./azurlane.js');
 const music = require('./music.js');
@@ -16,9 +16,11 @@ const client = new Discord.Client();
 const PING_EMBED = new Discord.RichEmbed().setTitle("Ping Results").setColor(0x21f8ff).addField("Latency", 0).addField("Discord API Latency", 0);
 const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
     .addField(`${PREFIX}ping`, "Get the bot's ping")
+    .addField(`${PREFIX}music [play|skip|import|stop|pause]`, "Didn't see it coming, did you? I am a music bot")
+    .addField(`${PREFIX}covid [country name]`, "Get COVID-19 data of a country")
     .addField(`${PREFIX}azurlane`, `Find information on your ship waifu\nUsage: \`${PREFIX}azurlane (ship-name)\``)
     .addField(`${PREFIX}azurlane find`, `Query for a list of ships\nUsage: \`${PREFIX}azurlane find (field=value)/(field>value)+\`\nSeperated by ',' (comma)`)
-    .addField(`${PREFIX}coursemology`, `Access Coursemology.\nUsage: \`${PREFIX}coursemology (info|list|user) [args]\``)
+    // .addField(`${PREFIX}coursemology`, `Access Coursemology.\nUsage: \`${PREFIX}coursemology (info|list|user) [args]\``)
     .addField(`${PREFIX}timetable`, `Access time table\nUsage: \`${PREFIX}timetable [next|now]? [classname]?\``)
     .addField(`${PREFIX}sleep`, "Tell you whether or not you should sleep.")
 chainUpStdOut();
@@ -33,8 +35,8 @@ client.on('ready', () => {
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     config.HOOK2 = new Discord.WebhookClient('676309488021798912', process.env.HKTOKEN2);
     config.id = client.user.id;
-    coursemology.init();
-    setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
+    // coursemology.init();
+    // setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
     const covidChannel = client.guilds.get('642273802520231936').channels.get('693051246885470209');
     covid.update(covidChannel);
     setInterval(() => covid.update(covidChannel), 60 * 60 * 1000);
@@ -67,8 +69,8 @@ client.on('message', async msg => {
         console.log(` ping results obtained. lat = ${m.createdTimestamp - msg.createdTimestamp}, discord lat = ${Math.round(client.ping)}`);
         m.edit(PING_EMBED);
     }
-    //if (command === "coursemology" || command === "cm") msg.reply("Coursemology command is currently disabled.\nHelp me design some embed and send it to me! (The data side is perfectly fine, just the design)")
-    if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
+
+    // if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
 
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
 
