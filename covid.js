@@ -125,7 +125,8 @@ function drawGraph(location, region) {
 
 function convertToData(region) {
     let newDataArray = [];
-    for (let day of region) {
+    for (let i = 0; i < region.length; i++) {
+        let day = region[i];
         if (day.confirmed === 0) continue;
         newDataArray.push({
             date: day.date.substring(5),
@@ -146,6 +147,11 @@ function convertToData(region) {
             date: day.date.substring(5),
             value: day.recovered,
             c: "Recovered"
+        });
+        newDataArray.push({
+            date: day.date.substring(5),
+            value: i === 0 ? 0 : day.confirmed - region[i - 1].confirmed,
+            c: "New"
         });
     }
     return newDataArray;
