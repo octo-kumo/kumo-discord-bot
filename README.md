@@ -1,2 +1,2 @@
-# nush-discord-bot
-"M2040X" Discord (Utility) Bot 
+# kumo-discord-bot
+Some random discord bot not meant for public use
