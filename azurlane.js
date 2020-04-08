@@ -272,7 +272,8 @@ function generateBook(name) {
         const skinPage = new Discord.RichEmbed();
         skinPage.setTitle("Skins (" + ship.skins[i].name + ")").setThumbnail(ship.skins[i].chibi).setImage(ship.skins[i].image);
         skinPage.setDescription(ship.skins.map(skin => skin.name === ship.skins[i].name ? `**${skin.name}**` : skin.name).join("\n"));
-        for (let key of Object.keys(ship.skins[i].info)) skinPage.addField(SKIN_INFO_TRANSLATION[key], ship.skins[i].info[key], true);
+        for (let key of Object.keys(ship.skins[i].info))
+            if (ship.skins[i].info[key]) skinPage.addField(SKIN_INFO_TRANSLATION[key], ship.skins[i].info[key], true);
         skinPage.setFooter("Skin #" + (i + 1));
         pages.push(skinPage);
     }
