@@ -36,7 +36,7 @@ exports.handleCommand = async (args, msg, PREFIX) => {
     await refreshData();
     const region = args.join(" ").trim().toLowerCase();
     if (region === "world" || region === "globe" || region === "global") {
-        msg.channel.send(await generateRegionEmbed("Global", globalData, msg, true));
+        msg.channel.send(await generateRegionEmbed("The World", globalData, msg, true));
     } else {
         console.log("COVID: Requested region = " + region);
         let found = null;
