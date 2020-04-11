@@ -178,44 +178,6 @@
                     }
                 }
             }
-        }, {
-            "type": "text",
-            "from": {
-                "data": "series"
-            },
-            "encode": {
-                "enter": {
-                    "text": {
-                        "field": "value"
-                    },
-                    "x": {
-                        "scale": "x",
-                        "field": "date"
-                    },
-                    "y": {
-                        "scale": "y",
-                        "field": "value"
-                    },
-                    "fill": {
-                        "value": "#fff"
-                    },
-                    "angle": {
-                        "value": -30
-                    },
-                    "align": {
-                        "value": "center"
-                    },
-                    "zindex": {
-                        "value": 10
-                    },
-                    "dx": {
-                        "value": 0
-                    },
-                    "dy": {
-                        "value": -5
-                    }
-                }
-            }
         }]
     }]
 }
