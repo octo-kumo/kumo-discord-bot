@@ -74,7 +74,7 @@ client.on('message', async msg => {
 
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
 
-    if ((msg.channel.id === "644112354879078411" || msg.guild.id !== "642273802520231936") && (command === "azurlane" || command === "al" || command === "azur" || command === "az")) azurlane.handleCommand(args, msg, PREFIX);
+    if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
     if (command === "music" || command === "am" || command === "m" || command === "song") await music.handleCommand(args, msg, PREFIX);
     if (command.startsWith("!")) {
         console.log("Double !!: end command = " + command.substring(1));
