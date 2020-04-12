@@ -4,12 +4,13 @@ const SHIPS = require('./ships.json');
 const MEMORIES = require('./memories.json');
 const generateFilter = require('./generateFilter.js').generateFilter;
 
-const ship_book_filter = (reaction, user) => ['⬅️', '📊', '🎉', '👕', '🖌️', '➡️', '❎'].includes(reaction.emoji.name) && user.id !== config.id;
+const ship_book_filter = (reaction, user) =>
+    (['⬅️', '📊', '👕', '🖌️', '➡️', '❎'].includes(reaction.emoji.name) || "698441024644841543" === reaction.emoji.id) && user.id !== config.id;
 const memory_book_filter = (reaction, user) => ['❎', '⏬', '⏫', '🔼', '🔽', '🇨🇳', '🇯🇵', '🇬🇧'].includes(reaction.emoji.name) && user.id !== config.id;
 
 const ship_book_anchors = {
     '📊': 'stats',
-    '🎉': 'skills',
+    'numba_wan': 'skills',
     '👕': 'skins',
     '🖌️': 'gallery'
 }
@@ -118,11 +119,12 @@ exports.handleCommand = async function(args, msg, PREFIX) {
             if (!book) return msg.reply("Is that a ship from another world?");
             msg.channel.send(book.pages[0]).then(message => {
                 BOOKS[message.id] = book;
-                message.react('⬅️').then(() => message.react('📊')).then(() => message.react('🎉')).then(() => message.react('👕')).then(() => message.react('🖌️')).then(() => message.react('➡️')).then(() => message.react('❎'));
+                message.react('⬅️').then(() => message.react('📊')).then(() => message.react('698441024644841543')).then(() => message.react('👕')).then(() => message.react('🖌️')).then(() => message.react('➡️')).then(() => message.react('❎'));
                 message.createReactionCollector(ship_book_filter).on('collect', r => {
                     if (!r) return;
                     r.remove(msg.author.id);
                     let name = r.emoji.name;
+                    console.log("Emoji Name = " + name);
                     if (r.emoji.name === '❎') return message.delete();
                     let book = BOOKS[message.id];
                     if (name === "⬅️" || name === "➡️") {
@@ -374,26 +376,26 @@ function generateStatsPage(ship, key) {
 function generateSkillsPage(ship) {
     const skills_limits_eq = new Discord.RichEmbed(); // Page 3
     skills_limits_eq.setTitle("Equipment Slots / Skills / Limit Breaks");
-    skills_limits_eq.addField("**Equipment Slots**", "\u200B");
-    skills_limits_eq.addField("(1) " + ship.slots[1].type, ship.slots[1].minEfficiency ? ship.slots[1].minEfficiency + "% → " + ship.slots[1].maxEfficiency + "%" : "None", true)
+    skills_limits_eq.addField("> **Equipment Slots**\n" + "(1) " + ship.slots[1].type, ship.slots[1].minEfficiency ? ship.slots[1].minEfficiency + "% → " + ship.slots[1].maxEfficiency + "%" : "None", true)
         .addField("(2) " + ship.slots[2].type, ship.slots[2].minEfficiency + "% → " + ship.slots[2].maxEfficiency + "%", true)
         .addField("(3) " + ship.slots[3].type, ship.slots[3].minEfficiency + "% → " + ship.slots[3].maxEfficiency + "%", true);
-    skills_limits_eq.addField("**Skills**", "\u200B");
-    for (let skill of ship.skills) {
+    for (let i = 0; i < ship.skills.length; i++) {
+        let skill = ship.skills[i];
         let skill_field = creatSkillField(skill);
-        skills_limits_eq.addField(skill_field.name, skill_field.value, true);
+        skills_limits_eq.addField((i === 0 ? "> **Skills**\n" : "") + skill_field.name, skill_field.value, true);
     }
     if (ship.rarity === "Priority" || ship.rarity === "Decisive") {
-        skills_limits_eq.addField("**Development Levels**", "\u200B");
-        for (level of Object.keys(ship.devLevels)) {
+        skills_limits_eq.addField("> **Development Levels**", "\u200B");
+        let keys = Object.keys(ship.devLevels);
+        for (let i = 0; i < keys.length; i++) {
+            let level = keys[i];
             let delv_field = createDevLevelField(level, ship.devLevels[level]);
-            skills_limits_eq.addField(delv_field.name, delv_field.value, true);
+            skills_limits_eq.addField((i === 0 ? "> **Development Levels**\n" : "") + delv_field.name, delv_field.value, true);
         }
     } else {
-        skills_limits_eq.addField("**Limit Breaks**", "\u200B");
         for (let i = 0; i < ship.limitBreaks.length; i++) {
             let limit_field = creatLimitField(i + 1, ship.limitBreaks[i]);
-            skills_limits_eq.addField(limit_field.name, limit_field.value, true);
+            skills_limits_eq.addField((i === 0 ? "> **Limit Breaks**\n" : "") + limit_field.name, limit_field.value, true);
         }
     }
     return skills_limits_eq;

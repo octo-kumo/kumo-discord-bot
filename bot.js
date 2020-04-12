@@ -115,7 +115,7 @@ client.on('message', async msg => {
 });
 
 client.on('reconnecting', () => {
-    console.log('Reconnecting!');
+    // console.log('Reconnecting!');
 });
 client.on('disconnect', () => {
     console.log('Disconnect!');
