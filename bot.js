@@ -49,7 +49,7 @@ client.on('message', async msg => {
     if (!msg.guild && msg.author.id !== "456001047756800000") return;
     if (msg.author.id === config.id) return;
     let matcher = msg.content.replace(/[^\w ]+/g, '').trim().toLowerCase()
-    if (msg.guild.id !== "642273802520231936") {
+    if (msg.guild.id !== "642273802520231936" && Math.random() > .8) {
         if (config.SIMPLE_REPLIES[matcher])
             return msg.channel.send(config.SIMPLE_REPLIES[matcher]);
         for (let key of Object.keys(config.CONTAINS_REPLIES))
