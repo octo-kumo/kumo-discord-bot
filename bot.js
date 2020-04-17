@@ -123,6 +123,9 @@ client.on('disconnect', () => {
 client.on('guildCreate', (guild) => {
     console.log("Joined " + guild.id);
 });
+client.on('error', error => {
+    console.log("Error Occured " + error.message);
+})
 
 client.login(process.env.TOKEN);
 

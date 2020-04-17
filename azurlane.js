@@ -1,11 +1,13 @@
 const Discord = require('discord.js');
 const config = require('./config.js').config;
 const SHIPS = require('./ships.json');
+const CHAPTERS = require('./chapters.json');
 const MEMORIES = require('./memories.json');
 const generateFilter = require('./generateFilter.js').generateFilter;
 
 const ship_book_filter = (reaction, user) =>
     (['⬅️', '📊', '👕', '🖌️', '➡️', '❎'].includes(reaction.emoji.name) || "698441024644841543" === reaction.emoji.id) && user.id !== config.id;
+const chapter_book_filter = (reaction, user) => ['⬅️', '➡️', '❎'].includes(reaction.emoji.name) && user.id !== config.id;
 const memory_book_filter = (reaction, user) => ['❎', '⏬', '⏫', '🔼', '🔽', '🇨🇳', '🇯🇵', '🇬🇧'].includes(reaction.emoji.name) && user.id !== config.id;
 
 const ship_book_anchors = {
@@ -114,6 +116,24 @@ exports.handleCommand = async function(args, msg, PREFIX) {
                     }
                 });
             });
+        } else if (['map', 'chapter', 'c'].includes(args[0])) {
+            let book = generateChapterBook(args.join(" ").replace(/[^0-9]/g, ''));
+            if (!book) return msg.reply("Are you from the future?");
+            msg.channel.send(book.pages[0]).then(message => {
+                BOOKS[message.id] = book;
+                message.react('⬅️').then(() => message.react('➡️')).then(() => message.react('❎'));
+                message.createReactionCollector(chapter_book_filter).on('collect', r => {
+                    if (!r) return;
+                    r.remove(msg.author.id);
+                    let name = r.emoji.name;
+                    console.log("Emoji Name = " + name);
+                    if (r.emoji.name === '❎') return message.delete();
+                    let book = BOOKS[message.id];
+                    let incre = name === "⬅️" ? -1 : 1;
+                    if ((book.page >= book.pages.length && incre === 1) || (book.page <= 0 && incre === -1)) return;
+                    message.edit(book.pages[book.page += incre]).catch(e => {});;
+                });
+            }).catch(e => {});
         } else {
             let book = generateBook(args.join(" "));
             if (!book) return msg.reply("Is that a ship from another world?");
@@ -168,6 +188,52 @@ function generateShipsBook(filter) {
         page: 0,
         pages: pages
     };
+}
+
+function generateChapterBook(chapterIndex) {
+    let chapter = CHAPTERS[chapterIndex];
+    if (!chapter) return null;
+    console.log("Chapter " + chapterIndex);
+    console.log(chapter.names);
+    let pages = [];
+    for (let i = 0; i < 4; i++) {
+        let map = chapter[i + 1];
+        console.log(map);
+        pages.push(generateMapPage(chapter, map));
+    }
+    for (let i = 0; i < pages.length; i++) {
+        pages[i].setAuthor("#" + chapterIndex + " " + chapter.names.en + " (" + chapter.names.jp + ")").setColor(COLOR.query);
+        let footer = "Map " + (i + 1) + "/" + pages.length;
+        pages[i].setFooter(footer);
+    }
+    return {
+        page: 0,
+        pages: pages
+    };
+}
+
+function generateMapPage(chapter, map) {
+    const embed = new Discord.RichEmbed();
+    embed.setTitle(`**${map.normal.code}** ${map.names.en} (${map.names.jp})`);
+    embed.setDescription(map.normal.introduction);
+    embed.addField("Unlock Req.", map.normal.unlockRequirements.text, true);
+    embed.addField("Clear Rewards", map.normal.clearRewards.cube + "<:core:655377687875026974> " + map.normal.clearRewards.coin + "<:coin:700498633753231381> " + map.normal.clearRewards.oil + "<:oil:700498633296052276>", true);
+    embed.addField("Enemy Level", "**Mob**: Lv." + map.normal.enemyLevel.mobLevel + "\n**Boss**: " + map.normal.enemyLevel.boss + " (Lv." + map.normal.enemyLevel.bossLevel + ")", true);
+    embed.addField("Base XP", Object.keys(map.normal.baseXP).map(key => XP_NAME_TRANSLATION[key] + map.normal.baseXP[key] + (key === "mediumFleet" ? "\n" : "")).join(" "), true);
+    embed.addField("Air Supremacy", "Min: " + map.normal.airSupremacy.actual + "\nSuggest: " + map.normal.airSupremacy.suggestedLv2 + "-" + map.normal.airSupremacy.suggestedLv1, true);
+    embed.addField("Drops", map.normal.mapDrops.join("\n"), true);
+    embed.addField("Stars", map.normal.starConditions.join("\n"), true);
+    let eq = map.normal.equipmentBlueprintDrops.map(drop => drop.name + "(" + drop.tier + ")").join("\n");
+    embed.addField("Equipments", eq || "*None*");
+    embed.addField("Ship Drops", map.normal.shipDrops.map(ship => typeof(ship) === "string" ? ship : ship.name + " (" + ship.note + ")").join(", "));
+    embed.setImage(map.normal.nodeMap.preview);
+    return embed;
+}
+const XP_NAME_TRANSLATION = {
+    "smallFleet": "<:small_fleet:700500409135136798>",
+    "mediumFleet": "<:medium_fleet:700500409051250728>",
+    "largeFleet": "<:large_fleet:700500409172754442>",
+    "bossFleet": "<:boss_node:700500409168560229>",
 }
 
 const STATS_NAME_TRANSLATION = {
