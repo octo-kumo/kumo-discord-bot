@@ -4,6 +4,7 @@ const config = require('./config.js').config;
 const coursemology = require('./coursemology.js');
 const covid = require('./covid.js');
 const azurlane = require('./azurlane.js');
+const gomoku = require('./gomoku.js');
 const music = require('./music.js');
 const waifulabs = require('./waifulabs.js');
 const timetable = require('./timetable.js');
@@ -79,6 +80,11 @@ client.on('message', async msg => {
     if (command.startsWith("!")) {
         console.log("Double !!: end command = " + command.substring(1));
         await music.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
+    }
+    if (command === "gomoku" || command === "g" || command === "tictactoe" || command === "ttt") gomoku.handleCommand(args, msg, PREFIX);
+    if (command.startsWith("?")) {
+        console.log("Chain !?: end command = " + command.substring(1));
+        gomoku.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
     }
     if (command === "waifulabs") waifulabs.newBatch(msg);
     if (command === "timetable" || command === "tt") timetable.handleCommand(args, msg, PREFIX);
