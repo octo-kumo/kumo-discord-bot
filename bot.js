@@ -46,7 +46,7 @@ client.on('ready', () => {
     }
 });
 
-const OWO_24_MESSAGE_REGEX = /\*\*Ok <@!\d+>, your numbers are: \`(\d \d \d \d)\` \*\*/g;
+const OWO_24_MESSAGE_REGEX = /\*\*Ok <@!?\d+>, your numbers are: \`(\d \d \d \d)\` \*\*/g;
 
 client.on('message', async msg => {
     let startTime = Date.now();
