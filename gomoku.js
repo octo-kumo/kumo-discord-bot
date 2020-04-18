@@ -189,7 +189,7 @@ class Gomoku {
     toString() {
         let heading = [];
         for (let j = 0; j < this.size; j++) {
-            heading.push((j + 1).toString().padEnd(2, "_"));
+            heading.push(j.toString().padEnd(2, "_"));
         }
         let str = [];
         str.push("  |" + heading.join("_") + "|");
@@ -198,7 +198,7 @@ class Gomoku {
             for (let j = 0; j < this.size; j++) {
                 line.push((this.gameBoard[i][j] || "").padEnd(2, "_"));
             }
-            str.push((i + 1).toString().padEnd(2, " ") + "|" + line.join("|") + "|");
+            str.push(i.toString().padEnd(2, " ") + "|" + line.join("|") + "|");
         }
         return "```\n" + str.join("\n") + "\n```";
     }
