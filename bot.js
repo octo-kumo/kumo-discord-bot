@@ -8,6 +8,7 @@ const gomoku = require('./gomoku.js');
 const music = require('./music.js');
 const waifulabs = require('./waifulabs.js');
 const timetable = require('./timetable.js');
+const solve24 = require('./solver24.js').solve24;
 
 // Constants
 const PREFIX = process.env.PREFIX || "!";
@@ -39,22 +40,31 @@ client.on('ready', () => {
     coursemology.init();
     setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
     const covidChannel = client.guilds.get('642273802520231936').channels.get('693051246885470209');
-    covid.update(covidChannel);
-    setInterval(() => covid.update(covidChannel), 60 * 60 * 1000);
+    if (!process.env.LOCAL) {
+        covid.update(covidChannel);
+        setInterval(() => covid.update(covidChannel), 60 * 60 * 1000);
+    }
 });
+
+const OWO_24_MESSAGE_REGEX = /\*\*Ok <@!\d+>, your numbers are: \`(\d \d \d \d)\` \*\*/g;
 
 client.on('message', async msg => {
     let startTime = Date.now();
     console.log(`=> Message "${msg.content}" received from ${msg.author.tag}.`);
     if (!msg.channel.type === "text") return;
-    if (!msg.guild && msg.author.id !== "456001047756800000") return;
-    if (msg.author.id === config.id) return;
+    if (!msg.guild && msg.author.id !== "456001047756800000") return; // Direct message from myself only
+    if (msg.author.id === config.id) return; // Dont respond to bot's own messages
     let matcher = msg.content.replace(/[^\w ]+/g, '').trim().toLowerCase()
     if (msg.guild.id !== "642273802520231936" && Math.random() > .8) {
         if (config.SIMPLE_REPLIES[matcher])
             return msg.channel.send(config.SIMPLE_REPLIES[matcher]);
         for (let key of Object.keys(config.CONTAINS_REPLIES))
             if (msg.content.includes(key)) return msg.channel.send(config.CONTAINS_REPLIES[key]);
+    }
+    if (msg.author.id === "289066747443675143" && OWO_24_MESSAGE_REGEX.test(msg.content)) { // owo bot
+        let processed = msg.content.replace(OWO_24_MESSAGE_REGEX, '$1');
+        solve24(processed, client);
+        console.log("Solving for 24 " + processed);
     }
     if (msg.content.indexOf(PREFIX) !== 0) return;
     console.log(`====== Message is a valid command.`);
