@@ -107,14 +107,14 @@ async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
             embed.attachFile(new Discord.Attachment(await drawGraph(location, region), "attachment.png"))
             embed.setImage("attachment://attachment.png")
             if (!msg) embed.setDescription("_This message is automatically updated every 1 hour_");
-            else embed.setDescription("_Accurate as of_\n**" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY, 23:59') + "**");
+            else embed.setDescription("_Accurate as of_\n**" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY') + "**");
             if (includeLeaderBoard) {
                 let desc = [];
                 desc.push("#  " + "Region".padEnd(7, " ") + " " + "Cases".padStart(6, " ") + " " + "Dead".padStart(6, " ") + " " + "Heal".padStart(6, " "))
                 for (let i = 0; i < 8; i++) {
                     desc.push(`#${(i+1)} ${(LONG_NAMES[leaderBoard[i].region]?LONG_NAMES[leaderBoard[i].region]:leaderBoard[i].region).padEnd(7," ")} ${formatNumber(leaderBoard[i].confirmed).padStart(6," ")} ${formatNumber(leaderBoard[i].deaths).padStart(6," ")} ${formatNumber(leaderBoard[i].recovered).padStart(6," ")}`);
                 }
-                embed.setDescription("Accurate as of **" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY, 23:59') + "**\n" + "```" + desc.join("\n") + "```");
+                embed.setDescription("Accurate as of **" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY') + "**\n" + "```" + desc.join("\n") + "```");
             }
         } else {
             embed.setTitle("Waiting for Data")
