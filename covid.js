@@ -87,10 +87,10 @@ async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
             let deathIncrease = today.deaths - yesterday.deaths;
 
             embed.setTitle(location);
-            embed.addField("Active", `**${todayActive}** ${(activeIncrease<0?"":"+")+numberWithCommas(activeIncrease)}`, true);
-            embed.addField("Total", `**${today.confirmed}** ${(confirmedIncrease<0?"":"+")+numberWithCommas(confirmedIncrease)}`, true);
-            embed.addField("Cured", `**${today.recovered}** ${(recoveredIncrease<0?"":"+")+numberWithCommas(recoveredIncrease)}`, true);
-            embed.addField("Dead", `**${today.deaths}** ${(deathIncrease<0?"":"+")+numberWithCommas(deathIncrease)}`, true);
+            embed.addField("Active", `**${numberWithCommas(todayActive)}** ${(activeIncrease<0?"":"+")+numberWithCommas(activeIncrease)}`, true);
+            embed.addField("Total", `**${numberWithCommas(today.confirmed)}** ${(confirmedIncrease<0?"":"+")+numberWithCommas(confirmedIncrease)}`, true);
+            embed.addField("Cured", `**${numberWithCommas(today.recovered)}** ${(recoveredIncrease<0?"":"+")+numberWithCommas(recoveredIncrease)}`, true);
+            embed.addField("Dead", `**${numberWithCommas(today.deaths)}** ${(deathIncrease<0?"":"+")+numberWithCommas(deathIncrease)}`, true);
             embed.addField("Cured Rate", (today.recovered === 0 ? 0 : Math.round(today.recovered * 1000 / today.confirmed) / 10) + "%", true);
             embed.addField("Death Rate", (today.deaths === 0 ? 0 : Math.round(today.deaths * 1000 / today.confirmed) / 10) + "%", true);
             embed.attachFile(new Discord.Attachment(await drawGraph(location, region), "attachment.png"))
