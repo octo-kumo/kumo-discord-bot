@@ -80,6 +80,7 @@ async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
         let today = null;
         let yesterday = null;
         while (!(today && yesterday)) {
+            today = yesterday = null;
             let todayStr = moment().subtract(diff, 'days').format('YYYY-M-D');
             let yesterdayStr = moment().subtract(diff + 1, 'days').format('YYYY-M-D');
             for (let m of region) {
@@ -88,7 +89,6 @@ async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
             }
             diff++;
         }
-        console.log("Today", today, "Yesterday", yesterday);
         if (today && yesterday) {
             let yesterdayActive = yesterday.confirmed - yesterday.deaths - yesterday.recovered;
             let todayActive = today.confirmed - today.deaths - today.recovered;
@@ -98,16 +98,16 @@ async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
             let deathIncrease = today.deaths - yesterday.deaths;
 
             embed.setTitle(location);
-            embed.addField("Active", `**${numberWithSpace(todayActive)}** ${(activeIncrease<0?"":"+")+numberWithSpace(activeIncrease)}`, true);
-            embed.addField("Total", `**${numberWithSpace(today.confirmed)}** ${(confirmedIncrease<0?"":"+")+numberWithSpace(confirmedIncrease)}`, true);
-            embed.addField("Cured", `**${numberWithSpace(today.recovered)}** ${(recoveredIncrease<0?"":"+")+numberWithSpace(recoveredIncrease)}`, true);
-            embed.addField("Dead", `**${numberWithSpace(today.deaths)}** ${(deathIncrease<0?"":"+")+numberWithSpace(deathIncrease)}`, true);
+            embed.addField("Active", `**${numberWithSpace(todayActive)}** (${(activeIncrease<0?"":"+")+numberWithSpace(activeIncrease)})`, true);
+            embed.addField("Total", `**${numberWithSpace(today.confirmed)}** (${(confirmedIncrease<0?"":"+")+numberWithSpace(confirmedIncrease)})`, true);
+            embed.addField("Cured", `**${numberWithSpace(today.recovered)}** (${(recoveredIncrease<0?"":"+")+numberWithSpace(recoveredIncrease)})`, true);
+            embed.addField("Dead", `**${numberWithSpace(today.deaths)}** (${(deathIncrease<0?"":"+")+numberWithSpace(deathIncrease)})`, true);
             embed.addField("Cured Rate", (today.recovered === 0 ? 0 : Math.round(today.recovered * 1000 / today.confirmed) / 10) + "%", true);
             embed.addField("Death Rate", (today.deaths === 0 ? 0 : Math.round(today.deaths * 1000 / today.confirmed) / 10) + "%", true);
             embed.attachFile(new Discord.Attachment(await drawGraph(location, region), "attachment.png"))
             embed.setImage("attachment://attachment.png")
             if (!msg) embed.setDescription("_This message is automatically updated every 1 hour_");
-            else embed.setDescription("_Accurate as of_\n> **" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY, 23:59') + "**");
+            else embed.setDescription("_Accurate as of_\n**" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY, 23:59') + "**");
             if (includeLeaderBoard) {
                 let desc = [];
                 desc.push("#  " + "Region".padEnd(7, " ") + " " + "Cases".padStart(6, " ") + " " + "Dead".padStart(6, " ") + " " + "Heal".padStart(6, " "))
@@ -275,7 +275,7 @@ function getDataPointFromMOH() {
             let recovered = parseInt(lines[2].textContent.replace(/[^\d]/g, ''));
             let light = parseInt(lines[3].textContent.replace(/[^\d]/g, ''));
             let deaths = parseInt(lines[6].textContent.replace(/[^\d]/g, ''));
-            let date = doc.querySelector(".sfContentBlock:nth-child(4) span").textContent.trim().replace(/^[^\d]+(\d{2}\s*\w+\s*2020).+$/, '$1');
+            let date = doc.querySelector(".sfContentBlock:nth-child(4) > h3 span").textContent.trim().replace(/^[^\d]+(\d{2}\s*\w+\s*2020).+$/, '$1');
             let formalDate = moment(date, "D MMM YYYY").format('YYYY-M-D');
             return {
                 date: formalDate,
