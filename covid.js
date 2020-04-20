@@ -114,7 +114,7 @@ async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
                 for (let i = 0; i < 8; i++) {
                     desc.push(`#${(i+1)} ${(LONG_NAMES[leaderBoard[i].region]?LONG_NAMES[leaderBoard[i].region]:leaderBoard[i].region).padEnd(7," ")} ${formatNumber(leaderBoard[i].confirmed).padStart(6," ")} ${formatNumber(leaderBoard[i].deaths).padStart(6," ")} ${formatNumber(leaderBoard[i].recovered).padStart(6," ")}`);
                 }
-                embed.setDescription("```" + desc.join("\n") + "```");
+                embed.setDescription("Accurate as of **" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY, 23:59') + "**\n" + "```" + desc.join("\n") + "```");
             }
         } else {
             embed.setTitle("Waiting for Data")
@@ -184,9 +184,12 @@ async function refreshData() {
     if (now - cacheDate > 60000) { // 1 minute cache
         cacheDate = now;
         cacheData = await fetch('https://pomber.github.io/covid19/timeseries.json').then(res => res.json());
-        let MOH_DATA = await getDataPointFromMOH();
-        if (cacheData.Singapore[cacheData.Singapore.length - 1].date === MOH_DATA.date) cacheData.Singapore[cacheData.Singapore.length - 1] = MOH_DATA;
-        else cacheData.Singapore.push(MOH_DATA);
+        let LATEST_DATA = await getLatestDataFromWikipedia();
+        for (let data of LATEST_DATA) {
+            if (!cacheData[data.country]) cacheData[data.country] = [];
+            cacheData[data.country].push(data);
+            delete data.country;
+        }
         globalData = combineData();
         leaderBoard = compileLeaderboard();
     }
@@ -194,8 +197,11 @@ async function refreshData() {
 
 function combineData() {
     const global_data = {}; // days mapped by date
+    const today = moment().format('YYYY-M-D');
     for (let key of Object.keys(cacheData)) {
+        if (key === "World") continue;
         for (let day of cacheData[key]) {
+            if (day.date === today) continue;
             if (!global_data[day.date]) {
                 global_data[day.date] = {
                     confirmed: 0,
@@ -218,12 +224,14 @@ function combineData() {
             recovered: day.recovered
         });
     }
+    global_array.push(cacheData.World[0]);
     return global_array;
 }
 
 function compileLeaderboard() {
     let leaderBoard = [];
     for (let key of Object.keys(cacheData)) {
+        if (key === "World") continue;
         let today = cacheData[key][cacheData[key].length - 1];
         leaderBoard.push({
             region: key,
@@ -265,23 +273,44 @@ function numberWithSpace(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
-function getDataPointFromMOH() {
-    return fetch('https://www.moh.gov.sg/covid-19')
+const WIKIPEDIA_TRANSLATION = {
+    "United States": "US"
+}
+
+function getLatestDataFromWikipedia() {
+    return fetch('https://en.wikipedia.org/wiki/Template:2019%E2%80%9320_coronavirus_pandemic_data')
         .then(res => res.text())
         .then(body => {
             const doc = new JSDOM(body).window.document;
-            let lines = doc.querySelectorAll("table>tbody>tr:nth-child(2):last-child");
-            let active = parseInt(lines[1].textContent.replace(/[^\d]/g, ''));
-            let recovered = parseInt(lines[2].textContent.replace(/[^\d]/g, ''));
-            let light = parseInt(lines[3].textContent.replace(/[^\d]/g, ''));
-            let deaths = parseInt(lines[6].textContent.replace(/[^\d]/g, ''));
-            let date = doc.querySelector(".sfContentBlock:nth-child(4) > h3 span").textContent.trim().replace(/^[^\d]+(\d{2}\s*\w+\s*2020).+$/, '$1');
-            let formalDate = moment(date, "D MMM YYYY").format('YYYY-M-D');
-            return {
-                date: formalDate,
-                confirmed: active + recovered + light + deaths,
-                deaths: deaths,
-                recovered: recovered
-            };
+            let rows = doc.querySelectorAll("#thetable tbody tr:not(.sortbottom)");
+            let latestData = [];
+            for (let row of rows) {
+                if (row.classList.length !== 0) {
+                    console.log("Skipping " + row.children[1].firstElementChild.textContent);
+                    continue;
+                }
+                let totalRow = false;
+                let countryName = row.children[1].firstElementChild.textContent.replace(/\s*\([^()]+\)\s*/g, '');
+                if (WIKIPEDIA_TRANSLATION[countryName]) countryName = WIKIPEDIA_TRANSLATION[countryName];
+                if (totalRow = row.firstElementChild.classList.contains("covid-total-row")) countryName = "World";
+
+                let confirmedStr = row.children[2 - (totalRow ? 1 : 0)].textContent.replace(/[^\d]/g, '').trim();
+                let deathsStr = row.children[3 - (totalRow ? 1 : 0)].textContent.replace(/[^\d]/g, '').trim();
+                let recoveredStr = row.children[4 - (totalRow ? 1 : 0)].textContent.replace(/[^\d]/g, '').trim();
+                let dayBefore = cacheData[countryName] ? cacheData[countryName][cacheData[countryName].length - 1] : {
+                    date: moment().format('YYYY-M-D'),
+                    confirmed: 0,
+                    deaths: 0,
+                    recovered: 0
+                };
+                latestData.push({
+                    country: countryName,
+                    date: moment().format('YYYY-M-D'),
+                    confirmed: confirmedStr ? parseInt(confirmedStr) : dayBefore.confirmed,
+                    deaths: deathsStr ? parseInt(deathsStr) : dayBefore.deaths,
+                    recovered: recoveredStr ? parseInt(recoveredStr) : dayBefore.recovered
+                });
+            }
+            return latestData;
         });
 }
