@@ -140,7 +140,7 @@
                         "value": 3
                     },
                     "interpolate": [{
-                        "value": "monotone"
+                        "value": "basis"
                     }],
                     "fillOpacity": {
                         "value": 1
