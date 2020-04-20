@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const config = require('./config.js').config;
 
 const GAMES = {};
+const filter = (reaction, user) => ['⚫', '⚪'].includes(reaction.emoji.name) && user.id !== config.id;
 
 exports.handleCommand = function(args, msg, PREFIX) {
     console.log("running gomoku sub-system...");
@@ -13,18 +14,43 @@ exports.handleCommand = function(args, msg, PREFIX) {
             try {
                 let game = new Gomoku(msg.channel.id, args[0], args[1]);
                 GAMES[msg.channel.id] = game;
-                msg.channel.send("A game has started!\nJoin with `" + PREFIX + "gomoku join [black|white]`");
+                msg.channel.send("A game has started!\nJoin with `" + PREFIX + "gomoku join [black|white]` or react to this message!")
+                    .then(message => {
+                        message.react('⚫').then(r => message.react('⚪'));
+                        message.createReactionCollector(filter).on('collect', r => {
+                            if (!r) return;
+                            console.log(r.emoji.id);
+                            let user = r.users.filter(u => u.id !== config.id).first();
+                            let side = r.emoji.name === "⚫" ? "black" : "white";
+                            console.log(user.tag + " has joined the game as " + side);
+                            join(msg, side, () => r.removeAll());
+                        });
+                    });
+                msg.delete();
             } catch (err) {
                 msg.reply("Start by using `" + PREFIX + "gomoku start [size] [win length]`");
             }
             break;
         case "join":
         case "j":
-            if (GAMES.hasOwnProperty(msg.channel.id)) try {
-                GAMES[msg.channel.id].join(msg.author.id, args[0]);
-                msg.channel.send("<@" + msg.author.id + "> has joined the game!");
-            } catch (err) {
-                msg.reply(err);
+            if (GAMES.hasOwnProperty(msg.channel.id)) join(msg, args[0], () => msg.delete());
+            else msg.reply("There are no games yet, start with `" + PREFIX + "gomoku start`");
+            break;
+        case "leave":
+        case "l":
+            if (GAMES.hasOwnProperty(msg.channel.id)) {
+                try {
+                    let game = GAMES[msg.channel.id];
+                    game.leave(msg.author.id);
+                    msg.channel.send("<@" + msg.author.id + "> has left the game!");
+                    if (!(game.players.white || game.players.black)) {
+                        msg.channel.send("The game have been abandoned!");
+                        delete GAMES[msg.channel.id];
+                    }
+                } catch (err) {
+                    console.log(err);
+                    msg.reply(err);
+                }
             } else msg.reply("There are no games yet, start with `" + PREFIX + "gomoku start`");
             break;
         case "play":
@@ -32,10 +58,14 @@ exports.handleCommand = function(args, msg, PREFIX) {
             if (GAMES.hasOwnProperty(msg.channel.id)) try {
                 let game = GAMES[msg.channel.id];
                 game.play(args[0], args[1], msg.author.id);
-                msg.channel.send(game.toString());
+                if (!game.boardMessage)
+                    msg.channel.send(game.toString()).then(message => game.boardMessage = message);
+                else game.boardMessage.edit(game.toString());
+
                 if (game.checkWinStatus()) {
                     msg.channel.send("<@" + game.players[game.winner] + "> has won the game!");
                 }
+                msg.delete();
             } catch (err) {
                 console.log(err);
                 msg.reply(err);
@@ -58,6 +88,24 @@ exports.handleCommand = function(args, msg, PREFIX) {
                 msg.reply(err);
             } else msg.reply("There are no games yet, start with `" + PREFIX + "gomoku start`");
             break;
+    }
+}
+
+function join(msg, side, success) {
+    try {
+        if (side === "b") side = "black";
+        if (side === "w") side = "white";
+        let game = GAMES[msg.channel.id];
+        game.join(msg.author.id, side);
+        msg.channel.send("<@" + msg.author.id + "> has joined the game as " + side + "!");
+        if (game.hasStarted()) {
+            msg.channel.send("> **The game has started!**\nPlaying as black: <@" + game.players.black + ">\nPlaying as white: <@" + game.players.white + ">");
+            msg.channel.send(game.toString()).then(message => game.boardMessage = message);
+        }
+        success();
+    } catch (err) {
+        console.log(err);
+        msg.reply(err);
     }
 }
 
@@ -95,6 +143,14 @@ class Gomoku {
         console.log("Player " + player + " has joined " + this.id);
     }
 
+    leave(player) {
+        if (player !== this.players.black && player !== this.players.white) throw "You are not playing!";
+        if (player === this.players.black) this.players.black = null;
+        if (player === this.players.white) this.players.white = null;
+        this.winner = null;
+        console.log("Player " + player + " has left " + this.id);
+    }
+
     checkPlayer(player) {
         if (!(this.players.black && this.players.white)) throw "2 players required to start!";
         if (player !== this.players.black && player !== this.players.white) throw "You are not in the game";
@@ -118,6 +174,10 @@ class Gomoku {
         });
         this.reqUndo.black = this.reqUndo.white = false;
         this.reqRestart.black = this.reqRestart.white = false;
+    }
+
+    hasStarted() {
+        return this.players.black && this.players.white;
     }
 
     undo(player) {
@@ -153,7 +213,6 @@ class Gomoku {
     checkWinHorizontal(board) {
         let blackwin = new RegExp(`x{${this.winLength},${this.winLength}}`, "g");
         let whitewin = new RegExp(`o{${this.winLength},${this.winLength}}`, "g");
-        console.log(board);
         for (let y = 0; y < this.size; y++) {
             let line = board[y].map(c => c || " ").join("");
             if (blackwin.test(line)) return "black";

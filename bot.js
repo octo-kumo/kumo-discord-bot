@@ -1,7 +1,7 @@
 // Required dependencies
 const Discord = require('discord.js');
 const config = require('./config.js').config;
-const coursemology = require('./coursemology.js');
+// const coursemology = require('./coursemology.js');
 const covid = require('./covid.js');
 const azurlane = require('./azurlane.js');
 const gomoku = require('./gomoku.js');
@@ -37,8 +37,8 @@ client.on('ready', () => {
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     config.HOOK2 = new Discord.WebhookClient('676309488021798912', process.env.HKTOKEN2);
     config.id = client.user.id;
-    coursemology.init();
-    setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
+    // coursemology.init();
+    // setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
     const covidChannel = client.guilds.get('642273802520231936').channels.get('693051246885470209');
     if (!process.env.LOCAL) {
         covid.update(covidChannel);
@@ -81,7 +81,7 @@ client.on('message', async msg => {
         m.edit(PING_EMBED);
     }
 
-    if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
+    // if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
 
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
 
@@ -126,6 +126,12 @@ client.on('message', async msg => {
             msg.channel.send(embed);
             console.log("told " + msg.author.username + " to not to goto sleep");
         }
+    }
+    if (command === "clear") {
+        msg.channel.bulkDelete(parseInt(args[0]))
+            .then(messages => {
+                msg.reply("Deleted " + message.size() + " messages");
+            }).catch(console.error);
     }
     console.log("====== Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
 });
