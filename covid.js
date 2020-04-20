@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const JSDOM = require('jsdom').JSDOM;
 const Discord = require('discord.js');
 const moment = require('moment');
 const vega = require('vega');
@@ -34,7 +35,8 @@ exports.handleCommand = async (args, msg, PREFIX) => {
     console.log("Running COVID sub-system. args = " + args);
     if (args.length === 0) args = ['SINGAPORE'];
     await refreshData();
-    const region = args.join(" ").trim().toLowerCase();
+    let region = args.join(" ").trim().toLowerCase();
+    if (SHORT_NAMES[region]) region = SHORT_NAMES[region];
     if (region === "world" || region === "globe" || region === "global") {
         msg.channel.send(await generateRegionEmbed("The World", globalData, msg, true));
     } else {
@@ -60,6 +62,11 @@ exports.handleCommand = async (args, msg, PREFIX) => {
     }
 };
 
+const SHORT_NAMES = {
+    "uk": "united kingdom",
+    "sg": "singapore"
+}
+
 const LONG_NAMES = {
     "United Kingdom": "UK"
 }
@@ -69,13 +76,17 @@ async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
     embed.setColor(0x0074D9);
     if (msg) embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL);
     if (region) {
-        let todayStr = moment().subtract(1, 'days').format('YYYY-M-D');
-        let yesterdayStr = moment().subtract(2, 'days').format('YYYY-M-D');
+        let diff = 0;
         let today = null;
         let yesterday = null;
-        for (let m of region) {
-            if (!today && m.date === todayStr) today = m;
-            else if (!yesterday && m.date === yesterdayStr) yesterday = m;
+        while (!(today && yesterday)) {
+            let todayStr = moment().subtract(diff, 'days').format('YYYY-M-D');
+            let yesterdayStr = moment().subtract(diff + 1, 'days').format('YYYY-M-D');
+            for (let m of region) {
+                if (!today && m.date === todayStr) today = m;
+                else if (!yesterday && m.date === yesterdayStr) yesterday = m;
+            }
+            diff++;
         }
         console.log("Today", today, "Yesterday", yesterday);
         if (today && yesterday) {
@@ -87,15 +98,16 @@ async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
             let deathIncrease = today.deaths - yesterday.deaths;
 
             embed.setTitle(location);
-            embed.addField("Active", `**${numberWithCommas(todayActive)}** ${(activeIncrease<0?"":"+")+numberWithCommas(activeIncrease)}`, true);
-            embed.addField("Total", `**${numberWithCommas(today.confirmed)}** ${(confirmedIncrease<0?"":"+")+numberWithCommas(confirmedIncrease)}`, true);
-            embed.addField("Cured", `**${numberWithCommas(today.recovered)}** ${(recoveredIncrease<0?"":"+")+numberWithCommas(recoveredIncrease)}`, true);
-            embed.addField("Dead", `**${numberWithCommas(today.deaths)}** ${(deathIncrease<0?"":"+")+numberWithCommas(deathIncrease)}`, true);
+            embed.addField("Active", `**${numberWithSpace(todayActive)}** ${(activeIncrease<0?"":"+")+numberWithSpace(activeIncrease)}`, true);
+            embed.addField("Total", `**${numberWithSpace(today.confirmed)}** ${(confirmedIncrease<0?"":"+")+numberWithSpace(confirmedIncrease)}`, true);
+            embed.addField("Cured", `**${numberWithSpace(today.recovered)}** ${(recoveredIncrease<0?"":"+")+numberWithSpace(recoveredIncrease)}`, true);
+            embed.addField("Dead", `**${numberWithSpace(today.deaths)}** ${(deathIncrease<0?"":"+")+numberWithSpace(deathIncrease)}`, true);
             embed.addField("Cured Rate", (today.recovered === 0 ? 0 : Math.round(today.recovered * 1000 / today.confirmed) / 10) + "%", true);
             embed.addField("Death Rate", (today.deaths === 0 ? 0 : Math.round(today.deaths * 1000 / today.confirmed) / 10) + "%", true);
             embed.attachFile(new Discord.Attachment(await drawGraph(location, region), "attachment.png"))
             embed.setImage("attachment://attachment.png")
             if (!msg) embed.setDescription("_This message is automatically updated every 1 hour_");
+            else embed.setDescription("_Accurate as of_\n> **" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY, 23:59') + "**");
             if (includeLeaderBoard) {
                 let desc = [];
                 desc.push("#  " + "Region".padEnd(7, " ") + " " + "Cases".padStart(6, " ") + " " + "Dead".padStart(6, " ") + " " + "Heal".padStart(6, " "))
@@ -172,6 +184,9 @@ async function refreshData() {
     if (now - cacheDate > 60000) { // 1 minute cache
         cacheDate = now;
         cacheData = await fetch('https://pomber.github.io/covid19/timeseries.json').then(res => res.json());
+        let MOH_DATA = await getDataPointFromMOH();
+        if (cacheData.Singapore[cacheData.Singapore.length - 1].date === MOH_DATA.date) cacheData.Singapore[cacheData.Singapore.length - 1] = MOH_DATA;
+        else cacheData.Singapore.push(MOH_DATA);
         globalData = combineData();
         leaderBoard = compileLeaderboard();
     }
@@ -246,6 +261,27 @@ function formatNumber(number) {
     return Number.parseFloat(number / base).toPrecision(4) + UNITS[counter];
 }
 
-function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+function numberWithSpace(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
+function getDataPointFromMOH() {
+    return fetch('https://www.moh.gov.sg/covid-19')
+        .then(res => res.text())
+        .then(body => {
+            const doc = new JSDOM(body).window.document;
+            let lines = doc.querySelectorAll("table>tbody>tr:nth-child(2):last-child");
+            let active = parseInt(lines[1].textContent.replace(/[^\d]/g, ''));
+            let recovered = parseInt(lines[2].textContent.replace(/[^\d]/g, ''));
+            let light = parseInt(lines[3].textContent.replace(/[^\d]/g, ''));
+            let deaths = parseInt(lines[6].textContent.replace(/[^\d]/g, ''));
+            let date = doc.querySelector(".sfContentBlock:nth-child(4) span").textContent.trim().replace(/^[^\d]+(\d{2}\s*\w+\s*2020).+$/, '$1');
+            let formalDate = moment(date, "D MMM YYYY").format('YYYY-M-D');
+            return {
+                date: formalDate,
+                confirmed: active + recovered + light + deaths,
+                deaths: deaths,
+                recovered: recovered
+            };
+        });
 }
