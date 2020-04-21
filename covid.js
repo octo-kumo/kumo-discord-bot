@@ -38,7 +38,7 @@ exports.handleCommand = async (args, msg, PREFIX) => {
     let region = args.join(" ").trim().toLowerCase();
     if (SHORT_NAMES[region]) region = SHORT_NAMES[region];
     if (region === "world" || region === "globe" || region === "global") {
-        msg.channel.send(await generateRegionEmbed("The World", globalData, msg, true));
+        msg.channel.send(await generateRegionEmbed("World", globalData, msg, true));
     } else {
         console.log("COVID: Requested region = " + region);
         let found = null;
@@ -82,7 +82,7 @@ async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
         while (!(today && yesterday)) {
             today = yesterday = null;
             let todayStr = moment().subtract(diff, 'days').format('YYYY-M-D');
-            let yesterdayStr = moment().subtract(diff + 1, 'days').format('YYYY-M-D');
+            let yesterdayStr = moment().subtract(diff + (location === "World" ? 2 : 1), 'days').format('YYYY-M-D');
             for (let m of region) {
                 if (!today && m.date === todayStr) today = m;
                 else if (!yesterday && m.date === yesterdayStr) yesterday = m;
@@ -185,12 +185,31 @@ async function refreshData() {
         cacheDate = now;
         cacheData = await fetch('https://pomber.github.io/covid19/timeseries.json').then(res => res.json());
         let LATEST_DATA = await getLatestDataFromWikipedia();
+        let world = null;
         for (let data of LATEST_DATA) {
-            if (!cacheData[data.country]) cacheData[data.country] = [];
+            if (data.country === "World") {
+                world = data;
+                continue;
+            }
+            if (!cacheData[data.country]) {
+                if (WIKIPEDIA_TRANSLATION[data.country]) data.country = WIKIPEDIA_TRANSLATION[data.country];
+                else continue;
+            }
+
             cacheData[data.country].push(data);
             delete data.country;
         }
+        for (let data of LATEST_DATA) {
+            if (WIKIPEDIA_CHILD_TRANSLATION[data.country]) {
+                let last = cacheData[WIKIPEDIA_CHILD_TRANSLATION[data.country]];
+                last = last[last.length - 1];
+                last.confirmed += data.confirmed;
+                last.deaths += data.deaths;
+                last.recovered += data.recovered;
+            }
+        }
         globalData = combineData();
+        globalData.push(world);
         leaderBoard = compileLeaderboard();
     }
 }
@@ -224,7 +243,6 @@ function combineData() {
             recovered: day.recovered
         });
     }
-    global_array.push(cacheData.World[0]);
     return global_array;
 }
 
@@ -274,7 +292,34 @@ function numberWithSpace(x) {
 }
 
 const WIKIPEDIA_TRANSLATION = {
-    "United States": "US"
+    "United States": "US",
+    "South Korea": "Korea, South",
+    "Czech Republic": "Czechia",
+    "Bosnia & Herzegovina": "Bosnia and Herzegovina",
+    "Republic of the Congo": "Congo (Brazzaville)",
+    "DR Congo": "Congo (Kinshasa)",
+    "Myanmar": "Burma"
+}
+
+const WIKIPEDIA_CHILD_TRANSLATION = {
+    "Puerto Rico": "US",
+    "Hong Kong": "China",
+    "Taiwan": "China",
+    "Ivory Coast": "South Africa",
+    "Réunion": "France",
+    "Isle of Man": "United Kingdom",
+    "Mayotte": "France",
+    "Jersey": "United Kingdom",
+    "Guernsey": "United Kingdom",
+    "Faroe Islands": "Denmark",
+    "Martinique": "France",
+    "Guadeloupe": "France",
+    "Guam": "US",
+    "Gibraltar": "United Kingdom",
+    "U.S. Virgin Islands": "US",
+    "French Guiana": "France",
+    "Bermuda": "United Kingdom",
+
 }
 
 function getLatestDataFromWikipedia() {
@@ -292,6 +337,7 @@ function getLatestDataFromWikipedia() {
                 let totalRow = false;
                 let countryName = row.children[1].firstElementChild.textContent.replace(/\s*\([^()]+\)\s*/g, '');
                 if (WIKIPEDIA_TRANSLATION[countryName]) countryName = WIKIPEDIA_TRANSLATION[countryName];
+
                 if (totalRow = row.firstElementChild.classList.contains("covid-total-row")) countryName = "World";
 
                 let confirmedStr = row.children[2 - (totalRow ? 1 : 0)].textContent.replace(/[^\d]/g, '').trim();
