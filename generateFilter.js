@@ -1,4 +1,4 @@
-const getEqualFilter = (child, value) => (obj => obj[child] && obj[child].toUpperCase() === value.toUpperCase()); // = operator
+const getEqualFilter = (child, value) => (obj => obj[child] && obj[child].toUpperCase().trim() === value.toUpperCase().trim()); // = operator
 const getIncludeFilter = (child, value) => (obj => obj[child] && obj[child].toUpperCase().includes(value.toUpperCase())); // includes operator
 const getNameFilter = (filterGen, value) => (obj => {
     let filters = [];
