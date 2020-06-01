@@ -27,38 +27,46 @@ exports.update = async (channel) => {
             break;
         }
     }
-    if (!updatingMessage || updatingMessage.deleted) updatingMessage = await channel.send(await generateRegionEmbed(location, found));
-    else updatingMessage.edit(await generateRegionEmbed(location, found));
+    try {
+        if (!updatingMessage || updatingMessage.deleted) updatingMessage = await channel.send(await generateRegionEmbed(location, found));
+        else updatingMessage.edit(await generateRegionEmbed(location, found));
+    } catch (e) {
+        console.log("Something went wrong and covid data is not sent");
+    }
 };
 
 exports.handleCommand = async (args, msg, PREFIX) => {
     console.log("Running COVID sub-system. args = " + args);
-    if (args.length === 0) args = ['SINGAPORE'];
-    await refreshData();
-    let region = args.join(" ").trim().toLowerCase();
-    if (SHORT_NAMES[region]) region = SHORT_NAMES[region];
-    if (region === "world" || region === "globe" || region === "global") {
-        msg.channel.send(await generateRegionEmbed("World", globalData, msg, true));
-    } else {
-        console.log("COVID: Requested region = " + region);
-        let found = null;
-        let location = null;
-        for (let key of Object.keys(cacheData)) {
-            if (key.toLowerCase() === region) {
-                found = cacheData[key];
-                location = key;
-                break;
-            }
-        }
-        if (!found)
+    try {
+        if (args.length === 0) args = ['SINGAPORE'];
+        await refreshData();
+        let region = args.join(" ").trim().toLowerCase();
+        if (SHORT_NAMES[region]) region = SHORT_NAMES[region];
+        if (region === "world" || region === "globe" || region === "global") {
+            msg.channel.send(await generateRegionEmbed("World", globalData, msg, true));
+        } else {
+            console.log("COVID: Requested region = " + region);
+            let found = null;
+            let location = null;
             for (let key of Object.keys(cacheData)) {
-                if (key.toLowerCase().includes(region)) {
+                if (key.toLowerCase() === region) {
                     found = cacheData[key];
                     location = key;
                     break;
                 }
             }
-        msg.channel.send(await generateRegionEmbed(location, found, msg));
+            if (!found)
+                for (let key of Object.keys(cacheData)) {
+                    if (key.toLowerCase().includes(region)) {
+                        found = cacheData[key];
+                        location = key;
+                        break;
+                    }
+                }
+            msg.channel.send(await generateRegionEmbed(location, found, msg));
+        }
+    } catch (e) {
+        console.log("Something went wrong and covid data is not sent");
     }
 };
 
@@ -184,43 +192,43 @@ async function refreshData() {
     if (now - cacheDate > 60000) { // 1 minute cache
         cacheDate = now;
         cacheData = await fetch('https://pomber.github.io/covid19/timeseries.json').then(res => res.json());
-        let LATEST_DATA = await getLatestDataFromWikipedia();
-        let world = null;
-        for (let data of LATEST_DATA) {
-            if (data.country === "World") {
-                world = data;
-                continue;
-            }
-            if (!cacheData[data.country]) {
-                if (WIKIPEDIA_TRANSLATION[data.country]) data.country = WIKIPEDIA_TRANSLATION[data.country];
-                else continue;
-            }
-
-            cacheData[data.country].push(data);
-            delete data.country;
-        }
-        for (let data of LATEST_DATA) {
-            if (WIKIPEDIA_CHILD_TRANSLATION[data.country]) {
-                let last = cacheData[WIKIPEDIA_CHILD_TRANSLATION[data.country]];
-                last = last[last.length - 1];
-                last.confirmed += data.confirmed;
-                last.deaths += data.deaths;
-                last.recovered += data.recovered;
-            }
-        }
+        // let LATEST_DATA = await getLatestDataFromWikipedia();
+        // let world = null;
+        // for (let data of LATEST_DATA) {
+        //     if (data.country === "World") {
+        //         world = data;
+        //         continue;
+        //     }
+        //     if (!cacheData[data.country]) {
+        //         if (WIKIPEDIA_TRANSLATION[data.country]) data.country = WIKIPEDIA_TRANSLATION[data.country];
+        //         else continue;
+        //     }
+        //
+        //     cacheData[data.country].push(data);
+        //     delete data.country;
+        // }
+        // for (let data of LATEST_DATA) {
+        //     if (WIKIPEDIA_CHILD_TRANSLATION[data.country]) {
+        //         let last = cacheData[WIKIPEDIA_CHILD_TRANSLATION[data.country]];
+        //         last = last[last.length - 1];
+        //         last.confirmed += data.confirmed;
+        //         last.deaths += data.deaths;
+        //         last.recovered += data.recovered;
+        //     }
+        // }
         globalData = combineData();
-        globalData.push(world);
+        // globalData.push(world);
         leaderBoard = compileLeaderboard();
     }
 }
 
 function combineData() {
     const global_data = {}; // days mapped by date
-    const today = moment().format('YYYY-M-D');
+    // const today = moment().format('YYYY-M-D');
     for (let key of Object.keys(cacheData)) {
-        if (key === "World") continue;
+        // if (key === "World") continue;
         for (let day of cacheData[key]) {
-            if (day.date === today) continue;
+            // if (day.date === today) continue;
             if (!global_data[day.date]) {
                 global_data[day.date] = {
                     confirmed: 0,
@@ -290,73 +298,73 @@ function formatNumber(number) {
 function numberWithSpace(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
-
-const WIKIPEDIA_TRANSLATION = {
-    "United States": "US",
-    "South Korea": "Korea, South",
-    "Czech Republic": "Czechia",
-    "Bosnia & Herzegovina": "Bosnia and Herzegovina",
-    "Republic of the Congo": "Congo (Brazzaville)",
-    "DR Congo": "Congo (Kinshasa)",
-    "Myanmar": "Burma"
-}
-
-const WIKIPEDIA_CHILD_TRANSLATION = {
-    "Puerto Rico": "US",
-    "Hong Kong": "China",
-    "Taiwan": "China",
-    "Ivory Coast": "South Africa",
-    "Réunion": "France",
-    "Isle of Man": "United Kingdom",
-    "Mayotte": "France",
-    "Jersey": "United Kingdom",
-    "Guernsey": "United Kingdom",
-    "Faroe Islands": "Denmark",
-    "Martinique": "France",
-    "Guadeloupe": "France",
-    "Guam": "US",
-    "Gibraltar": "United Kingdom",
-    "U.S. Virgin Islands": "US",
-    "French Guiana": "France",
-    "Bermuda": "United Kingdom",
-
-}
-
-function getLatestDataFromWikipedia() {
-    return fetch('https://en.wikipedia.org/wiki/Template:2019%E2%80%9320_coronavirus_pandemic_data')
-        .then(res => res.text())
-        .then(body => {
-            const doc = new JSDOM(body).window.document;
-            let rows = doc.querySelectorAll("#thetable tbody tr:not(.sortbottom)");
-            let latestData = [];
-            for (let row of rows) {
-                if (row.classList.length !== 0) {
-                    console.log("Skipping " + row.children[1].firstElementChild.textContent);
-                    continue;
-                }
-                let totalRow = false;
-                let countryName = row.children[1].firstElementChild.textContent.replace(/\s*\([^()]+\)\s*/g, '');
-                if (WIKIPEDIA_TRANSLATION[countryName]) countryName = WIKIPEDIA_TRANSLATION[countryName];
-
-                if (totalRow = row.firstElementChild.classList.contains("covid-total-row")) countryName = "World";
-
-                let confirmedStr = row.children[2 - (totalRow ? 1 : 0)].textContent.replace(/[^\d]/g, '').trim();
-                let deathsStr = row.children[3 - (totalRow ? 1 : 0)].textContent.replace(/[^\d]/g, '').trim();
-                let recoveredStr = row.children[4 - (totalRow ? 1 : 0)].textContent.replace(/[^\d]/g, '').trim();
-                let dayBefore = cacheData[countryName] ? cacheData[countryName][cacheData[countryName].length - 1] : {
-                    date: moment().format('YYYY-M-D'),
-                    confirmed: 0,
-                    deaths: 0,
-                    recovered: 0
-                };
-                latestData.push({
-                    country: countryName,
-                    date: moment().format('YYYY-M-D'),
-                    confirmed: confirmedStr ? parseInt(confirmedStr) : dayBefore.confirmed,
-                    deaths: deathsStr ? parseInt(deathsStr) : dayBefore.deaths,
-                    recovered: recoveredStr ? parseInt(recoveredStr) : dayBefore.recovered
-                });
-            }
-            return latestData;
-        });
-}
+//
+// const WIKIPEDIA_TRANSLATION = {
+//     "United States": "US",
+//     "South Korea": "Korea, South",
+//     "Czech Republic": "Czechia",
+//     "Bosnia & Herzegovina": "Bosnia and Herzegovina",
+//     "Republic of the Congo": "Congo (Brazzaville)",
+//     "DR Congo": "Congo (Kinshasa)",
+//     "Myanmar": "Burma"
+// }
+//
+// const WIKIPEDIA_CHILD_TRANSLATION = {
+//     "Puerto Rico": "US",
+//     "Hong Kong": "China",
+//     "Taiwan": "China",
+//     "Ivory Coast": "South Africa",
+//     "Réunion": "France",
+//     "Isle of Man": "United Kingdom",
+//     "Mayotte": "France",
+//     "Jersey": "United Kingdom",
+//     "Guernsey": "United Kingdom",
+//     "Faroe Islands": "Denmark",
+//     "Martinique": "France",
+//     "Guadeloupe": "France",
+//     "Guam": "US",
+//     "Gibraltar": "United Kingdom",
+//     "U.S. Virgin Islands": "US",
+//     "French Guiana": "France",
+//     "Bermuda": "United Kingdom",
+//
+// }
+//
+// function getLatestDataFromWikipedia() {
+//     return fetch('https://en.wikipedia.org/wiki/Template:2019%E2%80%9320_coronavirus_pandemic_data')
+//         .then(res => res.text())
+//         .then(body => {
+//             const doc = new JSDOM(body).window.document;
+//             let rows = doc.querySelectorAll("#thetable tbody tr:not(.sortbottom)");
+//             let latestData = [];
+//             for (let row of rows) {
+//                 if (row.classList.length !== 0) {
+//                     console.log("Skipping " + row.children[1].firstElementChild.textContent);
+//                     continue;
+//                 }
+//                 let totalRow = false;
+//                 let countryName = row.children[1].firstElementChild.textContent.replace(/\s*\([^()]+\)\s*/g, '');
+//                 if (WIKIPEDIA_TRANSLATION[countryName]) countryName = WIKIPEDIA_TRANSLATION[countryName];
+//
+//                 if (totalRow = row.firstElementChild.classList.contains("covid-total-row")) countryName = "World";
+//
+//                 let confirmedStr = row.children[2 - (totalRow ? 1 : 0)].textContent.replace(/[^\d]/g, '').trim();
+//                 let deathsStr = row.children[3 - (totalRow ? 1 : 0)].textContent.replace(/[^\d]/g, '').trim();
+//                 let recoveredStr = row.children[4 - (totalRow ? 1 : 0)].textContent.replace(/[^\d]/g, '').trim();
+//                 let dayBefore = cacheData[countryName] ? cacheData[countryName][cacheData[countryName].length - 1] : {
+//                     date: moment().format('YYYY-M-D'),
+//                     confirmed: 0,
+//                     deaths: 0,
+//                     recovered: 0
+//                 };
+//                 latestData.push({
+//                     country: countryName,
+//                     date: moment().format('YYYY-M-D'),
+//                     confirmed: confirmedStr ? parseInt(confirmedStr) : dayBefore.confirmed,
+//                     deaths: deathsStr ? parseInt(deathsStr) : dayBefore.deaths,
+//                     recovered: recoveredStr ? parseInt(recoveredStr) : dayBefore.recovered
+//                 });
+//             }
+//             return latestData;
+//         });
+// }

@@ -82,7 +82,9 @@ client.on('message', async msg => {
     }
 
     // if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
-
+    if (command === "list-emotes" || command === "emotes") {
+        sendLongMessage(msg.channel, "**Emotes:**\n" + join(msg.guild.emojis.array().map(e => `<:${e.name}:${e.id}> \`:${e.name}:\``), [" ", " ", "\n"]));
+    }
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
 
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
@@ -174,4 +176,33 @@ function chainUpStdOut() {
             str = [];
         }
     });
+}
+
+function join(parts, seperators, formatLength) {
+    let str = "";
+    for (let i = 0; i < parts.length; i++) {
+        str += parts[i] + seperators[i % seperators.length];
+    }
+    if (str.length > 0) str = str.substring(0, str.length - 1);
+    return str;
+}
+
+function sendLongMessage(channel, msg) {
+    console.log("Sending to [" + channel.id + "]\n" + msg);
+    let messages = [];
+    let buffer = [];
+    let size = 0;
+    msg.split("\n").forEach(line => {
+        if (size + line.length > 2000) {
+            size = 0;
+            messages.push(buffer.join("\n"));
+            buffer = [];
+        }
+        buffer.push(line);
+        size += line.length + 1;
+        console.log("=> " + line + " <= " + size);
+    })
+    messages.push(buffer.join("\n"));
+    console.log(messages);
+    messages.forEach(m => channel.send(m));
 }
