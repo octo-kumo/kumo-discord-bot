@@ -55,7 +55,7 @@ client.on('message', async msg => {
     if (!msg.guild && msg.author.id !== "456001047756800000") return; // Direct message from myself only
     if (msg.author.id === config.id) return; // Dont respond to bot's own messages
     let matcher = msg.content.replace(/[^\w ]+/g, '').trim().toLowerCase()
-    if (msg.guild.id !== "642273802520231936" && Math.random() > .8) {
+    if (msg.guild && msg.guild.id !== "642273802520231936" && Math.random() > .8) {
         if (config.SIMPLE_REPLIES[matcher])
             return msg.channel.send(config.SIMPLE_REPLIES[matcher]);
         for (let key of Object.keys(config.CONTAINS_REPLIES))
@@ -84,6 +84,9 @@ client.on('message', async msg => {
     // if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
     if (command === "list-emotes" || command === "emotes") {
         sendLongMessage(msg.channel, "**Emotes:**\n" + join(msg.guild.emojis.array().map(e => `<:${e.name}:${e.id}> \`:${e.name}:\``), [" ", " ", "\n"]));
+    }
+    if (command === "pop" || command === "bubble" || command === "bubbles" || command === "bubble-pop") {
+        sendBubblePop(msg, args);
     }
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
 
@@ -205,4 +208,8 @@ function sendLongMessage(channel, msg) {
     messages.push(buffer.join("\n"));
     console.log(messages);
     messages.forEach(m => channel.send(m));
+}
+
+function sendBubblePop(msg, args) {
+    msg.channel.send("||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||\n".repeat(args[0] && !isNaN(args[0]) ? Math.min(24, Math.max(1, parseInt(args[0]))) : 8) + `Have fun, ${msg.author.username}! (๑•̀ㅂ•́)و`);
 }
