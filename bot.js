@@ -89,7 +89,7 @@ client.on('message', async msg => {
     if (command === "pop" || command === "bubble" || command === "bubbles" || command === "bubble-pop") {
         sendBubblePop(msg, args);
     }
-    if (command === "ms" || command === "minesweeper") sendLongMessage(minesweeper.handleCommand(args, msg, PREFIX));
+    if (command === "ms" || command === "minesweeper") sendLongMessage(msg.channel, minesweeper.handleCommand(args, msg, PREFIX));
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
 
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
