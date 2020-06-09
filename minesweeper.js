@@ -43,7 +43,7 @@ const Board = (width, height, msg) => {
         cells[y][x].mine = true;
         i++;
     }
-    return `__***Minesweeper ${width}×${height}***__\n` +
+    return `__***Minesweeper ${width}×${height}***__ (${numOfMines} mines)\n` +
         cells.map(row => row.map(cell => cell.init()).join("")).join("\n") +
         "\nDo your best! " + msg.author.username;
 }
