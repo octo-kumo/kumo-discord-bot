@@ -21,7 +21,7 @@ const Cell = (x, y, board, mine) => {
                 if (y < board.length - 1) neighbours.push(board[y + 1][x + 1]);
             }
             sum = neighbours.filter(c => c.mine).length;
-            return `||${mine ? MINE : EMOTES[sum]}||`;
+            return `||${this.mine ? MINE : EMOTES[sum]}||`;
         }
     };
 }
