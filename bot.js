@@ -192,7 +192,7 @@ function join(parts, seperators, formatLength) {
     return str;
 }
 
-function sendLongMessage(channel, msg) {
+async function sendLongMessage(channel, msg) {
     console.log("Sending to [" + channel.id + "]\n" + msg);
     let messages = [];
     let buffer = [];
@@ -208,8 +208,9 @@ function sendLongMessage(channel, msg) {
         console.log("=> " + line + " <= " + size);
     })
     messages.push(buffer.join("\n"));
-    console.log(messages);
-    messages.forEach(m => channel.send(m));
+    for (let i = 0; i < messages.length; i++) {
+        await channel.send(messages[i]);
+    }
 }
 
 function sendBubblePop(msg, args) {
