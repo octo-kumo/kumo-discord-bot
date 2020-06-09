@@ -26,8 +26,8 @@ const Cell = (x, y, board, mine) => {
     };
 }
 const Board = (width, height) => {
-    let width = Math.min(64, Math.max(0, width && !isNaN(width) ? parseInt(width) : 8));
-    let height = Math.min(64, Math.max(0, height && !isNaN(height) ? parseInt(height) : 8));
+    width = Math.min(64, Math.max(0, width && !isNaN(width) ? parseInt(width) : 8));
+    height = Math.min(64, Math.max(0, height && !isNaN(height) ? parseInt(height) : 8));
     let cells = [];
     for (let y = 0; y < height; y++) {
         cells[y] = [];
