@@ -8,6 +8,7 @@ const gomoku = require('./gomoku.js');
 const music = require('./music.js');
 const waifulabs = require('./waifulabs.js');
 const timetable = require('./timetable.js');
+const minesweeper = require('./minesweeper.js');
 const solve24 = require('./solver24.js').solve24;
 
 // Constants
@@ -88,6 +89,7 @@ client.on('message', async msg => {
     if (command === "pop" || command === "bubble" || command === "bubbles" || command === "bubble-pop") {
         sendBubblePop(msg, args);
     }
+    if (command === "ms" || command === "minesweeper") minesweeper.handleCommand(args, msg, PREFIX);
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
 
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
