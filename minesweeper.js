@@ -25,22 +25,26 @@ const Cell = (x, y, board, mine) => {
         }
     };
 }
-const Board = () => {
+const Board = (width, height) => {
+    let width = Math.min(64, Math.max(0, width && !isNaN(width) ? parseInt(width) : 8));
+    let height = Math.min(64, Math.max(0, height && !isNaN(height) ? parseInt(height) : 8));
     let cells = [];
-    for (let y = 0; y < 8; y++) {
+    for (let y = 0; y < height; y++) {
         cells[y] = [];
-        for (let x = 0; x < 8; x++)
+        for (let x = 0; x < width; x++)
             cells[y][x] = Cell(x, y, cells, false);
     }
     for (let i = 0; i < 10;) {
-        let x = Math.floor(Math.random() * 8);
-        let y = Math.floor(Math.random() * 8);
+        let x = Math.floor(Math.random() * width);
+        let y = Math.floor(Math.random() * height);
         if (cells[y][x].mine) continue;
         cells[y][x].mine = true;
         i++;
     }
-    return cells.map(row => row.map(cell => cell.init()).join("")).join("\n");
+    return `__***Minesweeper ${width}×${height}***__\n` +
+        cells.map(row => row.map(cell => cell.init()).join("")).join("\n") +
+        "\nDo your best! " + msg.author.username;
 }
 exports.handleCommand = function(args, msg, PREFIX) {
-    msg.channel.send(Board()).then(msg.channel.send("Do your best! " + msg.author.username));
+    return Board(args[0], args[1] || args[0]);
 }
