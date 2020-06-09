@@ -25,7 +25,7 @@ const Cell = (x, y, board, mine) => {
         }
     };
 }
-const Board = (width, height) => {
+const Board = (width, height, msg) => {
     width = Math.min(64, Math.max(0, width && !isNaN(width) ? parseInt(width) : 8));
     height = Math.min(64, Math.max(0, height && !isNaN(height) ? parseInt(height) : 8));
     let cells = [];
@@ -46,5 +46,5 @@ const Board = (width, height) => {
         "\nDo your best! " + msg.author.username;
 }
 exports.handleCommand = function(args, msg, PREFIX) {
-    return Board(args[0], args[1] || args[0]);
+    return Board(args[0], args[1] || args[0], msg);
 }
