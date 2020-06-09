@@ -469,20 +469,26 @@ function generateSkillsPage(ship) {
 
 function getShipByName(name) {
     for (let ship of Object.values(SHIPS)) {
-        if (ship.names.en && ship.names.en.toUpperCase() === name.toUpperCase()) return ship;
-        if (ship.names.jp && ship.names.jp.toUpperCase() === name.toUpperCase()) return ship;
-        if (ship.names.kr && ship.names.kr.toUpperCase() === name.toUpperCase()) return ship;
-        if (ship.names.cn && ship.names.cn.toUpperCase() === name.toUpperCase()) return ship;
-        if (ship.names.code && ship.names.code.toUpperCase() === name.toUpperCase()) return ship;
+        if (ship.names.en && normalize(ship.names.en.toUpperCase()) === normalize(name.toUpperCase())) return ship;
+        if (ship.names.jp && normalize(ship.names.jp.toUpperCase()) === normalize(name.toUpperCase())) return ship;
+        if (ship.names.kr && normalize(ship.names.kr.toUpperCase()) === normalize(name.toUpperCase())) return ship;
+        if (ship.names.cn && normalize(ship.names.cn.toUpperCase()) === normalize(name.toUpperCase())) return ship;
+        if (ship.names.code && normalize(ship.names.code.toUpperCase()) === normalize(name.toUpperCase())) return ship;
     }
     for (let ship of Object.values(SHIPS)) {
-        if (ship.names.en && ship.names.en.toUpperCase().includes(name.toUpperCase())) return ship;
-        if (ship.names.jp && ship.names.jp.toUpperCase().includes(name.toUpperCase())) return ship;
-        if (ship.names.kr && ship.names.kr.toUpperCase().includes(name.toUpperCase())) return ship;
-        if (ship.names.cn && ship.names.cn.toUpperCase().includes(name.toUpperCase())) return ship;
-        if (ship.names.code && ship.names.code.toUpperCase().includes(name.toUpperCase())) return ship;
+        if (ship.names.en && normalize(ship.names.en.toUpperCase()).includes(normalize(name.toUpperCase()))) return ship;
+        if (ship.names.jp && normalize(ship.names.jp.toUpperCase()).includes(normalize(name.toUpperCase()))) return ship;
+        if (ship.names.kr && normalize(ship.names.kr.toUpperCase()).includes(normalize(name.toUpperCase()))) return ship;
+        if (ship.names.cn && normalize(ship.names.cn.toUpperCase()).includes(normalize(name.toUpperCase()))) return ship;
+        if (ship.names.code && normalize(ship.names.code.toUpperCase()).includes(normalize(name.toUpperCase()))) return ship;
     }
     return null;
+}
+
+var combining = /[\u0300-\u036F]/g;
+
+function normalize(string) {
+    return string.normalize('NFKD').replace(combining, '');
 }
 
 function getMemoryByName(name) {
