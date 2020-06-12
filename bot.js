@@ -55,6 +55,8 @@ client.on('message', async msg => {
     if (!msg.channel.type === "text") return;
     if (!msg.guild && msg.author.id !== "456001047756800000") return; // Direct message from myself only
     if (msg.author.id === config.id) return; // Dont respond to bot's own messages
+    if (msg.channel.id === "720891248352952341" && !process.env.LOCAL) return; // skip if not testing locally
+
     let matcher = msg.content.replace(/[^\w ]+/g, '').trim().toLowerCase()
     if (msg.guild && msg.guild.id !== "642273802520231936" && Math.random() > .8) {
         if (config.SIMPLE_REPLIES[matcher])
@@ -89,7 +91,7 @@ client.on('message', async msg => {
     if (command === "pop" || command === "bubble" || command === "bubbles" || command === "bubble-pop") {
         sendBubblePop(msg, args);
     }
-    if (command === "ms" || command === "minesweeper") sendLongMessage(msg.channel, minesweeper.handleCommand(args, msg, PREFIX));
+    if (command === "ms" || command === "minesweeper") minesweeper.handleCommand(args, msg, PREFIX, sendLongMessage);
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
 
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
@@ -192,8 +194,9 @@ function join(parts, seperators, formatLength) {
     return str;
 }
 
-async function sendLongMessage(channel, msg) {
+async function sendLongMessage(channel, msg, objects) {
     console.log("Sending to [" + channel.id + "]\n" + msg);
+    objects = objects || [];
     let messages = [];
     let buffer = [];
     let size = 0;
@@ -209,8 +212,10 @@ async function sendLongMessage(channel, msg) {
     })
     messages.push(buffer.join("\n"));
     for (let i = 0; i < messages.length; i++) {
-        await channel.send(messages[i]);
+        if (objects[i]) await objects[i].edit(messages[i]);
+        else objects.push(await channel.send(messages[i]));
     }
+    return objects;
 }
 
 function sendBubblePop(msg, args) {
