@@ -164,8 +164,9 @@ async function sendLongMessage(channel, msg, objects) {
     messages.push(buffer.join("\n"));
     for (let i = 0; i < messages.length; i++) {
         if (messages[i].length > 2000) console.log("Died\n" + messages[i]);
-        if (objects[i] && objects[i].content !== messages[i]) await objects[i].edit(messages[i]);
-        else objects.push(await channel.send(messages[i]));
+        if (objects[i]) {
+            if (objects[i].content !== messages[i]) await objects[i].edit(messages[i]);
+        } else objects.push(await channel.send(messages[i]));
     }
     if (objects.length > messages.length) {
         objects.splice(messages.length).forEach(m => m.delete());
