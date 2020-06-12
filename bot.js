@@ -51,7 +51,7 @@ const OWO_24_MESSAGE_REGEX = /\*\*Ok <@!?\d+>, your numbers are: \`(\d \d \d \d)
 
 client.on('message', async msg => {
     let startTime = Date.now();
-    console.log(`=> Message "${msg.content}" received from ${msg.author.tag}.`);
+    console.log(`=> Message "${msg.content.replace('\n','\\n').substring(0,80)+(msg.content.length>80?"...":"")}" received from ${msg.author.tag}.`);
     if (!msg.channel.type === "text") return;
     if (!msg.guild && msg.author.id !== "456001047756800000") return; // Direct message from myself only
     if (msg.author.id === config.id) return; // Dont respond to bot's own messages
@@ -69,6 +69,7 @@ client.on('message', async msg => {
         solve24(processed, client);
         console.log("Solving for 24 " + processed);
     }
+    if (minesweeper.directControl(msg)) return; // ah yes first direct control command
     if (msg.content.indexOf(PREFIX) !== 0) return;
     console.log(`====== Message is a valid command.`);
     let args = msg.content.slice(1).trim().split(/\s+/g);
@@ -91,7 +92,7 @@ client.on('message', async msg => {
     if (command === "pop" || command === "bubble" || command === "bubbles" || command === "bubble-pop") {
         sendBubblePop(msg, args);
     }
-    if (command === "ms" || command === "minesweeper") minesweeper.handleCommand(args, msg, PREFIX, sendLongMessage);
+    if (command === "ms" || command === "minesweeper") minesweeper.handleCommand(args, msg, PREFIX);
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
 
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
@@ -195,23 +196,22 @@ function join(parts, seperators, formatLength) {
 }
 
 async function sendLongMessage(channel, msg, objects) {
-    console.log("Sending to [" + channel.id + "]\n" + msg);
     objects = objects || [];
     let messages = [];
     let buffer = [];
     let size = 0;
     msg.split("\n").forEach(line => {
-        if (size + line.length > 2000) {
+        if (size + line.length >= 2000) {
             size = 0;
             messages.push(buffer.join("\n"));
             buffer = [];
         }
         buffer.push(line);
         size += line.length + 1;
-        console.log("=> " + line + " <= " + size);
     })
     messages.push(buffer.join("\n"));
     for (let i = 0; i < messages.length; i++) {
+        if (messages[i].length > 2000) console.log("Died\n" + messages[i]);
         if (objects[i]) await objects[i].edit(messages[i]);
         else objects.push(await channel.send(messages[i]));
     }
