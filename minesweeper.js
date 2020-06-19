@@ -124,7 +124,7 @@ const Game = (owner, width, height, msg) => {
 }
 const GAMES = {};
 const CORDS_REGEX = /^c?[ ,]?([\d]+)[ ,]([\d]+)$/;
-const FLAG_CORDS_REGEX = /^f[ ,]([\d]+)[ ,]([\d]+)$/;
+const FLAG_CORDS_REGEX = /^f[ ,]?([\d]+)[ ,]([\d]+)$/;
 exports.handleCommand = function(args, msg, PREFIX) {
     let game = GAMES[msg.author.id];
     let command = args.shift()
