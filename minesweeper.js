@@ -162,22 +162,24 @@ exports.handleCommand = function(args, msg, PREFIX) {
     if (game) game.lastCommand = msg;
 }
 exports.directControl = function(msg) {
-    if (GAMES[msg.author.id] && GAMES[msg.author.id].listening) {
+    let game = GAMES[msg.author.id]
+    if (game && game.listening) {
         if (CORDS_REGEX.test(msg.content)) {
             let match = CORDS_REGEX.exec(msg.content);
             let x = parseInt(match[1]) - 1;
             let y = parseInt(match[2]) - 1;
-            GAMES[msg.author.id].click(x, y);
             msg.delete();
+            game.click(x, y);
             return true;
         } else if (FLAG_CORDS_REGEX.test(msg.content)) {
             let match = FLAG_CORDS_REGEX.exec(msg.content);
             let x = parseInt(match[1]) - 1;
             let y = parseInt(match[2]) - 1;
-            GAMES[msg.author.id].flag(x, y);
             msg.delete();
+            game.flag(x, y);
             return true;
         }
+        if (game.state !== 0) delete GAMES[msg.author.id];
     }
     return false;
 }
