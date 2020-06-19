@@ -155,7 +155,7 @@ exports.handleCommand = function(args, msg, PREFIX) {
             break;
         default:
             if (GAMES[msg.author.id]) GAMES[msg.author.id].clearDisplay();
-            GAMES[msg.author.id] = game = startGame(command, args[0] || command, msg);
+            else GAMES[msg.author.id] = game = startGame(command, args[0] || command, msg);
             game.refreshDisplay();
             break;
     }
