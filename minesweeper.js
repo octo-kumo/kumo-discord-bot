@@ -6,6 +6,7 @@ const Cell = (x, y, board, mine) => {
         y: y,
         sum: 0,
         opened: false,
+        flagged: false,
         mine: mine,
         init: function() {
             let neighbours = [];
@@ -24,9 +25,7 @@ const Cell = (x, y, board, mine) => {
             this.sum = neighbours.filter(c => c.mine).length;
         },
         display: function() {
-            return (this.opened ? '' : '||') +
-                (this.mine ? MINE : EMOTES[this.sum]) +
-                (this.opened ? '' : '||');
+            return this.flagged ? "<:fd:723468192785104916>" : (this.opened ? (this.mine ? MINE : EMOTES[this.sum]) : "<:uo:723468192785367040>");
         }
     };
 }
@@ -54,8 +53,25 @@ const Board = (width, height) => {
         height: height,
         numOfMines: numOfMines,
         cells: cells,
+        checkState: function() {
+            let unopened = 0;
+            let flagged = 0;
+            for (let y = 0; y < this.height; y++) {
+                for (let x = 0; x < this.width; x++) {
+                    let cell = this.cells[y][x];
+                    if (cell.opened && cell.mine) {
+                        return -1;
+                    }
+                    if (!cell.opened) unopened += 1;
+                    if (cell.mine && cell.flagged) flagged += 1;
+                }
+            }
+            if (unopened == numOfMines) return 1;
+            if (flagged == numOfMines) return 1;
+            return 0;
+        },
         click: function(x, y, recursive) {
-            if (x >= 0 && x < width && y >= 0 && y < height && !this.cells[y][x].opened) {
+            if (x >= 0 && x < width && y >= 0 && y < height && !this.cells[y][x].opened && !this.cells[y][x].flagged) {
                 this.cells[y][x].opened = true;
                 if (this.cells[y][x].sum != 0) return;
                 this.click(x + 1, y, true);
@@ -69,6 +85,13 @@ const Board = (width, height) => {
             } else {
                 return;
             }
+        },
+        flag: function(x, y) {
+            if (x >= 0 && x < width && y >= 0 && y < height && !this.cells[y][x].opened) {
+                this.cells[y][x].flagged = true;
+            } else {
+                return;
+            }
         }
     };
 }
@@ -78,12 +101,21 @@ const Game = (owner, width, height, msg) => {
         board: Board(width, height),
         listening: true,
         messages: [],
+        state: 0,
         click: function(x, y) {
+            if (this.state !== 0) return;
             this.board.click(x, y);
+            this.state = this.board.checkState();
+            return this.refreshDisplay();
+        },
+        flag: function(x, y) {
+            if (this.state !== 0) return;
+            this.board.flag(x, y);
+            this.state = this.board.checkState();
             return this.refreshDisplay();
         },
         refreshDisplay: function() {
-            return sendLongMessage(msg.channel, render(this.board, msg.author.username), this.messages);
+            return sendLongMessage(msg.channel, render(this.board, msg.author.username, this.state), this.messages);
         },
         clearDisplay: function() {
             while (this.messages.length > 0) this.messages.pop().delete();
@@ -92,6 +124,7 @@ const Game = (owner, width, height, msg) => {
 }
 const GAMES = {};
 const CORDS_REGEX = /^([\d]+)[ ,]([\d]+)$/;
+const FLAG_CORDS_REGEX = /^f([\d]+)[ ,]([\d]+)$/;
 exports.handleCommand = function(args, msg, PREFIX) {
     let game = GAMES[msg.author.id];
     let command = args.shift()
@@ -116,10 +149,12 @@ exports.handleCommand = function(args, msg, PREFIX) {
             break;
         case "start":
         case "s":
+            if (GAMES[msg.author.id]) GAMES[msg.author.id].clearDisplay();
             GAMES[msg.author.id] = game = startGame(args[0], args[1] || args[0], msg);
             game.refreshDisplay();
             break;
         default:
+            if (GAMES[msg.author.id]) GAMES[msg.author.id].clearDisplay();
             GAMES[msg.author.id] = game = startGame(command, args[0] || command, msg);
             game.refreshDisplay();
             break;
@@ -127,24 +162,43 @@ exports.handleCommand = function(args, msg, PREFIX) {
     if (game) game.lastCommand = msg;
 }
 exports.directControl = function(msg) {
-    if (GAMES[msg.author.id] && GAMES[msg.author.id].listening && CORDS_REGEX.test(msg.content)) {
-        let match = CORDS_REGEX.exec(msg.content);
-        let x = parseInt(match[1]) - 1;
-        let y = parseInt(match[2]) - 1;
-        GAMES[msg.author.id].click(x, y);
-        msg.delete();
-        return true;
-    } else return false;
+    if (GAMES[msg.author.id] && GAMES[msg.author.id].listening) {
+        if (CORDS_REGEX.test(msg.content)) {
+            let match = CORDS_REGEX.exec(msg.content);
+            let x = parseInt(match[1]) - 1;
+            let y = parseInt(match[2]) - 1;
+            GAMES[msg.author.id].click(x, y);
+            msg.delete();
+            return true;
+        } else if (FLAG_CORDS_REGEX.test(msg.content)) {
+            let match = FLAG_CORDS_REGEX.exec(msg.content);
+            let x = parseInt(match[1]) - 1;
+            let y = parseInt(match[2]) - 1;
+            GAMES[msg.author.id].flag(x, y);
+            msg.delete();
+            return true;
+        }
+    }
+    return false;
 }
 
 function startGame(width, height, msg) {
     return Game(msg.author.id, width, height, msg);
 }
 
-function render(board, username) {
-    return `__**Minesweeper ${board.width}×${board.height}**__ (${board.numOfMines} mines)\n` +
-        board.cells.map(row => row.map(cell => cell.display()).join("")).join("\n") +
-        "\nGambatte " + username + "!";
+function render(board, username, state) {
+    return `__**Minesweeper ${board.width}×${board.height}**__ (${board.numOfMines} mines)\n` + genColLabels(board.width) + "\n" +
+        board.cells.map((row, y) => ":" + numbersToEng[(y + 1) % 10] + ":" + row.map(cell => cell.display()).join("")).join("\n") +
+        (state === 0 ? "\nGambatte " + username + "!" : state === 1 ? "\n**Subarashii!** " + username + " has won!" : "\n***You died*** " + username);
+}
+const numbersToEng = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+
+function genColLabels(width) {
+    let str = ":zero:";
+    for (let i = 0; i < width; i++) {
+        str += ":" + numbersToEng[(i + 1) % 10] + ":";
+    }
+    return str;
 }
 
 async function sendLongMessage(channel, msg, objects) {
