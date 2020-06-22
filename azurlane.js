@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
+const fetch = require('node-fetch')
 const config = require('./config.js').config;
-const SHIPS = require('./ships.json');
+var SHIPS;
 const CHAPTERS = require('./chapters.json');
 const MEMORIES = require('./memories.json');
 const generateFilter = require('./generateFilter.js').generateFilter;
@@ -41,8 +42,10 @@ const TRANSLATION = {
     "Anti-submarine warfare": "Anti-Sub"
 };
 const BOOKS = {};
-
-exports.ships = SHIPS;
+exports.init = async function() {
+    await fetch("https://raw.githubusercontent.com/AzurAPI/azurapi-js-setup/master/ships.json").then(res => res.json()).then(json => SHIPS = json);
+    console.log("Updated Ship Data");
+}
 exports.handleCommand = async function(args, msg, PREFIX) {
     try {
         console.log("running azurlane sub-system...");
@@ -134,6 +137,9 @@ exports.handleCommand = async function(args, msg, PREFIX) {
                     message.edit(book.pages[book.page += incre]).catch(e => {});;
                 });
             }).catch(e => {});
+        } else if (args[0] === "reload" && msg.author.id === "456001047756800000") {
+            await exports.init();
+            msg.reply("Azurlane Data has been reloaded!")
         } else {
             let book = generateBook(args.join(" "));
             if (!book) return msg.reply("Is that a ship from another world?");

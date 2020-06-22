@@ -38,6 +38,7 @@ client.on('ready', () => {
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     config.HOOK2 = new Discord.WebhookClient('676309488021798912', process.env.HKTOKEN2);
     config.id = client.user.id;
+    azurlane.init();
     // coursemology.init();
     // setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
     const covidChannel = client.guilds.get('642273802520231936').channels.get('693051246885470209');
