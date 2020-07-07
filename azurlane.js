@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const fetch = require('node-fetch')
+const fetch = require('node-fetch');
 const config = require('./config.js').config;
 var SHIPS;
 const CHAPTERS = require('./chapters.json');

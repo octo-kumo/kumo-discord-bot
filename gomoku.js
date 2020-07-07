@@ -112,7 +112,9 @@ function join(msg, side, success) {
 class Gomoku {
     constructor(id, size, winLength) {
         if (size && typeof(size) === "string") size = parseInt(size);
+        size = Math.min(Math.max(size, 3), 19);
         if (winLength && typeof(winLength) === "string") winLength = parseInt(winLength);
+        winLength = Math.min(Math.max(winLength, 3), size);
         this.id = id;
         this.size = size || 10;
         this.gameBoard = generateArray(this.size);
