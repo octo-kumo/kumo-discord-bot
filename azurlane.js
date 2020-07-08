@@ -141,9 +141,10 @@ exports.handleCommand = async function(args, msg, PREFIX) {
             await exports.init();
             msg.reply("Azurlane Data has been reloaded!")
         } else if (args[0] === "json") {
-            const ship = getShipByName(name);
+            args.shift();
+            const ship = getShipByName(args.join(" "));
             if (!ship) return null;
-            sendLongCode(msg.channel, JSON.stringify(ship, null, '\t'), "json");
+            await sendLongCode(msg.channel, JSON.stringify(ship, null, '\t'), "json");
         } else {
             let book = generateBook(args.join(" "));
             if (!book) return msg.reply("Is that a ship from another world?");
@@ -495,8 +496,9 @@ function getShipByName(name) {
     return null;
 }
 
-function sendLongCode(channel, code, tag) {
+async function sendLongCode(channel, code, tag) {
     let buffer = [];
+    let messages = [];
     let size = 0;
     code.split("\n").forEach(line => {
         if (size + line.length >= 2000 - 8 - tag.length) {
@@ -507,7 +509,7 @@ function sendLongCode(channel, code, tag) {
         buffer.push(line);
         size += line.length + 1;
     });
-    messages.push(buffer.join("\n"));
+    messages.push("```" + tag + "\n" + buffer.join("\n") + "\n```");
     for (let i = 0; i < messages.length; i++) {
         await channel.send(messages[i]);
     }
