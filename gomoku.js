@@ -48,7 +48,7 @@ exports.handleCommand = function(args, msg, PREFIX) {
                             let user = r.users.filter(u => u.id !== config.id).first();
                             let side = r.emoji.name === "⚫" ? "black" : "white";
                             console.log(user.tag + " has joined the game as " + side);
-                            join(msg, side, () => r.removeAll());
+                            join(user, msg.channel, side, () => r.removeAll());
                         });
                     });
                 msg.delete();
@@ -58,7 +58,7 @@ exports.handleCommand = function(args, msg, PREFIX) {
             break;
         case "join":
         case "j":
-            if (GAMES.hasOwnProperty(msg.channel.id)) join(msg, args[0], () => msg.delete());
+            if (GAMES.hasOwnProperty(msg.channel.id)) join(msg.author, msg.channel, args[0], () => msg.delete());
             else msg.reply("There are no games yet, start with `" + PREFIX + "gomoku start`");
             break;
         case "leave":
@@ -111,16 +111,16 @@ exports.handleCommand = function(args, msg, PREFIX) {
     }
 }
 
-function join(msg, side, success) {
+function join(author, channel, side, success) {
     try {
         if (side === "b") side = "black";
         if (side === "w") side = "white";
-        let game = GAMES[msg.channel.id];
-        game.join(msg.author.id, side);
-        msg.channel.send("<@" + msg.author.id + "> has joined the game as " + side + "!");
+        let game = GAMES[channel.id];
+        game.join(author.id, side);
+        channel.send("<@" + author.id + "> has joined the game as " + side + "!");
         if (game.hasStarted()) {
-            msg.channel.send("> **The game has started!**\nPlaying as black: <@" + game.players.black + ">\nPlaying as white: <@" + game.players.white + ">");
-            sendLongMessage(msg.channel, game.toString(), game.boardMessages).then(messages => game.boardMessages = messages);
+            channel.send("> **The game has started!**\nPlaying as black: <@" + game.players.black + ">\nPlaying as white: <@" + game.players.white + ">");
+            sendLongMessage(channel, game.toString(), game.boardMessages).then(messages => game.boardMessages = messages);
         }
         success();
     } catch (err) {
