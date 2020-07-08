@@ -227,7 +227,7 @@ class Gomoku {
         if (winner) return this.winner = winner;
 
         let shiftRight = [];
-        for (let y = 0; y < this.size; y++) shiftRight[y] = this.gameBoard[y].slice(this.size - 1 - y);
+        for (let y = 0; y < this.size; y++) shiftRight[y] = this.gameBoard[y].slice(0, this.size - 1 - y);
         winner = this.checkWinVertical(shiftRight);
         return this.winner = winner;
     }
