@@ -2,7 +2,32 @@ const Discord = require('discord.js');
 const config = require('./config.js').config;
 
 const GAMES = {};
+const CORDS_REGEX = /^c?[ ,]?([\d]+)[ ,]([\d]+)$/;
 const filter = (reaction, user) => ['⚫', '⚪'].includes(reaction.emoji.name) && user.id !== config.id;
+
+exports.directControl = function(msg) {
+    let game = GAMES[msg.channel.id]
+    if (game) {
+        if (CORDS_REGEX.test(msg.content)) {
+            try {
+                let match = CORDS_REGEX.exec(msg.content);
+                let x = parseInt(match[1]) - 1;
+                let y = parseInt(match[2]) - 1;
+                game.play(x, y, msg.author.id);
+                sendLongMessage(msg.channel, game.toString(), game.boardMessages).then(messages => game.boardMessages = messages);
+                if (game.checkWinStatus()) {
+                    msg.channel.send("<@" + game.players[game.winner] + "> has won the game!");
+                    delete GAMES[msg.channel.id];
+                }
+                msg.delete();
+                return true;
+            } catch (err) {
+                return false;
+            }
+        }
+    }
+    return false;
+}
 
 exports.handleCommand = function(args, msg, PREFIX) {
     console.log("running gomoku sub-system...");
@@ -58,13 +83,8 @@ exports.handleCommand = function(args, msg, PREFIX) {
             if (GAMES.hasOwnProperty(msg.channel.id)) try {
                 let game = GAMES[msg.channel.id];
                 game.play(args[0], args[1], msg.author.id);
-                if (!game.boardMessage)
-                    msg.channel.send(game.toString()).then(message => game.boardMessage = message);
-                else game.boardMessage.edit(game.toString());
-
-                if (game.checkWinStatus()) {
-                    msg.channel.send("<@" + game.players[game.winner] + "> has won the game!");
-                }
+                sendLongMessage(msg.channel, game.toString(), game.boardMessages).then(messages => game.boardMessages = messages);
+                if (game.checkWinStatus()) msg.channel.send("<@" + game.players[game.winner] + "> has won the game!");
                 msg.delete();
             } catch (err) {
                 console.log(err);
@@ -100,7 +120,7 @@ function join(msg, side, success) {
         msg.channel.send("<@" + msg.author.id + "> has joined the game as " + side + "!");
         if (game.hasStarted()) {
             msg.channel.send("> **The game has started!**\nPlaying as black: <@" + game.players.black + ">\nPlaying as white: <@" + game.players.white + ">");
-            msg.channel.send(game.toString()).then(message => game.boardMessage = message);
+            sendLongMessage(msg.channel, game.toString(), game.boardMessages).then(messages => game.boardMessages = messages);
         }
         success();
     } catch (err) {
@@ -166,7 +186,7 @@ class Gomoku {
         x = parseInt(x);
         y = parseInt(y);
         if (x >= this.size || y >= this.size || x < 0 || y < 0) throw "The board is " + this.size + "×" + this.size;
-        if (this.gameBoard[y][x]) throw "There is already a piece at " + x + ", " + y;
+        if (this.gameBoard[y][x] !== " ") throw "There is already a piece at " + x + ", " + y;
         this.gameBoard[y][x] = this.toPlay === "black" ? 'x' : 'o';
         this.toPlay = this.toPlay === "black" ? "white" : "black";
         this.history.push({
@@ -248,30 +268,60 @@ class Gomoku {
     }
 
     toString() {
-        let heading = [];
-        for (let j = 0; j < this.size; j++) {
-            heading.push(j.toString().padEnd(2, "_"));
-        }
-        let str = [];
-        str.push("  |" + heading.join("_") + "|");
-        for (let i = 0; i < this.size; i++) {
-            let line = [];
-            for (let j = 0; j < this.size; j++) {
-                line.push((this.gameBoard[i][j] || "").padEnd(2, "_"));
-            }
-            str.push(i.toString().padEnd(2, " ") + "|" + line.join("|") + "|");
-        }
-        return "```\n" + str.join("\n") + "\n```";
+        return genColLabels(this.size) + "\n" +
+            this.gameBoard.map((row, y) => ":" + numbersToEng[(y + 1) % 10] + ":" + row.map(cell => pieceToEmote[cell]).join("")).join("\n") + "\nMay the winner have good luck!";
     }
 }
+const numbersToEng = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+const pieceToEmote = {
+    "x": "<:pb:730333382797557782>",
+    "o": "<:pw:730333382981976104>",
+    " ": "<:gd:730327232735608843>"
+};
+
+function genColLabels(width) {
+    let str = ":zero:";
+    for (let i = 0; i < width; i++) {
+        str += ":" + numbersToEng[(i + 1) % 10] + ":";
+    }
+    return str;
+}
+
 
 function generateArray(size) {
     let array = [];
     for (let i = 0; i < size; i++) {
         array[i] = [];
         for (let j = 0; j < size; j++) {
-            array[i][j] = null;
+            array[i][j] = " ";
         }
     }
     return array;
+}
+
+async function sendLongMessage(channel, msg, objects) {
+    objects = objects || [];
+    let messages = [];
+    let buffer = [];
+    let size = 0;
+    msg.split("\n").forEach(line => {
+        if (size + line.length >= 2000) {
+            size = 0;
+            messages.push(buffer.join("\n"));
+            buffer = [];
+        }
+        buffer.push(line);
+        size += line.length + 1;
+    })
+    messages.push(buffer.join("\n"));
+    for (let i = 0; i < messages.length; i++) {
+        if (messages[i].length > 2000) console.log("Died\n" + messages[i]);
+        if (objects[i]) {
+            if (objects[i].content !== messages[i]) await objects[i].edit(messages[i]);
+        } else objects.push(await channel.send(messages[i]));
+    }
+    if (objects.length > messages.length) {
+        objects.splice(messages.length).forEach(m => m.delete());
+    }
+    return objects;
 }

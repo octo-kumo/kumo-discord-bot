@@ -71,6 +71,7 @@ client.on('message', async msg => {
         console.log("Solving for 24 " + processed);
     }
     if (minesweeper.directControl(msg)) return; // ah yes first direct control command
+    if (gomoku.directControl(msg)) return;
     if (msg.content.indexOf(PREFIX) !== 0) return;
     console.log(`====== Message is a valid command.`);
     let args = msg.content.slice(1).trim().split(/\s+/g);
