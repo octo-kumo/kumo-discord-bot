@@ -140,6 +140,10 @@ exports.handleCommand = async function(args, msg, PREFIX) {
         } else if (args[0] === "reload" && msg.author.id === "456001047756800000") {
             await exports.init();
             msg.reply("Azurlane Data has been reloaded!")
+        } else if (args[0] === "json") {
+            const ship = getShipByName(name);
+            if (!ship) return null;
+            sendLongCode(msg.channel, JSON.stringify(ship, null, '\t'), "json");
         } else {
             let book = generateBook(args.join(" "));
             if (!book) return msg.reply("Is that a ship from another world?");
@@ -489,6 +493,24 @@ function getShipByName(name) {
         if (ship.names.code && normalize(ship.names.code.toUpperCase()).includes(normalize(name.toUpperCase()))) return ship;
     }
     return null;
+}
+
+function sendLongCode(channel, code, tag) {
+    let buffer = [];
+    let size = 0;
+    code.split("\n").forEach(line => {
+        if (size + line.length >= 2000 - 8 - tag.length) {
+            size = 0;
+            messages.push("```" + tag + "\n" + buffer.join("\n") + "\n```");
+            buffer = [];
+        }
+        buffer.push(line);
+        size += line.length + 1;
+    });
+    messages.push(buffer.join("\n"));
+    for (let i = 0; i < messages.length; i++) {
+        await channel.send(messages[i]);
+    }
 }
 
 var combining = /[\u0300-\u036F]/g;
