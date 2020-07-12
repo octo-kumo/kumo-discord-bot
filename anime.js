@@ -63,7 +63,10 @@ const RESULT_CACHE_MESSAGE = {};
 async function handleSearch(args, msg) {
     if (Date.now() - last_req < 2000) return msg.reply("Please wait " + (Date.now() - last_req) + "ms.");
 
-    if (RESULT_CACHE_MESSAGE[msg.channel.id]) await RESULT_CACHE_MESSAGE[msg.channel.id].delete();
+    if (RESULT_CACHE_MESSAGE[msg.channel.id]) {
+        await RESULT_CACHE_MESSAGE[msg.channel.id].delete();
+        delete RESULT_CACHE_MESSAGE[msg.channel.id];
+    }
     let results;
     if (SUPPORTED_TYPES.includes(args[0])) results = await search(args.slice(1).join(" "), args[0]);
     else if (isNaN(args[0]) || !RESULT_CACHE[msg.channel.id]) results = await search(args.join(" "));
@@ -143,7 +146,7 @@ function sendManga(manga) {
 
     embed.addField("Status", manga.status, true);
     if (manga.volumes && manga.volumes > 1) embed.addField("Volumes", manga.volumes, true);
-    embed.addField("Chapters", manga.chapters, true);
+    embed.addField("Chapters", manga.chapters || "Unknown", true);
     let start = manga.published.from ? moment(manga.published.from).format("MMM YYYY") : null;
     let end = manga.published.to ? moment(manga.published.to).format("MMM YYYY") : null;
     embed.addField("Published", start === end || (!end) ? start ? start : "Unknown" : start + " → " + end, true);
