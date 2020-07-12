@@ -25,21 +25,25 @@ function anime(id) {
 
 exports.handleCommand = (args, msg, prefix) => {
     if (args.length === 0) return msg.reply(`Correct Usage: \`${prefix}anime (action)? (type)? name?\`\nFor supported params: \`${prefix}anime types|actions\``);
-    switch (args[0]) {
-        case "search":
-        case "s":
-            args.shift();
-            handleSearch(args, msg).then(e => msg.channel.send(e));
-            break;
-        case "actions":
-            msg.channel.send("Supported Actions\n```search```");
-            break;
-        case "types":
-            msg.channel.send("Supported Types\n```" + SUPPORTED_TYPES.join(" ") + "```");
-            break;
-        default:
-            handleSearch(args, msg).then(e => msg.channel.send(e));
-            break;
+    try {
+        switch (args[0]) {
+            case "search":
+            case "s":
+                args.shift();
+                handleSearch(args, msg).then(e => msg.channel.send(e));
+                break;
+            case "actions":
+                msg.channel.send("Supported Actions\n```search```");
+                break;
+            case "types":
+                msg.channel.send("Supported Types\n```" + SUPPORTED_TYPES.join(" ") + "```");
+                break;
+            default:
+                handleSearch(args, msg).then(e => msg.channel.send(e));
+                break;
+        }
+    } catch (err) {
+        msg.channel.send("I went off into the abyss");
     }
 };
 
