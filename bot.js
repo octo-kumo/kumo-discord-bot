@@ -95,7 +95,7 @@ client.on('message', async msg => {
     if (command === "pop" || command === "bubble" || command === "bubbles" || command === "bubble-pop") {
         sendBubblePop(msg, args);
     }
-    if (command === "anime" || command === "a") anime.handleCommand(args, msg, PREFIX);
+    if (command === "anime" || command === "a") await anime.handleCommand(args, msg, PREFIX);
     if (command === "ms" || command === "minesweeper") minesweeper.handleCommand(args, msg, PREFIX);
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
 
