@@ -9,13 +9,16 @@ const Discord = require('discord.js');
 const API_URL = "https://api.jikan.moe/v3";
 const SUPPORTED_TYPES = ["tv", "manga", "ova", "novel", "movie", "oneshot", "special", "doujin", "ona", "manhwa", "music", "manhua"];
 
-function search(q, type = "anime", page = 1) {
-    var url = new URL(API_URL + "/search/" + type);
+function search(q, type, page = 1) {
+    console.log("search", `"${q}"`, type, page);
+    var url = new URL(API_URL + "/search/" + (SUPPORTED_TYPES.indexOf(type) % 2 === 0 ? "anime" : "manga"));
     var params = {
         q: q && q.trim().length !== 0 ? q : undefined,
+        type: type && type.trim().length !== 0 ? type : undefined,
         page: page
     }
     url.search = new URLSearchParams(params).toString();
+    console.log("final url =", url.href);
     return fetch(url).then(res => res.json());
 }
 
