@@ -12,7 +12,7 @@ const SUPPORTED_TYPES = ["tv", "manga", "ova", "novel", "movie", "oneshot", "spe
 function search(q, type = "anime", page = 1) {
     var url = new URL(API_URL + "/search/" + type);
     var params = {
-        q: q ? q : undefined,
+        q: q && q.trim().length !== 0 ? q : undefined,
         page: page
     }
     url.search = new URLSearchParams(params).toString();
@@ -48,7 +48,7 @@ const RESULT_CACHE_MESSAGE = {};
 async function handleSearch(args, msg) {
     if (RESULT_CACHE_MESSAGE[msg.channel.id]) RESULT_CACHE_MESSAGE[msg.channel.id].delete();
     let results;
-    if (SUPPORTED_TYPES.includes(args[0])) results = await search(args.slice(1, args.length - 1).join(" "), args[0]);
+    if (SUPPORTED_TYPES.includes(args[0])) results = await search(args.slice(1).join(" "), args[0]);
     else if (isNaN(args[0])) results = await search(args.join(" "));
     else {
         results = RESULT_CACHE[msg.channel.id];
