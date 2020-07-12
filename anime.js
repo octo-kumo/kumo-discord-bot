@@ -163,4 +163,4 @@ function sendManga(manga) {
     return embed;
 }
 
-const truncate = (input) => input.length > 400 ? `${input.substring(0, 400)}...` : input;
+const truncate = (input) => input ? input.length > 400 ? `${input.substring(0, 400)}...` : input : "";
