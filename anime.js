@@ -77,7 +77,7 @@ async function handleSearch(args, msg) {
         console.log("selecting anime from list");
         results = RESULT_CACHE[msg.channel.id];
         let result = results.results[parseInt(args[0]) - 1];
-        if (SUPPORTED_TYPES.indexOf(String(type).toLowerCase()) % 2 === 0) await msg.channel.send(sendAnime(await anime(result.mal_id)));
+        if (SUPPORTED_TYPES.indexOf(String(result.type).toLowerCase()) % 2 === 0) await msg.channel.send(sendAnime(await anime(result.mal_id)));
         else await msg.channel.send(sendManga(await manga(result.mal_id)));
         return;
     }
