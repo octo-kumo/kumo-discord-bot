@@ -418,11 +418,11 @@ function generateGenInfoPage(ship) {
         .addField("Nation", ship.nationality, true)
         .addField("Class", ship.class, true)
         .addField("Type", ship.hullType, true);
-    if (ship.misc.artist) generalInfo.addField("Artist", ship.misc.artist, true);
-    if (ship.misc.web) generalInfo.addField("Web", ship.misc.web.name, true);
-    if (ship.misc.pixiv) generalInfo.addField("Pixiv", ship.misc.pixiv.name, true);
-    if (ship.misc.twitter) generalInfo.addField("Twitter", ship.misc.twitter.name, true);
-    if (ship.misc.voice) generalInfo.addField("Voice Actress", ship.misc.voice.name, true);
+    if (ship.misc.artist) generalInfo.addField("Artist", `[${ship.misc.artist.name}](${ship.misc.artist.url})`, true);
+    if (ship.misc.web) generalInfo.addField("Web", `[${ship.misc.web.name}](${ship.misc.web.url})`, true);
+    if (ship.misc.pixiv) generalInfo.addField("Pixiv", `[${ship.misc.pixiv.name}](${ship.misc.pixiv.url})`, true);
+    if (ship.misc.twitter) generalInfo.addField("Twitter", `[${ship.misc.twitter.name}](${ship.misc.twitter.url})`, true);
+    if (ship.misc.voice) generalInfo.addField("Voice Actress", `[${ship.misc.voice.name}](${ship.misc.voice.url})`, true);
     generalInfo.addField("Construction Time / Obtained From", ship.construction.constructionTime);
     return generalInfo;
 }
@@ -459,20 +459,19 @@ function generateSkillsPage(ship) {
     for (let i = 0; i < ship.skills.length; i++) {
         let skill = ship.skills[i];
         let skill_field = creatSkillField(skill);
-        skills_limits_eq.addField((i === 0 ? "> **Skills**\n" : "") + skill_field.name, skill_field.value, true);
+        skills_limits_eq.addField((i === 0 ? "> **Skills**\n" : "") + skill_field.name, skill_field.value, ship.skills.length - 1 !== i);
     }
     if (ship.rarity === "Priority" || ship.rarity === "Decisive") {
-        skills_limits_eq.addField("> **Development Levels**", "\u200B");
         let keys = Object.keys(ship.devLevels);
         for (let i = 0; i < keys.length; i++) {
             let level = keys[i];
             let delv_field = createDevLevelField(level, ship.devLevels[level]);
-            skills_limits_eq.addField((i === 0 ? "> **Development Levels**\n" : "") + delv_field.name, delv_field.value, true);
+            skills_limits_eq.addField((i === 0 ? "> **Development Levels**\n" : "") + delv_field.name, delv_field.value, keys.length - 1 !== i);
         }
     } else {
         for (let i = 0; i < ship.limitBreaks.length; i++) {
             let limit_field = creatLimitField(i + 1, ship.limitBreaks[i]);
-            skills_limits_eq.addField((i === 0 ? "> **Limit Breaks**\n" : "") + limit_field.name, limit_field.value, true);
+            skills_limits_eq.addField((i === 0 ? "> **Limit Breaks**\n" : "") + limit_field.name, limit_field.value, ship.limitBreaks.length - 1 !== i);
         }
     }
     return skills_limits_eq;
