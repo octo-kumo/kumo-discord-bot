@@ -11,7 +11,7 @@ const SUPPORTED_TYPES = ["tv", "manga", "ova", "novel", "movie", "oneshot", "spe
 
 function search(q, type, page = 1) {
     console.log("search", `"${q}"`, type, page);
-    var url = new URL(API_URL + "/search/" + (SUPPORTED_TYPES.indexOf(type) % 2 === 0 ? "anime" : "manga"));
+    var url = new URL(API_URL + "/search/" + (SUPPORTED_TYPES.indexOf(type) % 2 === 0 || (!type) ? "anime" : "manga"));
     var params = {
         q: q && q.trim().length !== 0 ? q : undefined,
         type: type && type.trim().length !== 0 ? type : undefined,
