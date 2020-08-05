@@ -120,12 +120,12 @@ function sendAnime(anime) {
     let end = anime.aired.to ? moment(anime.aired.to).format("MMM YYYY") : null;
     embed.addField("Aired", start === end || (!end) ? start ? start : "Unknown" : start + " → " + end, true);
 
-    embed.addField("Producers", anime.producers.map(producer => producer.name).join(", "))
-    embed.addField("Studios", anime.studios.map(studio => studio.name).join("\n"));
-    embed.addField("Genres", anime.genres.map(genre => genre.name).join(" "));
+    embed.addField("Producers", anime.producers.map(producer => producer.name).join(", ") || "*None*")
+    embed.addField("Studios", anime.studios.map(studio => studio.name).join("\n") || "*None*");
+    embed.addField("Genres", anime.genres.map(genre => genre.name).join(" ") || "*None*");
 
-    embed.addField("OP", anime.opening_themes.join("\n"));
-    embed.addField("ED", anime.ending_themes.join("\n"));
+    embed.addField("OP", anime.opening_themes.join("\n") || "*None*");
+    embed.addField("ED", anime.ending_themes.join("\n") || "*None*");
 
     embed.setDescription(truncate(anime.synopsis));
     return embed;
