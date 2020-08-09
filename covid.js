@@ -76,7 +76,8 @@ const SHORT_NAMES = {
 }
 
 const LONG_NAMES = {
-    "United Kingdom": "UK"
+    "United Kingdom": "UK",
+    "South Africa": "S. Africa"
 }
 
 async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
@@ -118,9 +119,9 @@ async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
             else embed.setDescription("_Accurate as of_\n**" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY') + "**");
             if (includeLeaderBoard) {
                 let desc = [];
-                desc.push("#  " + "Region".padEnd(7, " ") + " " + "Cases".padStart(6, " ") + " " + "Dead".padStart(6, " ") + " " + "Heal".padStart(6, " "))
+                desc.push("#  " + "Region".padEnd(9, " ") + " " + "Cases".padStart(6, " ") + " " + "Dead".padStart(6, " ") + " " + "Heal".padStart(6, " "))
                 for (let i = 0; i < 8; i++) {
-                    desc.push(`#${(i+1)} ${(LONG_NAMES[leaderBoard[i].region]?LONG_NAMES[leaderBoard[i].region]:leaderBoard[i].region).padEnd(7," ")} ${formatNumber(leaderBoard[i].confirmed).padStart(6," ")} ${formatNumber(leaderBoard[i].deaths).padStart(6," ")} ${formatNumber(leaderBoard[i].recovered).padStart(6," ")}`);
+                    desc.push(`#${(i+1)} ${(LONG_NAMES[leaderBoard[i].region]?LONG_NAMES[leaderBoard[i].region]:leaderBoard[i].region).padEnd(9," ")} ${formatNumber(leaderBoard[i].confirmed).padStart(6," ")} ${formatNumber(leaderBoard[i].deaths).padStart(6," ")} ${formatNumber(leaderBoard[i].recovered).padStart(6," ")}`);
                 }
                 embed.setDescription("Accurate as of **" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY') + "**\n" + "```" + desc.join("\n") + "```");
             }
