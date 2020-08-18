@@ -11,6 +11,7 @@ const timetable = require('./timetable.js');
 const anime = require('./anime.js');
 const minesweeper = require('./minesweeper.js');
 const solve24 = require('./solver24.js').solve24;
+const game24 = require('./24.js');
 
 // Constants
 const PREFIX = process.env.PREFIX || "!";
@@ -73,6 +74,7 @@ client.on('message', async msg => {
     }
     if (minesweeper.directControl(msg)) return; // ah yes first direct control command
     if (gomoku.directControl(msg)) return;
+    if (game24.directControl(msg)) return;
     if (msg.content.indexOf(PREFIX) !== 0) return;
     console.log(`====== Message is a valid command.`);
     let args = msg.content.slice(1).trim().split(/\s+/g);
@@ -110,6 +112,7 @@ client.on('message', async msg => {
         console.log("Chain !?: end command = " + command.substring(1));
         gomoku.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
     }
+    if (command === "24") game24.handleCommand(args, msg, PREFIX);
     if (command === "waifulabs") waifulabs.newBatch(msg);
     if (command === "timetable" || command === "tt") timetable.handleCommand(args, msg, PREFIX);
     if (msg.author.id === "456001047756800000" && (command === "toggledebug" || command === "td")) {

@@ -98,6 +98,30 @@ function showsolution(s, client) {
     console.log("24 solved! Result = " + out);
 }
 
+function getsolution() {
+    var x = 0,
+        p = 0,
+        lp = 0,
+        v = 0;
+    while (x < 4) {
+        if (x < 3) {
+            lp = p;
+            p = getpriority(x);
+            v = p - lp;
+            if (v > 0) parenth(v);
+        }
+        out += ar[x];
+        if (x < 3) {
+            if (v < 0) parenth(v);
+            out += oper.charAt(op[x]);
+        }
+        ++x;
+    }
+    parenth(-p);
+    return out.replace(/\(\((.+)\)\)/g, '$1');
+}
+
+
 function solve24(s, client) {
     let original = s;
     s = s.replace(/[^0-9]/g, '');
@@ -112,11 +136,29 @@ function solve24(s, client) {
         op[2] = (r >> 4) & 3;
         shuffle("ar", 4);
         shuffle("order", 3);
-        if (calc() != 24) continue;
+        if (calc() !== 24) continue;
         showsolution(s, client);
         return;
     }
     client.users.get("456001047756800000").send(`No Possible Answers for \`${original}\`!`);
 }
 
+function solve24Array(arr) {
+    var z = 4;
+    while (z--) ar[z] = arr[z];
+    out = "";
+    for (z = 100000; z--;) {
+        r = rnd(256);
+        op[0] = r & 3;
+        op[1] = (r >> 2) & 3;
+        op[2] = (r >> 4) & 3;
+        shuffle("ar", 4);
+        shuffle("order", 3);
+        if (calc() !== 24) continue;
+        return getsolution();
+    }
+    return null;
+}
+
 exports.solve24 = solve24;
+exports.solve24Array = solve24Array;
