@@ -54,8 +54,8 @@ exports.handleCommand = async (args, msg, prefix) => {
             shuffle(msg);
             break;
         case "loop":
-            queues[msg.guild.id].loop = !queues[msg.guild.id].loop;
-            msg.reply("Looping = `" + queues[msg.guild.id].loop + "`");
+            queues[msg.guild.id].looping = !queues[msg.guild.id].looping;
+            msg.reply("Looping = `" + queues[msg.guild.id].looping + "`");
             break;
     }
     console.log("music sub-command finished");
