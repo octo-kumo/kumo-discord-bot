@@ -147,6 +147,7 @@ async function progressQueue(guild) {
     console.log("progressQueue()");
     let song = queue.songs[queue.index];
     if (!song) {
+        console.log(`looping=${queue.looping},index=${queue.index}`)
         if (queue.looping && queue.index !== 0) {
             console.log("Looping");
             queue.index = 0;
