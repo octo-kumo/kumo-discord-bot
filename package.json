@@ -5,7 +5,8 @@
     "main": "bot.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node bot.js"
+        "start": "node bot.js",
+        "local": "node local.js"
     },
     "repository": {
         "type": "git",
@@ -22,6 +23,7 @@
         "discord.js": "^11.6.2",
         "jsdom": "^15.2.1",
         "moment": "^2.24.0",
+        "mongoose": "^5.10.0",
         "node-fetch": "^2.6.0",
         "opusscript": ">=0.0.7",
         "request": "^2.88.2",

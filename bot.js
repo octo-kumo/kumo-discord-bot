@@ -1,17 +1,19 @@
 // Required dependencies
 const Discord = require('discord.js');
-const config = require('./config.js').config;
+const config = require('./commands/config.js').config;
 // const coursemology = require('./coursemology.js');
-const covid = require('./covid.js');
-const azurlane = require('./azurlane.js');
-const gomoku = require('./gomoku.js');
-const music = require('./music.js');
-const waifulabs = require('./waifulabs.js');
-const timetable = require('./timetable.js');
-const anime = require('./anime.js');
-const minesweeper = require('./minesweeper.js');
-const solve24 = require('./solver24.js').solve24;
-const game24 = require('./24.js');
+const covid = require('./commands/covid.js');
+const azurlane = require('./commands/azurlane.js');
+const gomoku = require('./commands/gomoku.js');
+const music = require('./commands/music.js');
+const waifulabs = require('./commands/waifulabs.js');
+const timetable = require('./commands/timetable.js');
+const anime = require('./commands/anime.js');
+const minesweeper = require('./commands/minesweeper.js');
+const solve24 = require('./commands/solver24.js').solve24;
+const game24 = require('./commands/24.js');
+
+const db = require('./db');
 
 // Constants
 const PREFIX = process.env.PREFIX || "!";
@@ -26,7 +28,10 @@ const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
     .addField(`${PREFIX}azurlane`, `Find information on your ship waifu\nUsage: \`${PREFIX}azurlane (ship-name)\``)
     .addField(`${PREFIX}azurlane find`, `Query for a list of ships\nUsage: \`${PREFIX}azurlane find (field=value)/(field>value)+\`\nSeperated by ',' (comma)`)
     // .addField(`${PREFIX}coursemology`, `Access Coursemology.\nUsage: \`${PREFIX}coursemology (info|list|user) [args]\``)
-    .addField(`${PREFIX}timetable`, `Access time table\nUsage: \`${PREFIX}timetable [next|now]? [classname]?\``)
+    // .addField(`${PREFIX}timetable`, `Access time table\nUsage: \`${PREFIX}timetable [next|now]? [classname]?\``)
+    .addField(`${PREFIX}24`, `Play 24 the number game\nUsage: \`${PREFIX}24\`, \`${PREFIX}24 impossible\``)
+    .addField(`${PREFIX}minesweeper`, `Play minesweeper the mine game\nUsage: \`${PREFIX}minesweeper <size>\`, \`<x> <y>\``)
+    .addField(`${PREFIX}gomoku`, `Play gomoku the monotone game\nUsage: \`${PREFIX}gomoku start <size> <win>\`, \`<x> <y>\``)
     .addField(`${PREFIX}sleep`, "Tell you whether or not you should sleep.")
 chainUpStdOut();
 console.log('====== ZY Discord Bot Started! ======');
