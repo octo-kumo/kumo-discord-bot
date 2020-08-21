@@ -49,11 +49,10 @@ exports.handleCommand = async (args, msg, prefix) => {
             list(msg);
             break;
         case "shuffle":
-        case "sf":
-        case "shfl":
             shuffle(msg);
             break;
         case "loop":
+            if (!queues[msg.guild.id]) return msg.reply("Nothing is playing");
             queues[msg.guild.id].looping = !queues[msg.guild.id].looping;
             msg.reply("Looping = `" + queues[msg.guild.id].looping + "`");
             break;
