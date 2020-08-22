@@ -21,13 +21,15 @@ exports.handleCommand = function (args, msg, PREFIX) {
                 .then(uuid => fetch("https://api.minetools.eu/profile/" + uuid))
                 .then(res => res.json())
                 .then(profile => {
-                    let embed = new Discord.RichEmbed();
-                    embed.setColor(hashStringToColor(profile.decoded.profileId));
-                    embed.setAuthor("User Info");
-                    embed.setThumbnail(`https://minotar.net/helm/${profile.decoded.profileName}/256.png`);
-                    embed.addField("Name", profile.decoded.profileName);
-                    embed.addField("UUID", '`' + profile.decoded.profileId + '`');
-                    msg.channel.send(embed);
+                    if (profile.decoded) {
+                        let embed = new Discord.RichEmbed();
+                        embed.setColor(hashStringToColor(profile.decoded.profileId));
+                        embed.setAuthor("User Info");
+                        embed.setThumbnail(`https://minotar.net/helm/${profile.decoded.profileName}/256.png`);
+                        embed.addField("Name", profile.decoded.profileName);
+                        embed.addField("UUID", '`' + profile.decoded.profileId + '`');
+                        msg.channel.send(embed);
+                    } else msg.reply("Who is that?");
                 });
     }
 }
