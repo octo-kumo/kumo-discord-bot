@@ -5,6 +5,7 @@ const config = require('./commands/config.js').config;
 const covid = require('./commands/covid.js');
 const azurlane = require('./commands/azurlane.js');
 const gomoku = require('./commands/gomoku.js');
+const minecraft = require('./commands/minecraft.js');
 const music = require('./commands/music.js');
 const waifulabs = require('./commands/waifulabs.js');
 const timetable = require('./commands/timetable.js');
@@ -59,7 +60,7 @@ const OWO_24_MESSAGE_REGEX = /\*\*Ok <@!?\d+>, your numbers are: \`(\d \d \d \d)
 
 client.on('message', async msg => {
     let startTime = Date.now();
-    console.log(`=> Message "${msg.content.replace('\n','\\n').substring(0,80)+(msg.content.length>80?"...":"")}" received from ${msg.author.tag}.`);
+    console.log(`=> Message "${msg.content.replace('\n', '\\n').substring(0, 80) + (msg.content.length > 80 ? "..." : "")}" received from ${msg.author.tag}.`);
     if (!msg.channel.type === "text") return;
     if (!msg.guild && msg.author.id !== "456001047756800000") return; // Direct message from myself only
     if (msg.author.id === config.id) return; // Dont respond to bot's own messages
@@ -104,6 +105,7 @@ client.on('message', async msg => {
     }
     if (command === "anime" || command === "a") await anime.handleCommand(args, msg, PREFIX);
     if (command === "ms" || command === "minesweeper") minesweeper.handleCommand(args, msg, PREFIX);
+    if (command === "minecraft") minecraft.handleCommand(args, msg, PREFIX);
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
 
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
@@ -123,7 +125,7 @@ client.on('message', async msg => {
     if (msg.author.id === "456001047756800000" && (command === "toggledebug" || command === "td")) {
         config.debug = !config.debug;
         console.log("DEBUG TOGGLED, debug = " + config.debug)
-        msg.channel.send(`DEBUG: debug output has been turned ${config.debug?"on":"off"}!`);
+        msg.channel.send(`DEBUG: debug output has been turned ${config.debug ? "on" : "off"}!`);
     }
     if (msg.author.id === "456001047756800000" && (command === "forcestop" || command === "fs" || command === "restart" || command === "rs")) {
         console.log("Restarting program due to request from owner...");
@@ -180,14 +182,15 @@ function chainUpStdOut() {
 
     function hook_stdout(callback) {
         var old_write = process.stdout.write
-        process.stdout.write = (function(write) {
-            return function(string, encoding, fd) {
+        process.stdout.write = (function (write) {
+            return function (string, encoding, fd) {
                 write.apply(process.stdout, arguments)
                 callback(string, encoding, fd)
             }
         })(process.stdout.write)
         return () => process.stdout.write = old_write;
     }
+
     let str = [];
     hook_stdout((s) => {
         str.push(s);

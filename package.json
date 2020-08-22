@@ -22,6 +22,8 @@
         "canvas": "^2.6.1",
         "discord.js": "^11.6.2",
         "jsdom": "^15.2.1",
+        "minecraft-api": "0.0.3",
+        "minecraft-server-util": "^1.4.2",
         "moment": "^2.24.0",
         "mongoose": "^5.10.0",
         "node-fetch": "^2.6.0",
