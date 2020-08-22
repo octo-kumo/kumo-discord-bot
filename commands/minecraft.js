@@ -1,16 +1,18 @@
-const ping = require('minecraft-server-util');
 const minecraft = require('minecraft-api');
-const fetch = require('node-fetch');
 const Discord = require('discord.js');
+const fetch = require('node-fetch');
 
 exports.handleCommand = function (args, msg, PREFIX) {
     if (args.length < 1) return msg.reply(`Correct usage: \n\`${PREFIX}minecraft user? [user-name]\` check profile\n\`${PREFIX}minecraft server [ip]\` check server status`)
     switch (args[0]) {
         case 'server':
             args.shift();
-            ping(args.join(' ')).then((response) => {
-                msg.channel.send(generateServerEmbed(response, msg));
-            }).catch((error) => {
+
+            fetch("https://api.minetools.eu/ping/" + args.join(' ').replace(':', '/'))
+                .then(res => res.json())
+                .then((response) => {
+                    msg.channel.send(generateServerEmbed(response, msg));
+                }).catch((error) => {
                 msg.reply("Is the server dead?");
             });
             break;
@@ -37,10 +39,10 @@ exports.handleCommand = function (args, msg, PREFIX) {
 function generateServerEmbed(server, msg) {
     let embed = new Discord.RichEmbed();
     embed.setTitle("Server Info");
-    embed.addField("Version", server.version, true);
-    embed.addField("Protocol", server.protocolVersion, true);
-    embed.addField("Players", `**${server.onlinePlayers} / ${server.maxPlayers}**${server.samplePlayers && server.samplePlayers.length > 0 ? `\n\`\`\`\n${server.samplePlayers.map(player => player.name).join("\n")}\n\`\`\`` : ''}`);
-    embed.setDescription('```\n' + server.descriptionText.replace(/Â§./g, '') + '\n```');
+    embed.addField("Ping", server.latency, true);
+    embed.addField("Version", `${server.version.name} (${server.version.protocol})`, true);
+    embed.addField("Players", `**${server.players.online} / ${server.players.max}**${server.players.sample.length > 0 ? `\n\`\`\`\n${server.samplePlayers.map(player => player.name).join("\n")}\n\`\`\`` : ''}`);
+    embed.setDescription('```\n' + server.description.replace(/\u00a7./g, '').trimEnd() + '\n```');
     embed.setColor(hashStringToColor(server.host));
     embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL);
     if (server.favicon) {
