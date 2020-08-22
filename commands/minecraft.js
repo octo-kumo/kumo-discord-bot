@@ -46,7 +46,8 @@ function generateServerEmbed(server, msg, address) {
     embed.setDescription('```\n' + server.description.replace(/\u00a7./g, '').trimEnd() + '\n```');
     embed.setColor(hashStringToColor(address));
     embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL);
-    embed.setAuthor(address.toLowerCase(), server.favicon ? "https://api.minetools.eu/favicon/" + address.replace(':', '/') : "https://res.cloudinary.com/chatboxzy/image/upload/v1598103075/unknown_server.png");
+    embed.setAuthor(address.toLowerCase());
+    embed.setThumbnail(server.favicon ? "https://api.minetools.eu/favicon/" + address.replace(':', '/') : "https://res.cloudinary.com/chatboxzy/image/upload/v1598103075/unknown_server.png");
     return embed;
 }
 
