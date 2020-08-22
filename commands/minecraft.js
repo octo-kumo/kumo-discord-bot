@@ -11,9 +11,10 @@ exports.handleCommand = function (args, msg, PREFIX) {
             fetch("https://api.minetools.eu/ping/" + args.join(' ').replace(':', '/'))
                 .then(res => res.json())
                 .then((response) => {
-                    msg.channel.send(generateServerEmbed(response, msg));
+                    msg.channel.send(generateServerEmbed(response, msg, args.join(' ')));
                 }).catch((error) => {
                 msg.reply("Is the server dead?");
+                console.error(error);
             });
             break;
         case 'user':
@@ -36,24 +37,24 @@ exports.handleCommand = function (args, msg, PREFIX) {
     }
 }
 
-function generateServerEmbed(server, msg) {
+function generateServerEmbed(server, msg, address) {
     let embed = new Discord.RichEmbed();
     embed.setTitle("Server Info");
     embed.addField("Ping", server.latency, true);
     embed.addField("Version", `${server.version.name} (${server.version.protocol})`, true);
     embed.addField("Players", `**${server.players.online} / ${server.players.max}**${server.players.sample.length > 0 ? `\n\`\`\`\n${server.samplePlayers.map(player => player.name).join("\n")}\n\`\`\`` : ''}`);
     embed.setDescription('```\n' + server.description.replace(/\u00a7./g, '').trimEnd() + '\n```');
-    embed.setColor(hashStringToColor(server.host));
+    embed.setColor(hashStringToColor(address));
     embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL);
     if (server.favicon) {
         let attachment = new Discord.Attachment(Buffer.from(server.favicon, 'base64'), "image.png");
-        embed.setAuthor(server.host + (server.port === 25565 ? "" : ":" + server.port), "attachment://image.png")
+        embed.setAuthor(address, "attachment://image.png")
         return {
             embed: embed,
             files: [attachment]
         };
     } else {
-        embed.setAuthor(server.host + (server.port === 25565 ? "" : ":" + server.port), "https://res.cloudinary.com/chatboxzy/image/upload/v1598103075/unknown_server.png")
+        embed.setAuthor(address, "https://res.cloudinary.com/chatboxzy/image/upload/v1598103075/unknown_server.png")
         return embed;
     }
 }
