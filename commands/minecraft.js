@@ -39,14 +39,13 @@ exports.handleCommand = function (args, msg, PREFIX) {
 
 function generateServerEmbed(server, msg, address) {
     let embed = new Discord.RichEmbed();
-    embed.setTitle("Server Info");
+    embed.setTitle(address.toLowerCase());
     embed.addField("Ping", server.latency, true);
     embed.addField("Version", `${server.version.name} (${server.version.protocol})`, true);
     embed.addField("Players", `**${server.players.online} / ${server.players.max}**${server.players.sample.length > 0 ? `\n\`\`\`\n${server.samplePlayers.map(player => player.name).join("\n")}\n\`\`\`` : ''}`);
     embed.setDescription('```\n' + server.description.replace(/\u00a7./g, '').trimEnd() + '\n```');
     embed.setColor(hashStringToColor(address));
     embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL);
-    embed.setAuthor(address.toLowerCase());
     embed.setThumbnail(server.favicon ? "https://api.minetools.eu/favicon/" + address.replace(':', '/') : "https://res.cloudinary.com/chatboxzy/image/upload/v1598103075/unknown_server.png");
     return embed;
 }
