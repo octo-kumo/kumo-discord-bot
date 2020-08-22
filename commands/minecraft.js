@@ -46,17 +46,8 @@ function generateServerEmbed(server, msg, address) {
     embed.setDescription('```\n' + server.description.replace(/\u00a7./g, '').trimEnd() + '\n```');
     embed.setColor(hashStringToColor(address));
     embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL);
-    if (server.favicon) {
-        let attachment = new Discord.Attachment(Buffer.from(server.favicon, 'base64'), "image.png");
-        embed.setAuthor(address, "attachment://image.png")
-        return {
-            embed: embed,
-            files: [attachment]
-        };
-    } else {
-        embed.setAuthor(address, "https://res.cloudinary.com/chatboxzy/image/upload/v1598103075/unknown_server.png")
-        return embed;
-    }
+    embed.setAuthor(address.toLowerCase(), server.favicon ? "https://api.minetools.eu/favicon/" + address.replace(':', '/') : "https://res.cloudinary.com/chatboxzy/image/upload/v1598103075/unknown_server.png");
+    return embed;
 }
 
 function djb2(str) {
