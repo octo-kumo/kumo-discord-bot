@@ -7,7 +7,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
     switch (args[0]) {
         case 'server':
             args.shift();
-            fetch("https://api.minetools.eu/ping/" + args.join(' ').replace(':', '/'))
+            fetch("https://api.minetools.eu/ping/" + args.join(' ').replace('\:', '/'))
                 .then(res => res.json())
                 .then((response) => {
                     msg.channel.send(generateServerEmbed(response, msg, args.join(' ')));
@@ -41,7 +41,7 @@ function generateServerEmbed(server, msg, address) {
     embed.setTitle(address.toLowerCase());
     embed.addField("Ping", server.latency, true);
     embed.addField("Version", `${server.version.name} (${server.version.protocol})`, true);
-    embed.addField("Players", `**${server.players.online} / ${server.players.max}**${server.players.sample.length > 0 ? `\n\`\`\`\n${server.samplePlayers.map(player => player.name).join("\n")}\n\`\`\`` : ''}`);
+    embed.addField("Players", `**${server.players.online} / ${server.players.max}**${server.players.sample.length > 0 ? `\n\`\`\`\n${server.players.sample.map(player => player.name).join("\n")}\n\`\`\`` : ''}`);
     embed.setDescription('```\n' + server.description.replace(/\u00a7./g, '').trimEnd() + '\n```');
     embed.setColor(hashStringToColor(address));
     embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL);
