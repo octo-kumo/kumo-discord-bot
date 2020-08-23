@@ -80,7 +80,7 @@ client.on('message', async msg => {
     }
     if (minesweeper.directControl(msg)) return; // ah yes first direct control command
     if (gomoku.directControl(msg)) return;
-    if (game24.directControl(msg)) return;
+    if (await game24.directControl(msg)) return;
     if (msg.content.indexOf(PREFIX) !== 0) return;
     console.log(`====== Message is a valid command.`);
     let args = msg.content.slice(1).trim().split(/\s+/g);
@@ -93,7 +93,7 @@ client.on('message', async msg => {
         PING_EMBED.fields[1].value = Math.round(client.ping);
         PING_EMBED.setFooter("Requested By " + msg.author.username, msg.author.displayAvatarURL);
         console.log(` ping results obtained. lat = ${m.createdTimestamp - msg.createdTimestamp}, discord lat = ${Math.round(client.ping)}`);
-        m.edit(PING_EMBED);
+        await m.edit(PING_EMBED);
     }
 
     // if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);

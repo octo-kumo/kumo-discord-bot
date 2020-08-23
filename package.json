@@ -1,35 +1,37 @@
 {
-    "name": "kumo-discord-bot",
-    "version": "1.0.0",
-    "description": "Discord Bot 'Kumo'",
-    "main": "bot.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node bot.js",
-        "local": "node local.js"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/LE0ZY/kumo-discord-bot.git"
-    },
-    "author": "Kumo",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/LE0ZY/kumo-discord-bot/issues"
-    },
-    "homepage": "https://github.com/LE0ZY/kumo-discord-bot#readme",
-    "dependencies": {
-        "canvas": "^2.6.1",
-        "discord.js": "^11.6.2",
-        "jsdom": "^15.2.1",
-        "minecraft-api": "0.0.3",
-        "moment": "^2.24.0",
-        "mongoose": "^5.10.0",
-        "node-fetch": "^2.6.0",
-        "opusscript": ">=0.0.7",
-        "request": "^2.88.2",
-        "vega": "^5.10.0",
-        "yt-search": "^2.2.0",
-        "ytdl-core": "^3.2.2"
-    }
+  "name": "kumo-discord-bot",
+  "version": "1.0.0",
+  "description": "Discord Bot 'Kumo'",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node bot.js",
+    "local": "node local.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LE0ZY/kumo-discord-bot.git"
+  },
+  "author": "Kumo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LE0ZY/kumo-discord-bot/issues"
+  },
+  "homepage": "https://github.com/LE0ZY/kumo-discord-bot#readme",
+  "dependencies": {
+    "canvas": "^2.6.1",
+    "discord.js": "^11.6.4",
+    "jsdom": "^15.2.1",
+    "minecraft-api": "0.0.3",
+    "moment": "^2.24.0",
+    "mongoose": "^5.10.0",
+    "mongoose-findorcreate": "^3.0.0",
+    "node-fetch": "^2.6.0",
+    "opusscript": ">=0.0.7",
+    "request": "^2.88.2",
+    "stats-lite": "^2.2.0",
+    "vega": "^5.14.0",
+    "yt-search": "^2.2.0",
+    "ytdl-core": "^3.2.2"
+  }
 }

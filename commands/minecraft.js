@@ -7,7 +7,6 @@ exports.handleCommand = function (args, msg, PREFIX) {
     switch (args[0]) {
         case 'server':
             args.shift();
-
             fetch("https://api.minetools.eu/ping/" + args.join(' ').replace(':', '/'))
                 .then(res => res.json())
                 .then((response) => {

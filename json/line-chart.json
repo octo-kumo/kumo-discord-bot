@@ -1,8 +1,8 @@
 {
     "$schema": "https://vega.github.io/schema/vega/v5.json",
     "title": {
-        "text": "Total Cases in ${{REGION_NAME}}",
-        "subtitle": "Total cases of COVID-19 in ${{REGION_NAME}}, graphed by date",
+        "text": "COVID-19 in ${{REGION_NAME}}",
+        "subtitle": "Graph drawn by 白雲#1691",
         "encode": {
             "title": {
                 "enter": {
@@ -25,36 +25,39 @@
     },
     "width": 1280,
     "height": 720,
-
     "padding": 5,
-    "legends": [{
-        "fill": "color",
-        "title": "Legend",
-        "titleColor": "white",
-        "labelColor": "lightgrey",
-        "encode": {
-            "title": {
-                "update": {
-                    "fontSize": {
-                        "value": 14
+    "legends": [
+        {
+            "fill": "color",
+            "title": "Legend",
+            "titleColor": "white",
+            "labelColor": "lightgrey",
+            "encode": {
+                "title": {
+                    "update": {
+                        "fontSize": {
+                            "value": 14
+                        }
                     }
-                }
-            },
-            "labels": {
-                "update": {
-                    "fontSize": {
-                        "value": 12
+                },
+                "labels": {
+                    "update": {
+                        "fontSize": {
+                            "value": 12
+                        }
                     }
                 }
             }
         }
-    }],
-    "data": [{
-        "name": "table",
-        "values": []
-    }],
-
-    "scales": [{
+    ],
+    "data": [
+        {
+            "name": "table",
+            "values": []
+        }
+    ],
+    "scales": [
+        {
             "name": "x",
             "type": "point",
             "range": "width",
@@ -85,8 +88,8 @@
             }
         }
     ],
-
-    "axes": [{
+    "axes": [
+        {
             "orient": "bottom",
             "scale": "x",
             "title": "Date",
@@ -107,77 +110,82 @@
             "domainColor": "grey"
         }
     ],
-
-    "marks": [{
-        "type": "group",
-        "from": {
-            "facet": {
-                "name": "series",
-                "data": "table",
-                "groupby": "c"
-            }
-        },
-        "marks": [{
-            "type": "line",
+    "marks": [
+        {
+            "type": "group",
             "from": {
-                "data": "series"
+                "facet": {
+                    "name": "series",
+                    "data": "table",
+                    "groupby": "c"
+                }
             },
-            "encode": {
-                "enter": {
-                    "x": {
-                        "scale": "x",
-                        "field": "date"
+            "marks": [
+                {
+                    "type": "line",
+                    "from": {
+                        "data": "series"
                     },
-                    "y": {
-                        "scale": "y",
-                        "field": "value"
+                    "encode": {
+                        "enter": {
+                            "x": {
+                                "scale": "x",
+                                "field": "date"
+                            },
+                            "y": {
+                                "scale": "y",
+                                "field": "value"
+                            },
+                            "stroke": {
+                                "scale": "color",
+                                "field": "c"
+                            },
+                            "strokeWidth": {
+                                "value": 3
+                            },
+                            "interpolate": [
+                                {
+                                    "value": "basis"
+                                }
+                            ],
+                            "fillOpacity": {
+                                "value": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "type": "symbol",
+                    "from": {
+                        "data": "series"
                     },
-                    "stroke": {
-                        "scale": "color",
-                        "field": "c"
-                    },
-                    "strokeWidth": {
-                        "value": 3
-                    },
-                    "interpolate": [{
-                        "value": "basis"
-                    }],
-                    "fillOpacity": {
-                        "value": 1
+                    "encode": {
+                        "enter": {
+                            "x": {
+                                "scale": "x",
+                                "field": "date"
+                            },
+                            "y": {
+                                "scale": "y",
+                                "field": "value"
+                            },
+                            "fill": {
+                                "scale": "color",
+                                "field": "c"
+                            },
+                            "width": {
+                                "value": 5
+                            },
+                            "height": {
+                                "value": 5
+                            },
+                            "fillOpacity": {
+                                "value": 0.7
+                            }
+                        }
                     }
                 }
-            }
-        }, {
-            "type": "symbol",
-
-            "from": {
-                "data": "series"
-            },
-            "encode": {
-                "enter": {
-                    "x": {
-                        "scale": "x",
-                        "field": "date"
-                    },
-                    "y": {
-                        "scale": "y",
-                        "field": "value"
-                    },
-                    "fill": {
-                        "scale": "color",
-                        "field": "c"
-                    },
-                    "width": {
-                        "value": 5
-                    },
-                    "height": {
-                        "value": 5
-                    },
-                    "fillOpacity": {
-                        "value": 0.7
-                    }
-                }
-            }
-        }]
-    }]
+            ]
+        }
+    ]
 }
