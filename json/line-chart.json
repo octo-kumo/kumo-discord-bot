@@ -2,7 +2,7 @@
     "$schema": "https://vega.github.io/schema/vega/v5.json",
     "title": {
         "text": "COVID-19 in ${{REGION_NAME}}",
-        "subtitle": "Graph drawn by 白雲#1691",
+        "subtitle": "Graph drawn by Kumo#4902",
         "encode": {
             "title": {
                 "enter": {
