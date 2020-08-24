@@ -1,12 +1,6 @@
 const Discord = require('discord.js');
-const config = require('./config.js').config;
 const yts = require('yt-search');
 const ytdl = require('ytdl-core');
-
-const streamOptions = {
-    volume: 1,
-    bitrate: 'auto'
-};
 const ytdlOptions = {
     quality: 'highestaudio',
     filter: 'audioonly'
@@ -16,7 +10,16 @@ const search_results = {};
 
 exports.handleCommand = async (args, msg, prefix) => {
     console.log("running music sub-command");
-    if (args.length === 0) return msg.channel.send("> **Ancient Magic** _are not for the eyes of mortals!_");
+    if (args.length === 0) return msg.channel.send(prefix + "**music**: music command\n" +
+        "\t**play** [song name/youtube url], plays the song\n" +
+        "\t**import** [playlist id/youtube url], imports a playlist\n" +
+        "\t**nowplaying**, shows current playing song\n" +
+        "\t**skip**, skip the current song\n" +
+        "\t**pause**, pause the current song\n" +
+        "\t**resume**, resume a paused song\n" +
+        "\t**queue**, shows current queue\n" +
+        "\t**shuffle**, shuffles the current queue\n" +
+        "\t**loop**, loop the current queue");
     switch (args.shift()) {
         case "p":
         case "play":
@@ -28,6 +31,7 @@ exports.handleCommand = async (args, msg, prefix) => {
             await importList(args, msg);
             break;
         case "np":
+        case "nowplaying":
         case "status":
             np(msg);
             break;
@@ -76,7 +80,7 @@ async function play(args, msg) {
             search_results[msg.guild.id] = songs;
             return msg.channel.send("Search Results for `" + query + "`\n```\n" + [...Array(songs.length).keys()].map(i => "#" + (i + 1) + ": " + songs[i].title + " " + songs[i].timestamp).join("\n") + "\n```");
         } else if (songs.length === 1) {
-            playSong(voiceChannel, songs[0], msg);
+            await playSong(voiceChannel, songs[0], msg);
         } else return msg.channel.send("No songs found");
     } else {
         if (!search_results[msg.guild.id]) return msg.reply("Erm, ok?");
@@ -85,7 +89,7 @@ async function play(args, msg) {
         if (target < 0 || target >= search_results[msg.guild.id].length) {
             return msg.channel.send("Between 1 and " + search_results[msg.guild.id].length + " please.");
         }
-        playSong(voiceChannel, search_results[msg.guild.id][target], msg);
+        await playSong(voiceChannel, search_results[msg.guild.id][target], msg);
         search_results[msg.guild.id] = null;
     }
 }
@@ -143,17 +147,13 @@ async function importList(args, msg) {
 async function progressQueue(guild) {
     const queue = queues[guild.id];
     if (!queue) return;
-    console.log("progressQueue()");
     let song = queue.songs[queue.index];
     if (!song) {
-        console.log(`looping=${queue.looping},index=${queue.index}`)
         if (queue.looping && queue.index !== 0) {
-            console.log("Looping");
             queue.index = 0;
             await progressQueue(guild);
             return;
         } else {
-            console.log("No more songs!");
             queue.textChannel.send("_Bye~_");
             queue.voiceChannel.leave();
             delete queues[guild.id];
@@ -192,23 +192,21 @@ function list(msg) {
     embed.setTitle("Queue");
     embed.setColor(0x99ccff);
     let finalText = [];
-    let total = 0;
-    for (let i = 0; i < queue.songs.length; i++) {
-        total += queue.songs.seconds;
-        if (i > 9) continue;
-        finalText.push('#' + ((i + 1) + '').padStart(3, ' ') + " " + queue.songs[i].title + " (" + queue.songs[i].timestamp + ")");
+    for (let i = Math.max(0, queue.index - 5); i < queue.songs.length; i++) {
+        if (i > queue.index + 5) break;
+        finalText.push((i === queue.index ? '>' : '#') + ((i + 1) + '').padStart(3, ' ') + " " + queue.songs[i].title + " (" + queue.songs[i].timestamp + ")");
     }
     if (queue.songs.length > 10) finalText.push("And " + (queue.songs.length - 10) + " more!");
     embed.setDescription("```\n" + finalText.join("\n") + "\n```");
     embed.setFooter("Total " + queue.songs.length + " songs");
-    msg.channel.send(embed);
+    return msg.channel.send(embed);
 }
 
-async function shuffle(msg) {
+function shuffle(msg) {
     let queue = queues[msg.guild.id];
     if (!queue) return msg.channel.send("_No Song No Life_");
     queue.songs = [queue.songs[0]].concat(shuffleArray(queue.songs.slice(1)));
-    msg.channel.send("Shuffled!");
+    return msg.channel.send("Shuffled!");
 }
 
 function shuffleArray(array) {
@@ -229,7 +227,7 @@ function np(msg) {
     if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel, lol');
     if (!queue) return msg.channel.send('Nothing is playing');
     console.log("Stream Time: " + queue.connection.dispatcher.time);
-    return msg.channel.send(genVideoEmbed(queue.songs[0], queue.connection.dispatcher.time));
+    return msg.channel.send(genVideoEmbed(queue.songs[queue.index], queue.connection.dispatcher.time));
 }
 
 function skip(msg) {

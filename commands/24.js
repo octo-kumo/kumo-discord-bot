@@ -7,10 +7,16 @@ const round = (n, p) => parseFloat(String(n)).toFixed(p);
 exports.handleCommand = function (args, msg, PREFIX) {
     if (args.length === 0) {
         let game = GAMES[msg.author.id] = {
-            digits: [0, 1, 2, 3].map(i => Math.floor(Math.random() * 9) + 1),
+            digits: [0, 1, 2, 3].map(() => Math.floor(Math.random() * 9) + 1),
             start: Date.now()
         };
         msg.reply('Your numbers are `' + game.digits.map(i => String(i)).join(" ") + '`');
+    } else if (["hard", "difficult", "full"].includes(args[0])) {
+        let game = GAMES[msg.author.id] = {
+            digits: [0, 1, 2, 3].map(() => Math.floor(Math.random() * 13) + 1),
+            start: Date.now()
+        };
+        msg.reply('Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`');
     } else if (['impos', 'imposs', 'impossible'].includes(args[0])) {
         if (!GAMES[msg.author.id]) return msg.reply("You are not playing");
         let solution = solver.solve24Array(GAMES[msg.author.id].digits);
@@ -32,7 +38,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
             embed.addField("Mode", `${round(stats.mode(user.game24_history) / 1000, 2)}s`, true);
             embed.addField("σ (STDEV)", `${round(stats.stdev(user.game24_history) / 1000, 2)}s`, true);
             embed.setFooter("Profile of " + msg.author.tag, msg.author.avatarURL);
-            msg.channel.send(embed);
+            return msg.channel.send(embed);
         });
     } else if (['leaderboard', 'lb'].includes(args[0])) {
         db.User.find({appeared_in: msg.guild.id}).limit(12).sort('game24_average').exec((err, users) => {
@@ -40,16 +46,19 @@ exports.handleCommand = function (args, msg, PREFIX) {
             embed.setTitle("24 Game Leaderboard");
             embed.setColor(0x00FFFF);
             embed.setDescription(users.map((user, i) => `\`#${i + 1}\` <@${user.id}>: **${round(user.game24_average / 1000, 2)}s**`).join("\n"));
-            msg.channel.send(embed);
+            return msg.channel.send(embed);
         });
     }
 }
-const ANSWER_REGEX = /^[()+\-*/\s]*\d[()+\-*/\s]+\d[()+\-*/\s]+\d[()+\-*/\s]+\d[()+\-*/\s]*$/;
+const ANSWER_REGEX = /^[()+\-*/\s]*\d+[()+\-*/\s]+\d+[()+\-*/\s]+\d+[()+\-*/\s]+\d+[()+\-*/\s]*$/;
 exports.directControl = async function (msg) {
     let game = GAMES[msg.author.id];
     if (!game) return false;
     if (!ANSWER_REGEX.test(msg.content)) return;
-    if (eval(msg.content) === 24 && arraysEqual(msg.content.replace(/[^\d]/g, '').split('').map(c => parseInt(c)).sort(), [...game.digits].sort())) {
+    if (eval(msg.content) === 24 && arraysEqual(
+        msg.content.replace(/[^\d]/g, '').split('').map(c => parseInt(c)).sort(),
+        game.digits.join('').split('').map(c => parseInt(c)).sort()
+    )) {
         let millis = Date.now() - game.start;
         msg.reply('You are **correct**! Time used = `' + (Math.floor(millis / 10) / 100) + 's`');
         db.User.findOrCreate({id: msg.author.id}, function (err, user) {
@@ -73,8 +82,6 @@ function arraysEqual(a, b) {
     if (a === b) return true;
     if (a == null || b == null) return false;
     if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; ++i) {
-        if (a[i] !== b[i]) return false;
-    }
+    for (let i = 0; i < a.length; ++i) if (a[i] !== b[i]) return false;
     return true;
 }
