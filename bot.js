@@ -7,6 +7,7 @@ const azurlane = require('./commands/azurlane.js');
 const gomoku = require('./commands/gomoku.js');
 const minecraft = require('./commands/minecraft.js');
 const music = require('./commands/music.js');
+const inspire = require('./commands/inspire.js');
 const waifulabs = require('./commands/waifulabs.js');
 const timetable = require('./commands/timetable.js');
 const anime = require('./commands/anime.js');
@@ -107,7 +108,7 @@ client.on('message', async msg => {
     if (command === "ms" || command === "minesweeper") minesweeper.handleCommand(args, msg, PREFIX);
     if (command === "minecraft") minecraft.handleCommand(args, msg, PREFIX);
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") covid.handleCommand(args, msg, PREFIX);
-
+    if (command === "inspire") inspire.handleCommand(args, msg, PREFIX);
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") azurlane.handleCommand(args, msg, PREFIX);
     if (command === "music" || command === "am" || command === "m" || command === "song") await music.handleCommand(args, msg, PREFIX);
     if (command.startsWith("!")) {
