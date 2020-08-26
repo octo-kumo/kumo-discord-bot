@@ -121,19 +121,9 @@ client.on('message', async msg => {
         gomoku.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
     }
     if (command === "24") game24.handleCommand(args, msg, PREFIX);
-    if (command === "waifulabs") waifulabs.newBatch(msg);
+    if (command === "waifulabs") await waifulabs.newBatch(msg);
     if (command === "timetable" || command === "tt") timetable.handleCommand(args, msg, PREFIX);
-    if (msg.author.id === "456001047756800000" && (command === "toggledebug" || command === "td")) {
-        config.debug = !config.debug;
-        console.log("DEBUG TOGGLED, debug = " + config.debug)
-        await msg.channel.send(`DEBUG: debug output has been turned ${config.debug ? "on" : "off"}!`);
-    }
-    if (msg.author.id === "456001047756800000" && (command === "forcestop" || command === "fs" || command === "restart" || command === "rs")) {
-        console.log("Restarting program due to request from owner...");
-        await msg.channel.send("Forcing a **Restart**...");
-        process.exit(1);
-    }
-    if (command === "shouldisleep" || command === "sleep") {
+    if (command === "sleep") {
         const currentHour = (new Date().getHours() + 8) % 24;
         console.log("current hour = " + currentHour);
         if (currentHour < 6 || currentHour > 21) {
@@ -152,25 +142,24 @@ client.on('message', async msg => {
             console.log("told " + msg.author.username + " to not to goto sleep");
         }
     }
-    if (command === "clear") msg.channel.bulkDelete(parseInt(args[0])).then(messages => {
-        msg.reply("Deleted " + messages.keyArray().length + " messages");
-    }).catch(console.error);
+    if (command === "clear") msg.channel.bulkDelete(parseInt(args[0])).then(messages => msg.reply("Deleted " + messages.keyArray().length + " messages")).catch(console.error);
+    if (msg.author.id === "456001047756800000" && command === "debug") {
+        config.debug = !config.debug;
+        console.log("DEBUG TOGGLED, debug = " + config.debug)
+        await msg.channel.send(`DEBUG: debug output has been turned ${config.debug ? "on" : "off"}!`);
+    }
+    if (msg.author.id === "456001047756800000" && command === "restart") {
+        console.log("Restarting program due to request from owner...");
+        await msg.channel.send("Forcing a **Restart**...");
+        process.exit(1);
+    }
     console.log("====== Message Processed, Elapsed time = " + (Date.now() - startTime) + "ms\n");
 });
 
-client.on('reconnecting', () => {
-    // console.log('Reconnecting!');
-});
-client.on('disconnect', () => {
-    console.log('Disconnect!');
-});
-client.on('guildCreate', (guild) => {
-    console.log("Joined " + guild.id);
-});
-client.on('error', error => {
-    console.log("Error Occured " + error.message);
-})
-
+client.on('reconnecting', () => console.debug('Reconnecting!'));
+client.on('disconnect', () => console.debug('Disconnect!'));
+client.on('guildCreate', guild => console.debug("Joined " + guild.id));
+client.on('error', error => console.log("Error Occured " + error.message))
 client.login(process.env.TOKEN).then(() => console.log("Logged In"));
 
 function chainUpStdOut() {

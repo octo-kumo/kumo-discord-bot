@@ -61,7 +61,7 @@ exports.handleCommand = async function (args, msg, PREFIX) {
                 message.react('⬅️').then(() => message.react('➡️')).then(() => message.react('❎'));
                 message.createReactionCollector(ship_book_filter).on('collect', r => {
                     if (!r) return;
-                    r.remove(msg.author.id);
+                    r.users.keyArray().filter(k => k !== config.id).forEach(k => r.remove(k));
                     let name = r.emoji.name;
                     if (r.emoji.name === '❎') return message.delete();
                     let book = BOOKS[message.id];
@@ -83,7 +83,7 @@ exports.handleCommand = async function (args, msg, PREFIX) {
                     .then(() => message.react('❎'));
                 message.createReactionCollector(memory_book_filter).on('collect', r => {
                     if (!r) return;
-                    r.remove(msg.author.id);
+                    r.users.keyArray().filter(k => k !== config.id).forEach(k => r.remove(k));
                     let name = r.emoji.name;
                     if (r.emoji.name === '❎') return message.delete();
                     let book = BOOKS[message.id];
@@ -129,7 +129,7 @@ exports.handleCommand = async function (args, msg, PREFIX) {
                 message.react('⬅️').then(() => message.react('➡️')).then(() => message.react('❎'));
                 message.createReactionCollector(chapter_book_filter).on('collect', r => {
                     if (!r) return;
-                    r.remove(msg.author.id);
+                    r.users.keyArray().filter(k => k !== config.id).forEach(k => r.remove(k));
                     let name = r.emoji.name;
                     console.log("Emoji Name = " + name);
                     if (r.emoji.name === '❎') return message.delete();
@@ -157,7 +157,7 @@ exports.handleCommand = async function (args, msg, PREFIX) {
                 message.react('⬅️').then(() => message.react('📊')).then(() => message.react('698441024644841543')).then(() => message.react('👕')).then(() => message.react('🖌️')).then(() => message.react('➡️')).then(() => message.react('❎'));
                 message.createReactionCollector(ship_book_filter).on('collect', r => {
                     if (!r) return;
-                    r.remove(msg.author.id);
+                    r.users.keyArray().filter(k => k !== config.id).forEach(k => r.remove(k));
                     let name = r.emoji.name;
                     console.log("Emoji Name = " + name);
                     if (r.emoji.name === '❎') return message.delete();
