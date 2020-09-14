@@ -36,10 +36,19 @@ exports.handleCommand = async (args, msg, PREFIX) => {
     try {
         if (args.length === 0) args = ['SINGAPORE'];
         await refreshData();
+        let limit = -1;
+        let filter = [];
+        if (args.some(arg => arg.startsWith("-ignore="))) {
+            let removed = args.splice(args.findIndex(arg => arg.startsWith("-ignore=")), 1)[0];
+            removed = removed.replace('-ignore=', '');
+            removed = removed.toLowerCase().split(/,\s*/g);
+            filter = removed;
+        }
+        if (!isNaN(args[args.length - 1])) limit = parseInt(args.pop());
         let region = args.join(" ").trim().toLowerCase();
         if (SHORT_NAMES[region]) region = SHORT_NAMES[region];
         if (region === "world" || region === "globe" || region === "global") {
-            await msg.channel.send(await generateRegionEmbed("World", globalData, msg, true));
+            await msg.channel.send(await generateRegionEmbed("World", globalData, msg, limit, filter, true));
         } else {
             console.log("COVID: Requested region = " + region);
             let found = null;
@@ -59,7 +68,7 @@ exports.handleCommand = async (args, msg, PREFIX) => {
                         break;
                     }
                 }
-            await msg.channel.send(await generateRegionEmbed(location, found, msg));
+            await msg.channel.send(await generateRegionEmbed(location, found, msg, limit, filter));
         }
     } catch (e) {
         console.log("Something went wrong and covid data is not sent", e);
@@ -76,54 +85,40 @@ const LONG_NAMES = {
     "South Africa": "S. Africa"
 }
 
-async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
+async function generateRegionEmbed(location, region, msg, limit, filter, includeLeaderBoard) {
     const embed = new Discord.RichEmbed();
     embed.setColor(0x0074D9);
     if (msg) embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL);
     if (region) {
         let diff = 0;
-        let today = null;
-        let yesterday = null;
-        while (!(today && yesterday)) {
-            today = yesterday = null;
-            let todayStr = moment().subtract(diff, 'days').format('YYYY-M-D');
-            let yesterdayStr = moment().subtract(diff + (location === "World" ? 2 : 1), 'days').format('YYYY-M-D');
-            for (let m of region) {
-                if (!today && m.date === todayStr) today = m;
-                else if (!yesterday && m.date === yesterdayStr) yesterday = m;
-            }
-            diff++;
-        }
-        if (today && yesterday) {
-            let yesterdayActive = yesterday.confirmed - yesterday.deaths - yesterday.recovered;
-            let todayActive = today.confirmed - today.deaths - today.recovered;
-            let activeIncrease = todayActive - yesterdayActive;
-            let confirmedIncrease = today.confirmed - yesterday.confirmed;
-            let recoveredIncrease = today.recovered - yesterday.recovered;
-            let deathIncrease = today.deaths - yesterday.deaths;
+        let today = region[region.length - 1];
+        let yesterday = region[region.length - 2];
 
-            embed.setTitle(location);
-            embed.addField("Active", `**${numberWithSpace(todayActive)}** (${(activeIncrease < 0 ? "" : "+") + numberWithSpace(activeIncrease)})`, true);
-            embed.addField("Total", `**${numberWithSpace(today.confirmed)}** (${(confirmedIncrease < 0 ? "" : "+") + numberWithSpace(confirmedIncrease)})`, true);
-            embed.addField("Cured", `**${numberWithSpace(today.recovered)}** (${(recoveredIncrease < 0 ? "" : "+") + numberWithSpace(recoveredIncrease)})`, true);
-            embed.addField("Dead", `**${numberWithSpace(today.deaths)}** (${(deathIncrease < 0 ? "" : "+") + numberWithSpace(deathIncrease)})`, true);
-            embed.addField("Cured Rate", (today.recovered === 0 ? 0 : Math.round(today.recovered * 1000 / today.confirmed) / 10) + "%", true);
-            embed.addField("Death Rate", (today.deaths === 0 ? 0 : Math.round(today.deaths * 1000 / today.confirmed) / 10) + "%", true);
-            embed.attachFile(new Discord.Attachment(await drawGraph(location, region), "attachment.png"))
-            embed.setImage("attachment://attachment.png")
-            if (!msg) embed.setDescription("_This message is automatically updated every 1 hour_");
-            else embed.setDescription("_Accurate as of_\n**" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY') + "**");
-            if (includeLeaderBoard) {
-                let desc = [];
-                desc.push("#  " + "Region".padEnd(9, " ") + " " + "Cases".padStart(6, " ") + " " + "Dead".padStart(6, " ") + " " + "Heal".padStart(6, " "))
-                for (let i = 0; i < 8; i++) {
-                    desc.push(`#${(i + 1)} ${(LONG_NAMES[leaderBoard[i].region] ? LONG_NAMES[leaderBoard[i].region] : leaderBoard[i].region).padEnd(9, " ")} ${formatNumber(leaderBoard[i].confirmed).padStart(6, " ")} ${formatNumber(leaderBoard[i].deaths).padStart(6, " ")} ${formatNumber(leaderBoard[i].recovered).padStart(6, " ")}`);
-                }
-                embed.setDescription("Accurate as of **" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY') + "**\n" + "```" + desc.join("\n") + "```");
+        let yesterdayActive = yesterday.confirmed - yesterday.deaths - yesterday.recovered;
+        let todayActive = today.confirmed - today.deaths - today.recovered;
+        let activeIncrease = todayActive - yesterdayActive;
+        let confirmedIncrease = today.confirmed - yesterday.confirmed;
+        let recoveredIncrease = today.recovered - yesterday.recovered;
+        let deathIncrease = today.deaths - yesterday.deaths;
+
+        embed.setTitle(location);
+        embed.addField("Active", `**${numberWithSpace(todayActive)}** (${(activeIncrease < 0 ? "" : "+") + numberWithSpace(activeIncrease)})`, true);
+        embed.addField("Total", `**${numberWithSpace(today.confirmed)}** (${(confirmedIncrease < 0 ? "" : "+") + numberWithSpace(confirmedIncrease)})`, true);
+        embed.addField("Cured", `**${numberWithSpace(today.recovered)}** (${(recoveredIncrease < 0 ? "" : "+") + numberWithSpace(recoveredIncrease)})`, true);
+        embed.addField("Dead", `**${numberWithSpace(today.deaths)}** (${(deathIncrease < 0 ? "" : "+") + numberWithSpace(deathIncrease)})`, true);
+        embed.addField("Cured Rate", (today.recovered === 0 ? 0 : Math.round(today.recovered * 1000 / today.confirmed) / 10) + "%", true);
+        embed.addField("Death Rate", (today.deaths === 0 ? 0 : Math.round(today.deaths * 1000 / today.confirmed) / 10) + "%", true);
+        embed.attachFile(new Discord.Attachment(await drawGraph(location, region, limit, filter), "attachment.png"))
+        embed.setImage("attachment://attachment.png")
+        if (!msg) embed.setDescription("_This message is automatically updated every 1 hour_");
+        else embed.setDescription("_Accurate as of_\n**" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY') + "**");
+        if (includeLeaderBoard) {
+            let desc = [];
+            desc.push("#  " + "Region".padEnd(9, " ") + " " + "Cases".padStart(6, " ") + " " + "Dead".padStart(6, " ") + " " + "Heal".padStart(6, " "))
+            for (let i = 0; i < 8; i++) {
+                desc.push(`#${(i + 1)} ${(LONG_NAMES[leaderBoard[i].region] ? LONG_NAMES[leaderBoard[i].region] : leaderBoard[i].region).padEnd(9, " ")} ${formatNumber(leaderBoard[i].confirmed).padStart(6, " ")} ${formatNumber(leaderBoard[i].deaths).padStart(6, " ")} ${formatNumber(leaderBoard[i].recovered).padStart(6, " ")}`);
             }
-        } else {
-            embed.setTitle("Waiting for Data")
-                .setDescription("Newest data is yet to be released");
+            embed.setDescription("Accurate as of **" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY') + "**\n" + "```" + desc.join("\n") + "```");
         }
     } else {
         embed.setTitle("Region not Found")
@@ -132,49 +127,49 @@ async function generateRegionEmbed(location, region, msg, includeLeaderBoard) {
     return embed;
 }
 
-function drawGraph(location, region) {
+function drawGraph(location, region, limit, filter) {
     return new Promise((resolve, reject) => {
-        GRAPH_SPECS.data[0].values = convertToData(region);
+        GRAPH_SPECS.data[0].values = convertToData(region, limit, filter);
         GRAPH_SPECS.title.text = GRAPH_SPECS.title.text.replace("${{REGION_NAME}}", location);
         GRAPH_SPECS.title.subtitle = GRAPH_SPECS.title.subtitle.replace("${{REGION_NAME}}", location);
         const view = new vega.View(vega.parse(GRAPH_SPECS), {
             renderer: 'none'
         });
-        view.toCanvas().then(function (canvas) {
+        view.toCanvas().then(function(canvas) {
             resolve(canvas.toBuffer("image/png"));
-        }).catch(function (err) {
+        }).catch(function(err) {
             console.error(err);
             reject(err);
         });
     });
 }
 
-function convertToData(region) {
+function convertToData(region, limit, filter) {
     let newDataArray = [];
-    for (let i = 0; i < region.length; i++) {
+    for (let i = (limit > 0 ? region.length - limit : 0); i < region.length; i++) {
         let day = region[i];
         if (day.confirmed === 0) continue;
-        newDataArray.push({
+        if (!filter.includes("total")) newDataArray.push({
             date: day.date.substring(5),
             value: day.confirmed,
-            c: "Confirmed"
+            c: "Total"
         });
-        newDataArray.push({
+        if (!filter.includes("active")) newDataArray.push({
             date: day.date.substring(5),
             value: day.confirmed - day.deaths - day.recovered,
             c: "Active"
         });
-        newDataArray.push({
+        if (!filter.includes("deaths")) newDataArray.push({
             date: day.date.substring(5),
             value: day.deaths,
             c: "Deaths"
         });
-        newDataArray.push({
+        if (!filter.includes("cured")) newDataArray.push({
             date: day.date.substring(5),
             value: day.recovered,
-            c: "Recovered"
+            c: "Cured"
         });
-        newDataArray.push({
+        if (!filter.includes("new")) newDataArray.push({
             date: day.date.substring(5),
             value: i === 0 ? 0 : (day.confirmed - region[i - 1].confirmed),
             c: "New"
