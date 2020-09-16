@@ -179,8 +179,8 @@ exports.handleCommand = async function (args, msg, PREFIX) {
 
 function generateShipsBook(filter) {
     let ships = [];
-    for (let key of Object.keys(SHIPS))
-        if (filter(SHIPS[key])) ships.push(SHIPS[key]);
+    for (let ship of SHIPS)
+        if (filter(ship)) ships.push(ship);
     let targetEmbed = new Discord.RichEmbed();
     let pages = [];
     if (ships.length === 0) {
@@ -481,14 +481,14 @@ function generateSkillsPage(ship) {
 }
 
 function getShipByName(name) {
-    for (let ship of Object.values(SHIPS)) {
+    for (let ship of SHIPS) {
         if (ship.names.en && normalize(ship.names.en.toUpperCase()) === normalize(name.toUpperCase())) return ship;
         if (ship.names.jp && normalize(ship.names.jp.toUpperCase()) === normalize(name.toUpperCase())) return ship;
         if (ship.names.kr && normalize(ship.names.kr.toUpperCase()) === normalize(name.toUpperCase())) return ship;
         if (ship.names.cn && normalize(ship.names.cn.toUpperCase()) === normalize(name.toUpperCase())) return ship;
         if (ship.names.code && normalize(ship.names.code.toUpperCase()) === normalize(name.toUpperCase())) return ship;
     }
-    for (let ship of Object.values(SHIPS)) {
+    for (let ship of SHIPS) {
         if (ship.names.en && normalize(ship.names.en.toUpperCase()).includes(normalize(name.toUpperCase()))) return ship;
         if (ship.names.jp && normalize(ship.names.jp.toUpperCase()).includes(normalize(name.toUpperCase()))) return ship;
         if (ship.names.kr && normalize(ship.names.kr.toUpperCase()).includes(normalize(name.toUpperCase()))) return ship;
