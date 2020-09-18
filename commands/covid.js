@@ -34,8 +34,6 @@ exports.update = async (channel) => {
 exports.handleCommand = async (args, msg, PREFIX) => {
     console.log("Running COVID sub-system. args = " + args);
     try {
-        if (args.length === 0) args = ['SINGAPORE'];
-        await refreshData();
         let limit = -1;
         let filter = [];
         if (args.some(arg => arg.startsWith("-ignore="))) {
@@ -44,7 +42,9 @@ exports.handleCommand = async (args, msg, PREFIX) => {
             removed = removed.toLowerCase().split(/,\s*/g);
             filter = removed;
         }
-        if (!isNaN(args[args.length - 1])) limit = parseInt(args.pop());
+        if (args.length !== 0 && !isNaN(args[args.length - 1])) limit = parseInt(args.pop());
+        if (args.length === 0) args = ['SINGAPORE'];
+        await refreshData();
         let region = args.join(" ").trim().toLowerCase();
         if (SHORT_NAMES[region]) region = SHORT_NAMES[region];
         if (region === "world" || region === "globe" || region === "global") {
