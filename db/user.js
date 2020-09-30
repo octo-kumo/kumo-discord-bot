@@ -25,6 +25,9 @@ const User = new Schema({
     },
     game24_average: {
         type: Number
+    },
+    game24_min: {
+        type: Number
     }
 });
 User.plugin(findOrCreate);
