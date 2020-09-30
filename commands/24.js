@@ -1,5 +1,4 @@
 const solve24game = require('24game-solver');
-const calc = require('expression-calculator')();
 const Discord = require('discord.js');
 const stats = require("stats-lite");
 const db = require("../db");
@@ -63,7 +62,7 @@ exports.directControl = async function (msg) {
     let game = GAMES[msg.author.id];
     if (!game) return false;
     if (!ANSWER_REGEX.test(msg.content)) return;
-    if (calc.compile(msg.content).calc() === (game.goal || 24) && arraysEqual(
+    if (eval(msg.content) === (game.goal || 24) && arraysEqual(
         msg.content.replace(/[^\d]/g, '').split('').map(c => parseInt(c)).sort(),
         game.digits.join('').split('').map(c => parseInt(c)).sort()
     )) {

@@ -22,7 +22,6 @@
     "24game-solver": "^0.2.5",
     "canvas": "^2.6.1",
     "discord.js": "^11.6.4",
-    "expression-calculator": "0.0.5",
     "jsdom": "^15.2.1",
     "minecraft-api": "0.0.3",
     "moment": "^2.24.0",
