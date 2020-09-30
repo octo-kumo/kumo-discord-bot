@@ -6,18 +6,21 @@ const GAMES = [];
 const round = (n, p) => parseFloat(String(n)).toFixed(p);
 exports.handleCommand = function (args, msg, PREFIX) {
     if (args.length === 0) {
+        if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
         let game = GAMES[msg.author.id] = {
             digits: [0, 1, 2, 3].map(() => Math.floor(Math.random() * 9) + 1),
             start: Date.now()
         };
         msg.reply('Your numbers are `' + game.digits.map(i => String(i)).join(" ") + '`');
     } else if (["hard", "difficult", "full"].includes(args[0])) {
+        if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
         let game = GAMES[msg.author.id] = {
             digits: [0, 1, 2, 3].map(() => Math.floor(Math.random() * 13) + 1),
             start: Date.now()
         };
         msg.reply('Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`');
     } else if (["48", "expert"].includes(args[0])) {
+        if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
         let game = GAMES[msg.author.id] = {
             digits: [0, 1, 2, 3].map(() => Math.floor(Math.random() * 13) + 1),
             goal: 48,
