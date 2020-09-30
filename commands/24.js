@@ -79,7 +79,7 @@ exports.directControl = async function (msg) {
         delete GAMES[msg.author.id];
     } else {
         let solution = solve24game.apply(null, [...game.digits, (game.goal || 24)]);
-        if (solution) msg.reply('Sorry but you are **wrong**! One possible answer would be `' + solution + '`');
+        if (solution.length > 0) msg.reply('Sorry but you are **wrong**! One possible answer would be `' + solution[0] + '`. Found ' + solution.length);
         else msg.reply('Sorry but it is actually **impossible**!');
         delete GAMES[msg.author.id];
     }
