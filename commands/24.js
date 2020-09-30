@@ -62,7 +62,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
             let embed = new Discord.RichEmbed();
             embed.setTitle("24 Game Leaderboard");
             embed.setColor(0x00FFFF);
-            embed.setDescription(users.map((user, i) => `\`#${i + 1}\` <@${user.id}>: **${round(user.game24_average / 1000, 2)}s**`).join("\n"));
+            embed.setDescription(users.map((user, i) => `\`#${i + 1}\` <@${user.id}>: **${round(user[args[1] === 'min' ? "game24_min" : "game24_average"] / 1000, 2)}s**`).join("\n"));
             return msg.channel.send(embed);
         });
     }
