@@ -58,7 +58,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
             return msg.channel.send(embed);
         });
     } else if (['leaderboard', 'lb'].includes(args[0])) {
-        db.User.find({appeared_in: msg.guild.id}).limit(12).sort('game24_average').exec((err, users) => {
+        db.User.find({appeared_in: msg.guild.id}).limit(12).sort(args[1] === 'min' ? "game24_min" : "game24_average").exec((err, users) => {
             let embed = new Discord.RichEmbed();
             embed.setTitle("24 Game Leaderboard");
             embed.setColor(0x00FFFF);
@@ -83,6 +83,7 @@ exports.directControl = async function (msg) {
             if (!user.appeared_in.includes(msg.guild.id)) user.appeared_in.push(msg.guild.id);
             user.game24_history.push(millis);
             user.game24_average = stats.mean(user.game24_history);
+            user.game24_min = Math.min.apply(null, user.game24_history);
             user.save();
         });
         delete GAMES[msg.author.id];
