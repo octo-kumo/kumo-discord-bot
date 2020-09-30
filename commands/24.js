@@ -26,10 +26,17 @@ exports.handleCommand = function (args, msg, PREFIX) {
         msg.reply('Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`, try to get **48**!');
     } else if (['impos', 'imposs', 'impossible'].includes(args[0])) {
         if (!GAMES[msg.author.id]) return msg.reply("You are not playing");
-        let solution = solver.solve24Array(GAMES[msg.author.id].digits);
+        let game = GAMES[msg.author.id].digits;
+        let solution = solve24game.apply(null, [...game.digits, (game.goal || 24)]);
         if (!solution) msg.reply('It is **impossible**!');
-        else msg.reply('Sorry but one **possible** solution is `' + solution + '`');
+        else msg.reply('Sorry but one **possible** solution is `' + solution[0] + '`. Found ' + solution.length);
         delete GAMES[msg.author.id];
+    } else if (['solve', 'whatis'].includes(args[0])) {
+        if (GAMES[msg.author.id]) return msg.reply("You playing a game, **XXXXX**");
+        args.shift();
+        let solution = solve24game.apply(null, args);
+        if (solution.length === 0) msg.reply('It is **impossible**!');
+        else msg.reply('Found ' + solution.length + ', one solution is `' + solution[0] + '`');
     } else if (['profile'].includes(args[0])) {
         db.User.findOne({id: msg.author.id}).then(user => {
             if (!user) return msg.reply("You do not have a profile!");
