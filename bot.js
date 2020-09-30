@@ -68,7 +68,7 @@ client.on('message', async msg => {
     if (msg.channel.id === "720891248352952341" && !process.env.LOCAL) return; // skip if not testing locally
 
     let matcher = msg.content.replace(/[^\w ]+/g, '').trim().toLowerCase()
-    if (msg.guild && msg.guild.id !== "642273802520231936" && Math.random() > .8) {
+    if (msg.guild && msg.guild.id !== "642273802520231936" && Math.random() > .999) {
         if (config.SIMPLE_REPLIES[matcher])
             return msg.channel.send(config.SIMPLE_REPLIES[matcher]);
         for (let key of Object.keys(config.CONTAINS_REPLIES))
