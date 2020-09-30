@@ -31,7 +31,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
         if (!GAMES[msg.author.id]) return msg.reply("You are not playing");
         let game = GAMES[msg.author.id].digits;
         let solution = solve24game.apply(null, [...game.digits, (game.goal || 24)]);
-        if (!solution) msg.reply('It is **impossible**!');
+        if (solution.length === 0) msg.reply('It is **impossible**!');
         else msg.reply('Sorry but one **possible** solution is `' + solution[0] + '`. Found ' + solution.length);
         delete GAMES[msg.author.id];
     } else if (['solve', 'whatis'].includes(args[0])) {
