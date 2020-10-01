@@ -37,9 +37,16 @@ exports.handleCommand = function (args, msg, PREFIX) {
     } else if (['solve', 'whatis'].includes(args[0])) {
         if (GAMES[msg.author.id]) return msg.reply("You playing a game, **XXXXX**");
         args.shift();
+        let showAll = false;
+        if (args[0] === "all") {
+            args.shift();
+            showAll = true;
+        }
         let solution = solve24game.apply(null, args);
         if (solution.length === 0) msg.reply('It is **impossible**!');
-        else msg.reply('Found ' + solution.length + ', one solution is `' + solution[0] + '`');
+        else if (showAll) {
+            msg.reply('Found ' + solution.length + ' solutions.\n```\n' + solution.join('\n') + '\n```');
+        } else msg.reply('Found ' + solution.length + ', one solution is `' + solution[0] + '`');
     } else if (['profile'].includes(args[0])) {
         db.User.findOne({id: msg.author.id}).then(user => {
             if (!user) return msg.reply("You do not have a profile!");
