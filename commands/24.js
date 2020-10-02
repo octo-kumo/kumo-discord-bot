@@ -19,14 +19,16 @@ exports.handleCommand = function (args, msg, PREFIX) {
             start: Date.now()
         };
         msg.reply('Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`');
-    } else if (["48", "expert"].includes(args[0])) {
+    } else if (!isNaN(args[0])) {
         if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
+        let goal = parseInt(args[0]);
+        if (goal < 1 || goal > 99) return msg.reply("Only 1-99 allowed!");
         let game = GAMES[msg.author.id] = {
             digits: [0, 1, 2, 3].map(() => Math.floor(Math.random() * 13) + 1),
-            goal: 48,
+            goal: goal,
             start: Date.now()
         };
-        msg.reply('Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`, try to get **48**!');
+        msg.reply('Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`, try to get **' + goal + '**!');
     } else if (['impos', 'imposs', 'impossible'].includes(args[0])) {
         if (!GAMES[msg.author.id]) return msg.reply("You are not playing");
         let game = GAMES[msg.author.id];
@@ -48,9 +50,11 @@ exports.handleCommand = function (args, msg, PREFIX) {
             msg.reply('Found ' + solution.length + ' solutions.\n```\n' + solution.join('\n') + '\n```');
         } else msg.reply('Found ' + solution.length + ', one solution is `' + solution[0] + '`');
     } else if (['profile'].includes(args[0])) {
-        db.User.findOne({id: msg.author.id}).then(user => {
-            if (!user) return msg.reply("You do not have a profile!");
-            if (user.game24_history.length === 0) return msg.reply("You have not played any 24 games!");
+        let user_to_show = null;
+        if (msg.mentions.users.size > 0) user_to_show = msg.mentions.users.first();
+        db.User.findOne({id: (user_to_show || msg.author).id}).then(user => {
+            if (!user) return msg.reply((user_to_show ? "This person" : "You") + " do not have a profile!");
+            if (user.game24_history.length === 0) return msg.reply((user_to_show ? "This person" : "You") + " have not played any 24 games!");
             let embed = new Discord.RichEmbed();
             embed.setColor(0x00FFFF);
             embed.setTitle("24 Game Profile");
@@ -61,7 +65,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
             embed.addField("Median", `${round(stats.median(user.game24_history) / 1000, 2)}s`, true);
             embed.addField("Mode", `${round(stats.mode(user.game24_history) / 1000, 2)}s`, true);
             embed.addField("σ (STDEV)", `${round(stats.stdev(user.game24_history) / 1000, 2)}s`, true);
-            embed.setFooter("Profile of " + msg.author.tag, msg.author.avatarURL);
+            embed.setFooter("Profile of " + user_to_show.tag, user_to_show.avatarURL);
             return msg.channel.send(embed);
         });
     } else if (['leaderboard', 'lb'].includes(args[0])) {
