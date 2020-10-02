@@ -56,7 +56,7 @@ exports.daily = function (args, msg, PREFIX) {
                 msg.reply("**Nice!** You received **$" + credit + "**");
             } else if (credit < 0.95) {
                 credit = 200;
-                msg.reply("**Hooray! Jackpot!** You received $" + credit + "**");
+                msg.reply("**Hooray! Jackpot!** You received **$" + credit + "**");
             }
             user.credit += credit;
             user.daily_last_claimed = Date.now();
