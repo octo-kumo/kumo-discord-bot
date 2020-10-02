@@ -2,6 +2,7 @@
 const Discord = require('discord.js');
 const config = require('./commands/config.js').config;
 // const coursemology = require('./coursemology.js');
+const eco = require('./commands/eco.js');
 const covid = require('./commands/covid.js');
 const azurlane = require('./commands/azurlane.js');
 const gomoku = require('./commands/gomoku.js');
@@ -142,6 +143,12 @@ client.on('message', async msg => {
             console.log("told " + msg.author.username + " to not to goto sleep");
         }
     }
+    // ECO
+    if (command === "daily") eco.daily(args, msg, PREFIX);
+    if (command === "flip" || command === "coin" || command === "flipcoin") eco.flip_coin(!args, msg, PREFIX);
+    if (command === "balance" || command === "bal") eco.balance(args, msg, PREFIX);
+
+
     if (command === "clear") msg.channel.bulkDelete(parseInt(args[0])).then(messages => msg.reply("Deleted " + messages.keyArray().length + " messages")).catch(console.error);
     if (msg.author.id === "456001047756800000" && command === "debug") {
         config.debug = !config.debug;

@@ -9,9 +9,18 @@ const User = new Schema({
         unique: true,
         required: true
     },
+    // eco
     credit: {
         type: Number,
         required: true,
+        default: 0
+    },
+    daily_last_claimed: {
+        type: Date,
+        default: 0
+    },
+    daily_count: {
+        type: Number,
         default: 0
     },
     appeared_in: {
@@ -19,6 +28,7 @@ const User = new Schema({
         required: true,
         default: () => []
     },
+    // 24
     game24_history: {
         type: Array,
         default: () => []
