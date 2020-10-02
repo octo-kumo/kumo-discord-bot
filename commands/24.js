@@ -51,7 +51,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
         } else msg.reply('Found ' + solution.length + ', one solution is `' + solution[0] + '`');
     } else if (['profile'].includes(args[0])) {
         let user_to_show = null;
-        if (msg.mentions.users.size > 0) user_to_show = msg.mentions.users.first();
+        if (msg.mentions.users.size !== 0) user_to_show = msg.mentions.users.first();
         db.User.findOne({id: (user_to_show || msg.author).id}).then(user => {
             if (!user) return msg.reply((user_to_show ? "This person" : "You") + " do not have a profile!");
             if (user.game24_history.length === 0) return msg.reply((user_to_show ? "This person" : "You") + " have not played any 24 games!");
@@ -65,7 +65,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
             embed.addField("Median", `${round(stats.median(user.game24_history) / 1000, 2)}s`, true);
             embed.addField("Mode", `${round(stats.mode(user.game24_history) / 1000, 2)}s`, true);
             embed.addField("σ (STDEV)", `${round(stats.stdev(user.game24_history) / 1000, 2)}s`, true);
-            embed.setFooter("Profile of " + user_to_show.tag, user_to_show.avatarURL);
+            embed.setFooter("Profile of " + (user_to_show || msg.author).tag, (user_to_show || msg.author).avatarURL);
             return msg.channel.send(embed);
         });
     } else if (['leaderboard', 'lb'].includes(args[0])) {
