@@ -48,13 +48,13 @@ exports.daily = function (args, msg, PREFIX) {
             if (diff < 86400000) return msg.reply("Please wait for `" + Math.floor((86400000 - diff) / 1000) + "s` before claiming daily again!");
             user.daily_count = (user.daily_count || 0) + 1;
             let credit = Math.random();
-            if (credit < 0.5) {
+            if (credit < 0.7) {
                 credit = 20;
                 msg.reply("You received **$" + credit + "**");
-            } else if (credit < 0.8) {
+            } else if (credit < 0.95) {
                 credit = 50;
                 msg.reply("**Nice!** You received **$" + credit + "**");
-            } else if (credit < 0.95) {
+            } else {
                 credit = 200;
                 msg.reply("**Hooray! Jackpot!** You received **$" + credit + "**");
             }
