@@ -66,8 +66,9 @@ exports.handleCommand = function (args, msg, PREFIX) {
             let embed = new Discord.RichEmbed();
             embed.setColor(0x00FFFF);
             embed.setTitle("24 Game Profile");
-            if (!user.game24_total_play_count) user.game24_total_play_count = user.game24_history.length;
+            if (user.game24_total_play_count < user.game24_history.length) user.game24_total_play_count = user.game24_history.length;
             embed.addField("Accuracy", `${round(user.game24_history.length * 100 / user.game24_total_play_count, 2)}%`, true);
+            embed.addField("Play Count", 'x' + user.game24_total_play_count, true);
             embed.addField("Min", `${round(Math.min.apply(null, user.game24_history) / 1000, 2)}s`, true);
             embed.addField("Max", `${round(Math.max.apply(null, user.game24_history) / 1000, 2)}s`, true);
             embed.addField("Total", `${round(stats.sum(user.game24_history) / 1000, 2)}s`, true);
