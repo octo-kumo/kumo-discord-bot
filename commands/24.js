@@ -62,8 +62,8 @@ exports.handleCommand = function (args, msg, PREFIX) {
         if (msg.mentions.users.size !== 0) user_to_show = msg.mentions.users.first();
         db.User.findOne({id: (user_to_show || msg.author).id}).then(user => {
             if (!user) return msg.reply((user_to_show ? "This person" : "You") + " do not have a profile!");
-            if (user.game24_total_play_count < user.game24_history.length) {
-                user.game24_total_play_count = user.game24_history.length;
+            if ((!user.game24_total_play_count) || user.game24_total_play_count < user.game24_history.length) {
+                user.game24_total_play_count = user.game24_history ? user.game24_history.length : 0;
                 user.save();
             }
             if (user.game24_total_play_count === 0) return msg.reply((user_to_show ? "This person" : "You") + " have not played any 24 games!");
