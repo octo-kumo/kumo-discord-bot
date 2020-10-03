@@ -11,6 +11,10 @@ exports.handleCommand = function (args, msg, PREFIX) {
             digits: [0, 1, 2, 3].map(() => Math.floor(Math.random() * 9) + 1),
             start: Date.now()
         };
+        db.User.findOrCreate({id: msg.author.id}, (err, user) => {
+            user.game24_total_play_count = (user.game24_total_play_count || 0) + 1;
+            user.save();
+        });
         msg.reply('Your numbers are `' + game.digits.map(i => String(i)).join(" ") + '`');
     } else if (["hard", "difficult", "full"].includes(args[0])) {
         if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
@@ -18,6 +22,10 @@ exports.handleCommand = function (args, msg, PREFIX) {
             digits: [0, 1, 2, 3].map(() => Math.floor(Math.random() * 13) + 1),
             start: Date.now()
         };
+        db.User.findOrCreate({id: msg.author.id}, (err, user) => {
+            user.game24_total_play_count = (user.game24_total_play_count || 0) + 1;
+            user.save();
+        });
         msg.reply('Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`');
     } else if (!isNaN(args[0])) {
         if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
@@ -28,7 +36,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
             goal: goal,
             start: Date.now()
         };
-        msg.reply('Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`, try to get **' + goal + '**!');
+        msg.reply('**UNRANKED** Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`, try to get **' + goal + '**!');
     } else if (['impos', 'imposs', 'impossible'].includes(args[0])) {
         if (!GAMES[msg.author.id]) return msg.reply("You are not playing");
         let game = GAMES[msg.author.id];
@@ -58,6 +66,8 @@ exports.handleCommand = function (args, msg, PREFIX) {
             let embed = new Discord.RichEmbed();
             embed.setColor(0x00FFFF);
             embed.setTitle("24 Game Profile");
+            if (!user.game24_total_play_count) user.game24_total_play_count = user.game24_history.length;
+            embed.addField("Accuracy", `${round(user.game24_history.length * 100 / user.game24_total_play_count, 2)}%`, true);
             embed.addField("Min", `${round(Math.min.apply(null, user.game24_history) / 1000, 2)}s`, true);
             embed.addField("Max", `${round(Math.max.apply(null, user.game24_history) / 1000, 2)}s`, true);
             embed.addField("Total", `${round(stats.sum(user.game24_history) / 1000, 2)}s`, true);
@@ -89,7 +99,7 @@ exports.directControl = async function (msg) {
     )) {
         let millis = Date.now() - game.start;
         msg.reply('You are **correct**! Time used = `' + (Math.floor(millis / 10) / 100) + 's`');
-        db.User.findOrCreate({id: msg.author.id}, function (err, user) {
+        if (game.goal === 24) db.User.findOrCreate({id: msg.author.id}, function (err, user) {
             if (!user.game24_history) user.game24_history = [];
             if (!user.appeared_in.includes(msg.guild.id)) user.appeared_in.push(msg.guild.id);
             user.game24_history.push(millis);
