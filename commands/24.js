@@ -62,11 +62,14 @@ exports.handleCommand = function (args, msg, PREFIX) {
         if (msg.mentions.users.size !== 0) user_to_show = msg.mentions.users.first();
         db.User.findOne({id: (user_to_show || msg.author).id}).then(user => {
             if (!user) return msg.reply((user_to_show ? "This person" : "You") + " do not have a profile!");
-            if (user.game24_history.length === 0) return msg.reply((user_to_show ? "This person" : "You") + " have not played any 24 games!");
+            if (user.game24_total_play_count < user.game24_history.length) {
+                user.game24_total_play_count = user.game24_history.length;
+                user.save();
+            }
+            if (user.game24_total_play_count === 0) return msg.reply((user_to_show ? "This person" : "You") + " have not played any 24 games!");
             let embed = new Discord.RichEmbed();
             embed.setColor(0x00FFFF);
             embed.setTitle("24 Game Profile");
-            if (user.game24_total_play_count < user.game24_history.length) user.game24_total_play_count = user.game24_history.length;
             embed.addField("Accuracy", `${round(user.game24_history.length * 100 / user.game24_total_play_count, 2)}%`, true);
             embed.addField("Play Count", 'x' + user.game24_total_play_count, true);
             embed.addField("Min", `${round(Math.min.apply(null, user.game24_history) / 1000, 2)}s`, true);
