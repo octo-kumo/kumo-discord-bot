@@ -97,7 +97,7 @@ exports.directControl = async function (msg) {
     let game = GAMES[msg.author.id];
     if (!game) return false;
     if (!ANSWER_REGEX.test(msg.content)) return;
-    if (eval(msg.content) === (game.goal || 24) && arraysEqual(
+    if (parseFloat(eval(msg.content).toPrecision(5)) === (game.goal || 24) && arraysEqual(
         msg.content.replace(/[^\d]/g, '').split('').map(c => parseInt(c)).sort(),
         game.digits.join('').split('').map(c => parseInt(c)).sort()
     )) {
