@@ -24,18 +24,7 @@ const client = new Discord.Client();
 
 // Embed Presets
 const PING_EMBED = new Discord.RichEmbed().setTitle("Ping Results").setColor(0x21f8ff).addField("Latency", 0).addField("API Latency", 0);
-const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff)
-    .addField(`${PREFIX}ping`, "Get the bot's ping", true)
-    .addField(`${PREFIX}music [play|skip|import|stop|pause]`, "I am a music bot", true)
-    .addField(`${PREFIX}covid [country name]`, "Get COVID-19 data", true)
-    .addField(`${PREFIX}azurlane`, `Find information on your ship waifu\nUsage: \`${PREFIX}azurlane (ship-name)\``)
-    .addField(`${PREFIX}azurlane find`, `Query for a list of ships\nUsage: \`${PREFIX}azurlane find (field=value)/(field>value)+\`\nSeperated by ',' (comma)`)
-    // .addField(`${PREFIX}coursemology`, `Access Coursemology.\nUsage: \`${PREFIX}coursemology (info|list|user) [args]\``)
-    // .addField(`${PREFIX}timetable`, `Access time table\nUsage: \`${PREFIX}timetable [next|now]? [classname]?\``)
-    .addField(`${PREFIX}24`, `Play 24 the number game\nUsage: \`${PREFIX}24\`, \`${PREFIX}24 impossible\``)
-    .addField(`${PREFIX}minesweeper`, `Play minesweeper the mine game\nUsage: \`${PREFIX}minesweeper size\`, \`x y\``)
-    .addField(`${PREFIX}gomoku`, `Play gomoku the monotone game\nUsage: \`${PREFIX}gomoku start size goal\`, \`x y\``)
-    .addField(`${PREFIX}sleep`, "Tell you whether or not you should sleep.")
+const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff).setDescription("```\n" + Object.keys(config.HELP).join(" ") + "\n```").setFooter(`Get more help with \`${PREFIX}help [command]\``);
 chainUpStdOut();
 console.log('====== ZY Discord Bot Started! ======');
 
@@ -88,7 +77,14 @@ client.on('message', async msg => {
     let args = msg.content.slice(1).trim().split(/\s+/g);
     const command = args.shift().toLowerCase();
     console.log(`running "${command}", args = [${args.join(", ")}]...`);
-    if (command === "help") await msg.channel.send(HELP_EMBED);
+    if (command === "help") {
+        if (args.length === 0) await msg.channel.send(HELP_EMBED);
+        else {
+            args[0] = args[0].toLowerCase();
+            if (config.HELP.hasOwnProperty(args[0])) await msg.channel.send("**Help for command `" + args[0] + "`**\n" + config.HELP[args[0]]);
+            else await msg.channel.send("Is there help for command `" + args[0] + "`?\nNo, you are dumb.");
+        }
+    }
     if (command === "ping") {
         const m = await msg.channel.send("Ping?");
         PING_EMBED.fields[0].value = `${m.createdTimestamp - msg.createdTimestamp}ms`;

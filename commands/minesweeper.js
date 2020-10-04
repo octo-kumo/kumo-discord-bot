@@ -130,7 +130,6 @@ exports.handleCommand = function(args, msg, PREFIX) {
     let command = args.shift()
     switch (command) {
         case "stop":
-        case "s":
             if (!game) return msg.reply("You are not in the mine field");
             game.clearDisplay();
             delete GAMES[msg.author.id];

@@ -37,7 +37,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
             start: Date.now()
         };
         msg.reply('**UNRANKED** Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`, try to get **' + goal + '**!');
-    } else if (['impos', 'imposs', 'impossible'].includes(args[0])) {
+    } else if (['imp','impos', 'imposs', 'impossible'].includes(args[0])) {
         if (!GAMES[msg.author.id]) return msg.reply("You are not playing");
         let game = GAMES[msg.author.id];
         let solution = solve24game.apply(null, [...game.digits, (game.goal || 24)]);

@@ -110,7 +110,6 @@ exports.config = {
     SIMPLE_REPLIES: {
         'oof': 'Indeed',
         'idk': 'me neither',
-        '😉': ';)',
         'lol': ':P',
         'wip': ';)',
         'bio': 'you are bio',
@@ -132,5 +131,39 @@ exports.config = {
         "Are you perhaps accelerated?",
         "Only **Year 4** classes please!",
         "Me: What is your class?\nYou: ***Yes***"
-    ]
+    ],
+    HELP: {
+        "help": "Shows this help message",
+        "ping": "Shows the bot's ping",
+        "emotes": "List this server's emotes",
+        "bubble": "`bubble [size]`\nPop those bubbles!",
+        "anime": "`anime [anime/manga] [args]`\nFind information on your favourite anime/manga!",
+        "minesweeper": "`minesweeper [{size}/start/refresh/stop] [size]`\nEnter the minefield baka mitai ni\n**Note** Use `x y` or `f x y` to play",
+        "minecraft": "`minecraft [server/user] [ip/name]`\nQuery your minecraft server/account",
+        "covid": "`covid [country name/world]`\nFind data on current covid situation\n" +
+            "**Advanced usage:**\n" +
+            "1. `covid ... [-ignore=[total,active,deaths,cured,new]]`, ignore specified data when drawing graph\n" +
+            "2. `covid ... [number]`, limit graph to specified numbers of days",
+        "inspire": "*Inspires you*",
+        "azurlane": "Azur Lane command owo!\n" +
+            "`find? [ship name]`, basic ship query\n" +
+            "`memory [memory name]`, basic memory query\n" +
+            "`chapter [chapter id e.g. 1]`, basic chapter query\n" +
+            "`json [ship name], **SPAMMY** gets raw json data of ship",
+        "music": "I am a music bot owo\nHow to use me shall stay a mistery uwu",
+        "gomoku": "Play gomoku game",
+        "24": "Play the 24 game\n" +
+            "`24 [goal? default=24]` to start game\n" +
+            "`24 hard` to use bigger numbers\n" +
+            "`24 profile [mention?]` to view profile\n" +
+            "`24 [imp/impos/imposs/impossible]` claim impossible\n" +
+            "`24 solve [a] [b] [c] [d] [goal?]` solve it for you\n" +
+            "`24 leaderboard [min?]` view leaderboard\n" +
+            "**Note** to answer the puzzle, just send the solution directly. e.g. **\"1*2*3*4\"**",
+        "waifulabs": "Generate random anime girls pfp",
+        "sleep": "Maybe you should sleep",
+        "daily": "Claim your daily prize",
+        "flip": "Flip a coin, double or nothing",
+        "balance": "View your current balance"
+    }
 }
