@@ -3,6 +3,7 @@ const Discord = require('discord.js');
 const config = require('./commands/config.js').config;
 // const coursemology = require('./coursemology.js');
 const eco = require('./commands/eco.js');
+const bilibili = require('./commands/bilibili.js');
 const covid = require('./commands/covid.js');
 const azurlane = require('./commands/azurlane.js');
 const gomoku = require('./commands/gomoku.js');
@@ -38,6 +39,7 @@ client.on('ready', () => {
     config.HOOK2 = new Discord.WebhookClient('676309488021798912', process.env.HKTOKEN2);
     config.id = client.user.id;
     azurlane.init().then(r => console.log("Azurlane Init!"));
+    bilibili.init().then(r => console.log("Bilibili Init!"));
     // coursemology.init();
     // setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
     const covidChannel = client.guilds.get('642273802520231936').channels.get('693051246885470209');
@@ -102,6 +104,7 @@ client.on('message', async msg => {
         sendBubblePop(msg, args);
     }
     if (command === "anime" || command === "a") await anime.handleCommand(args, msg, PREFIX);
+    if (command === "bilibili" || command === "b") await bilibili.handleCommand(args, msg, PREFIX);
     if (command === "ms" || command === "minesweeper") minesweeper.handleCommand(args, msg, PREFIX);
     if (command === "minecraft") minecraft.handleCommand(args, msg, PREFIX);
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") await covid.handleCommand(args, msg, PREFIX);
