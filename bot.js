@@ -100,6 +100,11 @@ client.on('message', async msg => {
     if (command === "list-emotes" || command === "emotes") {
         await sendLongMessage(msg.channel, "**Emotes:**\n" + join(msg.guild.emojis.array().map(e => `<:${e.name}:${e.id}> \`:${e.name}:\``), [" ", " ", "\n"]));
     }
+    if (command === "horny") {
+        let words = ['no', 'stop', 'dude', 'literally', 'like', 'seriously', 'fuck'];
+        shuffle(words);
+        await msg.reply(words.join(' '));
+    }
     if (command === "pop" || command === "bubble" || command === "bubbles" || command === "bubble-pop") {
         sendBubblePop(msg, args);
     }
@@ -218,4 +223,18 @@ async function sendLongMessage(channel, msg, objects) {
 
 function sendBubblePop(msg, args) {
     return msg.channel.send("||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||\n".repeat(args[0] && !isNaN(args[0]) ? Math.min(24, Math.max(1, parseInt(args[0]))) : 8) + `Have fun, ${msg.author.username}! (๑•̀ㅂ•́)و`);
+}
+
+
+function shuffle(array) {
+    let currentIndex = array.length, temporaryValue, randomIndex;
+    while (0 !== currentIndex) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
 }

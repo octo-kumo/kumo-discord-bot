@@ -37,7 +37,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
             start: Date.now()
         };
         msg.reply('**UNRANKED** Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`, try to get **' + goal + '**!');
-    } else if (['imp','impos', 'imposs', 'impossible'].includes(args[0])) {
+    } else if (['imp', 'impos', 'imposs', 'impossible'].includes(args[0])) {
         if (!GAMES[msg.author.id]) return msg.reply("You are not playing");
         let game = GAMES[msg.author.id];
         let solution = solve24game.apply(null, [...game.digits, (game.goal || 24)]);
@@ -70,24 +70,32 @@ exports.handleCommand = function (args, msg, PREFIX) {
             let embed = new Discord.RichEmbed();
             embed.setColor(0x00FFFF);
             embed.setTitle("24 Game Profile");
-            embed.addField("Accuracy", `${round(user.game24_history.length * 100 / user.game24_total_play_count, 2)}%`, true);
+            embed.addField("Accuracy", `${round(user.game24_history.length * 100 / user.game24_total_play_count, 3)}%`, true);
             embed.addField("Play Count", 'x' + user.game24_total_play_count, true);
-            embed.addField("Min", `${round(Math.min.apply(null, user.game24_history) / 1000, 2)}s`, true);
-            embed.addField("Max", `${round(Math.max.apply(null, user.game24_history) / 1000, 2)}s`, true);
+            embed.addField("Min", `${round(Math.min.apply(null, user.game24_history) / 1000, 3)}s`, true);
+            embed.addField("Max", `${round(Math.max.apply(null, user.game24_history) / 1000, 3)}s`, true);
             embed.addField("Total", `${round(stats.sum(user.game24_history) / 1000, 2)}s`, true);
-            embed.addField("Average", `${round(stats.mean(user.game24_history) / 1000, 2)}s`, true);
-            embed.addField("Median", `${round(stats.median(user.game24_history) / 1000, 2)}s`, true);
-            embed.addField("Mode", `${round(stats.mode(user.game24_history) / 1000, 2)}s`, true);
-            embed.addField("σ (STDEV)", `${round(stats.stdev(user.game24_history) / 1000, 2)}s`, true);
+            embed.addField("Average", `${round(stats.mean(user.game24_history) / 1000, 3)}s`, true);
+            embed.addField("Median", `${round(stats.median(user.game24_history) / 1000, 3)}s`, true);
+            embed.addField("Mode", `${round(stats.mode(user.game24_history) / 1000, 3)}s`, true);
+            embed.addField("σ (STDEV)", `${round(stats.stdev(user.game24_history) / 1000, 3)}s`, true);
             embed.setFooter("Profile of " + (user_to_show || msg.author).tag, (user_to_show || msg.author).avatarURL);
             return msg.channel.send(embed);
         });
     } else if (['leaderboard', 'lb'].includes(args[0])) {
-        db.User.find({appeared_in: msg.guild.id}).limit(12).sort(args[1] === 'min' ? "game24_min" : "game24_average").exec((err, users) => {
+        let dict = {
+            "min": "game24_min",
+            "average": "game24_average",
+            "count": "game24_total_play_count"
+        };
+        let key = dict[(args[1] || 'average').toLowerCase().trim()];
+        if (!key) key = 'game24_average';
+        db.User.find({appeared_in: msg.guild.id}).limit(12).sort(key).exec((err, users) => {
+            console.log("Hi")
             let embed = new Discord.RichEmbed();
             embed.setTitle("24 Game Leaderboard");
             embed.setColor(0x00FFFF);
-            embed.setDescription(users.map((user, i) => `\`#${i + 1}\` <@${user.id}>: **${round(user[args[1] === 'min' ? "game24_min" : "game24_average"] / 1000, 2)}s**`).join("\n"));
+            embed.setDescription(users.map((user, i) => `\`#${i + 1}\` <@${user.id}>: **${round(user[key] / 1000, 3)}s**`).join("\n"));
             return msg.channel.send(embed);
         });
     }
