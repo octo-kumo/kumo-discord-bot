@@ -4,6 +4,15 @@ const stats = require("stats-lite");
 const db = require("../db");
 const GAMES = [];
 const round = (n, p) => parseFloat(String(n)).toFixed(p);
+
+function getHardDigits(layer) {
+    if (layer > 10000) return null;
+    let digits = [0, 1, 2, 3].map(() => Math.floor(Math.random() * 13) + 1);
+    let solution = solve24game.apply(null, digits);
+    if (solution.length === 1) return digits;
+    else return getHardDigits(layer++);
+}
+
 exports.handleCommand = function (args, msg, PREFIX) {
     if (args.length === 0) {
         if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
@@ -27,16 +36,27 @@ exports.handleCommand = function (args, msg, PREFIX) {
             user.save();
         });
         msg.reply('Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`');
+    } else if (["hardcore", "superhard"].includes(args[0])) {
+        if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
+        let hardDigits = getHardDigits(0);
+        if (!hardDigits) return msg.reply("Took way too long trying to find hard digits, giving up...");
+        let game = GAMES[msg.author.id] = {
+            unrank: true,
+            digits: hardDigits,
+            start: Date.now()
+        };
+        msg.reply('**UNRANKED** Your hardcore numbers are `' + game.digits.map(i => String(i)).join(" ") + '` (Only 1 solution!)');
     } else if (!isNaN(args[0])) {
         if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
         let goal = parseInt(args[0]);
         if (goal < 1 || goal > 99) return msg.reply("Only 1-99 allowed!");
         let game = GAMES[msg.author.id] = {
+            unrank: true,
             digits: [0, 1, 2, 3].map(() => Math.floor(Math.random() * 13) + 1),
             goal: goal,
             start: Date.now()
         };
-        msg.reply('**UNRANKED** Your harder numbers are `' + game.digits.map(i => String(i)).join(" ") + '`, try to get **' + goal + '**!');
+        msg.reply('**UNRANKED** Your numbers are `' + game.digits.map(i => String(i)).join(" ") + '`, try to get **' + goal + '**!');
     } else if (['imp', 'impos', 'imposs', 'impossible'].includes(args[0])) {
         if (!GAMES[msg.author.id]) return msg.reply("You are not playing");
         let game = GAMES[msg.author.id];
@@ -111,7 +131,7 @@ exports.directControl = async function (msg) {
     )) {
         let millis = Date.now() - game.start;
         msg.reply('You are **correct**! Time used = `' + (Math.floor(millis / 10) / 100) + 's`');
-        if (game.goal === 24) db.User.findOrCreate({id: msg.author.id}, function (err, user) {
+        if (!game.unrank) db.User.findOrCreate({id: msg.author.id}, function (err, user) {
             if (!user.game24_history) user.game24_history = [];
             if (!user.appeared_in.includes(msg.guild.id)) user.appeared_in.push(msg.guild.id);
             user.game24_history.push(millis);
