@@ -110,14 +110,23 @@ exports.handleCommand = function (args, msg, PREFIX) {
         };
         let key = dict[(args[1] || 'average').toLowerCase().trim()];
         if (!key) key = 'game24_average';
-        db.User.find({appeared_in: msg.guild.id}).limit(12).sort(key).exec((err, users) => {
-            console.log("Hi")
-            let embed = new Discord.RichEmbed();
-            embed.setTitle("24 Game Leaderboard");
-            embed.setColor(0x00FFFF);
-            embed.setDescription(users.map((user, i) => `\`#${i + 1}\` <@${user.id}>: **${round(user[key] / 1000, 3)}s**`).join("\n"));
-            return msg.channel.send(embed);
-        });
+        if (key === "game24_total_play_count") {
+            db.User.find({appeared_in: msg.guild.id}).limit(15).sort("-game24_total_play_count").exec((err, users) => {
+                let embed = new Discord.RichEmbed();
+                embed.setTitle("24 Game Leaderboard");
+                embed.setColor(0x00FFFF);
+                embed.setDescription(users.map((user, i) => `\`#${i + 1}\` <@${user.id}>: **x${user[key]}**`).join("\n"));
+                return msg.channel.send(embed);
+            });
+        } else {
+            db.User.find({appeared_in: msg.guild.id}).limit(15).sort(key).exec((err, users) => {
+                let embed = new Discord.RichEmbed();
+                embed.setTitle("24 Game Leaderboard");
+                embed.setColor(0x00FFFF);
+                embed.setDescription(users.map((user, i) => `\`#${i + 1}\` <@${user.id}>: **${round(user[key] / 1000, 3)}s**`).join("\n"));
+                return msg.channel.send(embed);
+            });
+        }
     }
 }
 const ANSWER_REGEX = /^[()+\-*%/\s]*\d+[()+\-*%/\s]+\d+[()+\-*%/\s]+\d+[()+\-*%/\s]+\d+[()+\-*%/\s]*$/;
