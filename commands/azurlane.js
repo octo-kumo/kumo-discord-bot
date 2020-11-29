@@ -482,6 +482,7 @@ function generateSkillsPage(ship) {
 
 function getShipByName(name) {
     for (let ship of SHIPS) {
+        if (ship.id && ship.id.toUpperCase() === name.toUpperCase()) return ship;
         if (ship.names.en && normalize(ship.names.en.toUpperCase()) === normalize(name.toUpperCase())) return ship;
         if (ship.names.jp && normalize(ship.names.jp.toUpperCase()) === normalize(name.toUpperCase())) return ship;
         if (ship.names.kr && normalize(ship.names.kr.toUpperCase()) === normalize(name.toUpperCase())) return ship;

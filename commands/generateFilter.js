@@ -2,9 +2,9 @@ const getEqualFilter = (child, value) => obj => obj[child] && obj[child].toUpper
 const getIncludeFilter = (child, value) => obj => obj[child] && obj[child].toUpperCase().includes(value.toUpperCase()); // includes operator
 const getNameFilter = (filterGen, value) => {
     let filters = [];
-    for (let lang of Object.keys(obj.names)) filters.push(filterGen(lang, value));
+    for (let lang of ["code", "en", "cn", "jp", "kr"]) filters.push(filterGen(lang, value));
     return obj => {
-        for (let filter of filters) if (filter(obj)) return true;
+        for (let filter of filters) if (filter(obj.names)) return true;
         return false;
     };
 };
