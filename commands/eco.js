@@ -25,7 +25,70 @@ exports.balance = function (args, msg, PREFIX) {
 }
 
 exports.pay = function (args, msg, PREFIX) {
+    if (msg.mentions.users.size > 0) {
+        if (msg.mentions.users.first().id === msg.author.id) return msg.reply("You can't pay yourself!");
+        let amm = args[args.length - 1];
+        if (isNaN(amm)) return msg.reply("Please pay in numbers!");
+        amm = parseFloat(parseFloat(amm).toFixed(2));
+        if (amm <= 0) return msg.reply("Positive amount please");
+        db.User.findOrCreate({id: msg.author.id}, function (err, fromUser) {
+            if (fromUser.credit < amm) return msg.reply("You are too broke!");
+            db.User.findOrCreate({id: msg.mentions.users.first().id}, function (err, toUser) {
+                if (err) return msg.reply("Something wrong happened!");
+                fromUser.credit -= amm;
+                toUser.credit += amm;
+                fromUser.save();
+                toUser.save();
+                msg.reply(`You have paid <@!${toUser.id}> $${amm}`);
+            });
+        });
+    } else msg.reply(`You need to specify who to pay! \`${PREFIX}pay [user] [amount]\``);
+}
 
+const DUELS = {};
+exports.duel = function (args, msg, PREFIX) {
+    if (args.length === 0) {
+        msg.reply(`How to duel \`${PREFIX}duel [user] [amount]\``);
+    } else if (args[0] === "accept") {
+        if (!DUELS[msg.author.id]) return msg.reply("You have no duels!");
+        let last_duel = DUELS[msg.author.id].pop();
+        if (!last_duel) return msg.reply("You have no challengers!");
+        msg.reply("Accepting duel...");
+        let amm = last_duel.amount;
+        db.User.findOrCreate({id: msg.author.id}, function (err, userA) {
+            if (userA.credit < amm) return msg.channel.send(`<@!${msg.author.id}> is too broke! Duel cancelled!`);
+            db.User.findOrCreate({id: last_duel.challenger}, function (err, userB) {
+                if (err) return msg.reply("Something wrong happened!");
+                if (userB.credit < amm) return msg.channel.send(`<@!${last_duel.challenger}> is too broke! Duel cancelled!`);
+                let winner;
+                if (Math.random() < 0.5) {
+                    userA.credit -= amm;
+                    userB.credit += amm;
+                    winner = userB.id;
+                } else {
+                    userA.credit += amm;
+                    userB.credit -= amm;
+                    winner = userA.id;
+                }
+                userA.save();
+                userB.save();
+                msg.channel.send(`<@!${winner}> has won the duel of $${amm}!`);
+            });
+        });
+    } else if (msg.mentions.users.size > 0) {
+        let other_guy_id = msg.mentions.users.first().id;
+        if (other_guy_id === msg.author.id) return msg.reply("You can't duel yourself!");
+        let amm = args[args.length - 1];
+        if (isNaN(amm)) return msg.reply("Stack must be in numbers!");
+        amm = Math.floor(parseFloat(amm));
+        if (amm <= 0) return msg.reply("Positive amount please!");
+        if (!DUELS[other_guy_id]) DUELS[other_guy_id] = [];
+        DUELS[other_guy_id].push({
+            challenger: msg.author.id,
+            amount: amm
+        });
+        msg.channel.send(`${msg.author.username} has challenged <@!${other_guy_id}> to a duel of $${amm}!\nAccept by \`${PREFIX}duel accept\``);
+    } else msg.reply(`You need to specify who to duel! \`${PREFIX}duel [user] [amount]\``);
 }
 
 exports.daily = function (args, msg, PREFIX) {

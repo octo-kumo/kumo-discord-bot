@@ -148,6 +148,8 @@ client.on('message', async msg => {
         }
     }
     // ECO
+    if (command === "pay") eco.pay(args, msg, PREFIX);
+    if (command === "duel") eco.duel(args, msg, PREFIX);
     if (command === "daily") eco.daily(args, msg, PREFIX);
     if (command === "flip" || command === "coin" || command === "flipcoin") eco.flip_coin(!args, msg, PREFIX);
     if (command === "balance" || command === "bal") eco.balance(args, msg, PREFIX);
