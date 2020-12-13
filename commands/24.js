@@ -139,10 +139,12 @@ exports.directControl = async function (msg) {
         game.digits.join('').split('').map(c => parseInt(c)).sort()
     )) {
         let millis = Date.now() - game.start;
-        msg.reply('You are **correct**! Time used = `' + (Math.floor(millis / 10) / 100) + 's`');
+        let earning = Math.min(60, Math.max(0, (Math.floor(60 - millis / 1000))));
+        msg.reply(`You are **correct**! Time used = \`${Math.floor(millis / 10) / 100}s\`${game.unrank || earning === 0 ? '' : `\nAnd you earned $${earning}`}`);
         if (!game.unrank) db.User.findOrCreate({id: msg.author.id}, function (err, user) {
             if (!user.game24_history) user.game24_history = [];
             if (!user.appeared_in.includes(msg.guild.id)) user.appeared_in.push(msg.guild.id);
+            user.credit += earning;
             user.game24_history.push(millis);
             user.game24_average = stats.mean(user.game24_history);
             user.game24_min = Math.min.apply(null, user.game24_history);
