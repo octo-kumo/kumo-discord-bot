@@ -19,10 +19,16 @@ exports.flip_coin = function (args, msg, PREFIX) {
 exports.balance = function (args, msg, PREFIX) {
     if (msg.mentions.users.size > 0) db.User.findOne({id: msg.mentions.users.first().id}).then(user => {
         msg.reply(msg.mentions.users.first().username + " has **$" + (user.credit || 0) + "**");
-        if (!user.appeared_in.includes(msg.guild.id)) user.appeared_in.push(msg.guild.id);
+        if (!user.appeared_in.includes(msg.guild.id)) {
+            user.appeared_in.push(msg.guild.id);
+            user.save();
+        }
     }); else db.User.findOrCreate({id: msg.author.id}, function (err, user) {
         msg.reply("You have **$" + (user.credit || 0) + "**");
-        if (!user.appeared_in.includes(msg.guild.id)) user.appeared_in.push(msg.guild.id);
+        if (!user.appeared_in.includes(msg.guild.id)) {
+            user.appeared_in.push(msg.guild.id);
+            user.save();
+        }
     });
 }
 
@@ -60,6 +66,8 @@ exports.duel = function (args, msg, PREFIX) {
         db.User.findOrCreate({id: msg.author.id}, function (err, userA) {
             if (userA.credit < amm) return msg.channel.send(`<@!${msg.author.id}> is too broke! Duel cancelled!`);
             db.User.findOrCreate({id: last_duel.challenger}, function (err, userB) {
+                if (!userA.appeared_in.includes(msg.guild.id)) userA.appeared_in.push(msg.guild.id);
+                if (!userB.appeared_in.includes(msg.guild.id)) userB.appeared_in.push(msg.guild.id);
                 if (err) return msg.reply("Something wrong happened!");
                 if (userB.credit < amm) return msg.channel.send(`<@!${last_duel.challenger}> is too broke! Duel cancelled!`);
                 let winner;
@@ -101,10 +109,12 @@ exports.daily = function (args, msg, PREFIX) {
     });
     if (args[0] === "count") {
         return db.User.findOrCreate({id: msg.author.id}, function (err, user) {
+            if (err) return msg.reply("You died");
             msg.reply("You have claimed **daily** " + user.daily_count + " times.");
         });
     } else if (msg.mentions.users.size > 0) {
         return db.User.findOne({id: msg.mentions.users.first().id}).then(user => {
+            if (!user) return msg.reply("It died");
             msg.reply(msg.mentions.users.first().username + " has claimed **daily** " + user.daily_count + " times.");
         });
     } else {
@@ -125,6 +135,7 @@ exports.daily = function (args, msg, PREFIX) {
             }
             user.credit += credit;
             user.daily_last_claimed = Date.now();
+            if (!user.appeared_in.includes(msg.guild.id)) user.appeared_in.push(msg.guild.id);
             user.save();
         });
     }
