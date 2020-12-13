@@ -153,6 +153,7 @@ client.on('message', async msg => {
     if (command === "daily") eco.daily(args, msg, PREFIX);
     if (command === "flip" || command === "coin" || command === "flipcoin") eco.flip_coin(!args, msg, PREFIX);
     if (command === "balance" || command === "bal") eco.balance(args, msg, PREFIX);
+    if (command === "baltop") eco.baltop(args, msg, PREFIX);
 
 
     if (command === "clear") msg.channel.bulkDelete(parseInt(args[0])).then(messages => msg.reply("Deleted " + messages.keyArray().length + " messages")).catch(console.error);

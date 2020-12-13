@@ -19,8 +19,10 @@ exports.flip_coin = function (args, msg, PREFIX) {
 exports.balance = function (args, msg, PREFIX) {
     if (msg.mentions.users.size > 0) db.User.findOne({id: msg.mentions.users.first().id}).then(user => {
         msg.reply(msg.mentions.users.first().username + " has **$" + (user.credit || 0) + "**");
+        if (!user.appeared_in.includes(msg.guild.id)) user.appeared_in.push(msg.guild.id);
     }); else db.User.findOrCreate({id: msg.author.id}, function (err, user) {
         msg.reply("You have **$" + (user.credit || 0) + "**");
+        if (!user.appeared_in.includes(msg.guild.id)) user.appeared_in.push(msg.guild.id);
     });
 }
 
@@ -126,4 +128,14 @@ exports.daily = function (args, msg, PREFIX) {
             user.save();
         });
     }
+}
+
+exports.baltop = function (args, msg, PREFIX) {
+    db.User.find({appeared_in: msg.guild.id}).limit(15).sort("-credit").exec((err, users) => {
+        let embed = new Discord.RichEmbed();
+        embed.setTitle("Balance Leaderboard");
+        embed.setColor(0x00FFFF);
+        embed.setDescription(users.map((user, i) => `\`#${i + 1}\` <@${user.id}>: **$${user.credit}**`).join("\n"));
+        return msg.channel.send(embed);
+    });
 }
