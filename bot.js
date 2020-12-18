@@ -156,7 +156,7 @@ client.on('message', async msg => {
     if (command === "baltop") eco.baltop(args, msg, PREFIX);
 
 
-    if (command === "clear") msg.channel.bulkDelete(parseInt(args[0])).then(messages => msg.reply("Deleted " + messages.keyArray().length + " messages")).catch(console.error);
+    if (msg.author.id === "456001047756800000" && command === "clear") msg.channel.bulkDelete(parseInt(args[0])).then(messages => msg.reply("Deleted " + messages.keyArray().length + " messages")).catch(console.error);
     if (msg.author.id === "456001047756800000" && command === "debug") {
         config.debug = !config.debug;
         console.log("DEBUG TOGGLED, debug = " + config.debug)

@@ -8,7 +8,7 @@ const Cell = (x, y, board, mine) => {
         opened: false,
         flagged: false,
         mine: mine,
-        init: function() {
+        init: function () {
             let neighbours = [];
             if (y > 0) neighbours.push(board[y - 1][x]);
             if (y < board.length - 1) neighbours.push(board[y + 1][x]);
@@ -24,7 +24,7 @@ const Cell = (x, y, board, mine) => {
             }
             this.sum = neighbours.filter(c => c.mine).length;
         },
-        display: function() {
+        display: function () {
             return this.flagged ? "<:fd:723468192785104916>" : (this.opened ? (this.mine ? MINE : EMOTES[this.sum]) : "<:uo:723468192785367040>");
         }
     };
@@ -53,7 +53,7 @@ const Board = (width, height) => {
         height: height,
         numOfMines: numOfMines,
         cells: cells,
-        checkState: function() {
+        checkState: function () {
             let unopened = 0;
             let flagged = 0;
             for (let y = 0; y < this.height; y++) {
@@ -66,32 +66,26 @@ const Board = (width, height) => {
                     if (cell.mine && cell.flagged) flagged += 1;
                 }
             }
-            if (unopened == numOfMines) return 1;
-            if (flagged == numOfMines) return 1;
+            if (unopened === numOfMines) return 1;
+            if (flagged === numOfMines) return 1;
             return 0;
         },
-        click: function(x, y, recursive) {
+        click: function (x, y) {
             if (x >= 0 && x < width && y >= 0 && y < height && !this.cells[y][x].opened && !this.cells[y][x].flagged) {
                 this.cells[y][x].opened = true;
-                if (this.cells[y][x].sum != 0) return;
-                this.click(x + 1, y, true);
-                this.click(x - 1, y, true);
-                this.click(x, y - 1, true);
-                this.click(x, y + 1, true);
-                this.click(x + 1, y + 1, true);
-                this.click(x - 1, y - 1, true);
-                this.click(x + 1, y - 1, true);
-                this.click(x - 1, y + 1, true);
-            } else {
-                return;
+                if (this.cells[y][x].sum !== 0) return;
+                this.click(x + 1, y);
+                this.click(x - 1, y);
+                this.click(x, y - 1);
+                this.click(x, y + 1);
+                this.click(x + 1, y + 1);
+                this.click(x - 1, y - 1);
+                this.click(x + 1, y - 1);
+                this.click(x - 1, y + 1);
             }
         },
-        flag: function(x, y) {
-            if (x >= 0 && x < width && y >= 0 && y < height && !this.cells[y][x].opened) {
-                this.cells[y][x].flagged = true;
-            } else {
-                return;
-            }
+        flag: function (x, y) {
+            if (x >= 0 && x < width && y >= 0 && y < height && !this.cells[y][x].opened) this.cells[y][x].flagged = true;
         }
     };
 }
@@ -102,22 +96,22 @@ const Game = (owner, width, height, msg) => {
         listening: true,
         messages: [],
         state: 0,
-        click: function(x, y) {
+        click: function (x, y) {
             if (this.state !== 0) return;
             this.board.click(x, y);
             this.state = this.board.checkState();
             return this.refreshDisplay();
         },
-        flag: function(x, y) {
+        flag: function (x, y) {
             if (this.state !== 0) return;
             this.board.flag(x, y);
             this.state = this.board.checkState();
             return this.refreshDisplay();
         },
-        refreshDisplay: function() {
+        refreshDisplay: function () {
             return sendLongMessage(msg.channel, render(this.board, msg.author.username, this.state), this.messages);
         },
-        clearDisplay: function() {
+        clearDisplay: function () {
             while (this.messages.length > 0) this.messages.pop().delete();
         }
     };
@@ -125,7 +119,7 @@ const Game = (owner, width, height, msg) => {
 const GAMES = {};
 const CORDS_REGEX = /^c?[ ,]?([\d]+)[ ,]([\d]+)$/;
 const FLAG_CORDS_REGEX = /^f[ ,]?([\d]+)[ ,]([\d]+)$/;
-exports.handleCommand = function(args, msg, PREFIX) {
+exports.handleCommand = function (args, msg, PREFIX) {
     let game = GAMES[msg.author.id];
     let command = args.shift()
     switch (command) {
@@ -160,7 +154,7 @@ exports.handleCommand = function(args, msg, PREFIX) {
     }
     if (game) game.lastCommand = msg;
 }
-exports.directControl = function(msg) {
+exports.directControl = function (msg) {
     let game = GAMES[msg.author.id]
     if (game && game.listening) {
         if (CORDS_REGEX.test(msg.content)) {
@@ -192,6 +186,7 @@ function render(board, username, state) {
         board.cells.map((row, y) => ":" + numbersToEng[(y + 1) % 10] + ":" + row.map(cell => cell.display()).join("")).join("\n") +
         (state === 0 ? "\nGambatte " + username + "!" : state === 1 ? "\n**Subarashii!** " + username + " has won!" : "\n***You died*** " + username);
 }
+
 const numbersToEng = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
 
 function genColLabels(width) {
