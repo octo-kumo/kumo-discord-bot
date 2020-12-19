@@ -2,7 +2,7 @@ const solve24game = require('24game-solver');
 const Discord = require('discord.js');
 const stats = require("stats-lite");
 const db = require("../db");
-const GAMES = [];
+const GAMES = {};
 const round = (n, p) => parseFloat(String(n)).toFixed(p);
 
 function getHardDigits(layer) {

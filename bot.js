@@ -16,6 +16,7 @@ const anime = require('./commands/anime.js');
 const minesweeper = require('./commands/minesweeper.js');
 const solve24 = require('./commands/solver24.js').solve24;
 const game24 = require('./commands/24.js');
+const scramble = require('./commands/scramble.js');
 
 const db = require('./db');
 
@@ -74,6 +75,7 @@ client.on('message', async msg => {
     if (minesweeper.directControl(msg)) return; // ah yes first direct control command
     if (gomoku.directControl(msg)) return;
     if (await game24.directControl(msg)) return;
+    if (scramble.directControl(msg)) return;
     if (msg.content.indexOf(PREFIX) !== 0) return;
     console.log(`====== Message is a valid command.`);
     let args = msg.content.slice(1).trim().split(/\s+/g);
@@ -102,7 +104,7 @@ client.on('message', async msg => {
     }
     if (command === "horny") {
         let words = ['no', 'stop', 'dude', 'literally', 'like', 'seriously', 'fuck'];
-        shuffle(words);
+        shuffleArray(words);
         await msg.reply(words.join(' '));
     }
     if (command === "pop" || command === "bubble" || command === "bubbles" || command === "bubble-pop") {
@@ -126,6 +128,7 @@ client.on('message', async msg => {
         gomoku.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
     }
     if (command === "24") game24.handleCommand(args, msg, PREFIX);
+    if (command === "s" || command === "scramble") scramble.handleCommand(args, msg, PREFIX);
     if (command === "waifulabs") await waifulabs.newBatch(msg);
     if (command === "timetable" || command === "tt") timetable.handleCommand(args, msg, PREFIX);
     if (command === "sleep") {
@@ -229,7 +232,7 @@ function sendBubblePop(msg, args) {
 }
 
 
-function shuffle(array) {
+function shuffleArray(array) {
     let currentIndex = array.length, temporaryValue, randomIndex;
     while (0 !== currentIndex) {
         randomIndex = Math.floor(Math.random() * currentIndex);
