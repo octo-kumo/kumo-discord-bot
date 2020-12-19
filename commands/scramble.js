@@ -1,46 +1,29 @@
 const WORDS = require('fs').readFileSync(require('path').join(__dirname, '..', 'json', 'words_csw.txt'), 'utf8').toLowerCase().split('\n');
 const WORDS_COMMON = require('fs').readFileSync(require('path').join(__dirname, '..', 'json', 'words_10k.txt'), 'utf8').toLowerCase().split('\n');
-const WORDS_NORMAL = WORDS_COMMON.filter(w => w.length > 5);
-console.log("word list length =", WORDS_NORMAL.length);
+const WORDS_NORMAL = WORDS.filter(w => w.length > 1);
 const GAMES = {};
 
 exports.handleCommand = function (args, msg, PREFIX) {
+    let easy = args.includes("easy");
+    if (easy) args.splice(args.indexOf('easy'), 1);
+    let limit = args.find(arg => !isNaN(arg));
+    if (limit) {
+        limit = Math.min(30, Math.max(1, parseInt(limit)));
+        args.splice(args.findIndex(arg => !isNaN(arg)), 1);
+    } else limit = -1;
+
     if (args.length === 0) {
         if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
-        let word = WORDS_NORMAL[Math.floor(WORDS_NORMAL.length * Math.random())];
+        let list = easy ? WORDS_COMMON : WORDS_NORMAL;
+        if (limit !== -1) list = list.filter(elem => elem.length === limit);
+        if (list.length === 0) return msg.reply("No words found for you!");
+        let word = list[Math.floor(list.length * Math.random())];
         let game = GAMES[msg.author.id] = {
-            characters: shuffleArray(word.split('')),
+            characters: (easy ? easyShuffle : shuffleArray)(word.split('')),
             word: word,
             start: Date.now()
         };
-        msg.reply('Your characters are `' + game.characters.map(i => String(i).toUpperCase()).join('') + '`');
-    } else if (args[0] === "easy") {
-        if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
-        let word = WORDS_COMMON[Math.floor(WORDS_COMMON.length * Math.random())];
-        let game = GAMES[msg.author.id] = {
-            characters: shuffleArray(word.split('')),
-            word: word,
-            // easy: true,
-            start: Date.now()
-        };
-        msg.reply('**EASY MODE** Your characters are `' + game.characters.map(i => String(i).toUpperCase()).join('') + '`');
-    } else if (!isNaN(args[0])) {
-        if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
-        let length = parseInt(args[0]);
-        let bigger = args[0].startsWith('+');
-        if (length < 1 || length > 99) return msg.reply("Only 1-99 allowed!");
-        let words;
-        if (bigger) words = WORDS.filter(w => w.length >= length);
-        else words = WORDS.filter(w => w.length === length);
-        if (words.length === 0) return msg.reply("No words found for you!");
-
-        let word = words[Math.floor(words.length * Math.random())];
-        let game = GAMES[msg.author.id] = {
-            characters: shuffleArray(word.split('')),
-            word: word,
-            start: Date.now()
-        };
-        msg.reply('Your characters are `' + game.characters.map(i => String(i).toUpperCase()).join('') + '`');
+        msg.reply(`${easy ? "**EASY MODE** " : ''}Your characters are \`${game.characters.map(i => String(i).toUpperCase()).join('')}\``);
     } else if (['giveup', 'impos', 'imposs', 'impossible'].includes(args[0])) {
         if (!GAMES[msg.author.id]) return msg.reply("You are not playing");
         let game = GAMES[msg.author.id];
@@ -50,11 +33,6 @@ exports.handleCommand = function (args, msg, PREFIX) {
         if (GAMES[msg.author.id]) return msg.reply("You playing a game, **XXXXX**");
         args.shift();
         let minL = 1;
-        let easy = false;
-        if (args[0] === "easy") {
-            args.shift();
-            easy = true;
-        }
         let showAll = false;
         if (args[0] === "all") {
             args.shift();
@@ -108,5 +86,16 @@ function shuffleArray(array) {
         array[randomIndex] = temporaryValue;
     }
 
+    return array;
+}
+
+function easyShuffle(array) {
+    let operations = Math.random() * (array.length / 4) + 2;
+    for (let i = 0; i < operations; i++) {
+        let a = Math.floor(Math.random() * (array.length - 1));
+        let b = Math.floor(Math.random() * (array.length - 1));
+        if (b >= a) b += 1;
+        [array[a], array[b]] = [array[b], array[a]];
+    }
     return array;
 }
