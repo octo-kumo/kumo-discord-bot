@@ -75,7 +75,8 @@ exports.directControl = function (msg) {
     if (/^[^a-zA-Z]/.test(msg.content)) return false;
     let isCorrect =
         // game.easy ? arraySubset(game.characters, msg.content.toLowerCase().split('')) :
-        arrayEqual(game.characters, msg.content.toLowerCase().split(''));
+        arrayEqual(game.characters, msg.content.toLowerCase().split(''))
+        && (WORDS.includes(msg.content.toLowerCase()) || WORDS_COMMON.includes(msg.content.toLowerCase()))
     let millis = Date.now() - game.start;
     if (isCorrect) {
         msg.reply(`You are **correct**! Time used = \`${Math.floor(millis / 10) / 100}s\``);
