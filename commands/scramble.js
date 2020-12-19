@@ -1,5 +1,6 @@
-const WORDS = require('fs').readFileSync(require('path').join(__dirname, '..', 'json', 'words_alpha.txt'), 'utf8').split('\n');
-const WORDS_NORMAL = WORDS.filter(w => w.length > 5);
+const WORDS = require('fs').readFileSync(require('path').join(__dirname, '..', 'json', 'words_csw.txt'), 'utf8').toLowerCase().split('\n');
+const WORDS_COMMON = require('fs').readFileSync(require('path').join(__dirname, '..', 'json', 'words_10k.txt'), 'utf8').toLowerCase().split('\n');
+const WORDS_NORMAL = WORDS_COMMON.filter(w => w.length > 5);
 console.log("word list length =", WORDS_NORMAL.length);
 const GAMES = {};
 
@@ -15,11 +16,11 @@ exports.handleCommand = function (args, msg, PREFIX) {
         msg.reply('Your characters are `' + game.characters.map(i => String(i).toUpperCase()).join('') + '`');
     } else if (args[0] === "easy") {
         if (GAMES[msg.author.id] && Date.now() - GAMES[msg.author.id].start < 60000) return msg.reply("Chill... (game not deleted)");
-        let word = WORDS_NORMAL[Math.floor(WORDS_NORMAL.length * Math.random())];
+        let word = WORDS_COMMON[Math.floor(WORDS_COMMON.length * Math.random())];
         let game = GAMES[msg.author.id] = {
             characters: shuffleArray(word.split('')),
             word: word,
-            easy: true,
+            // easy: true,
             start: Date.now()
         };
         msg.reply('**EASY MODE** Your characters are `' + game.characters.map(i => String(i).toUpperCase()).join('') + '`');
@@ -72,7 +73,9 @@ exports.directControl = function (msg) {
     let game = GAMES[msg.author.id];
     if (!game) return false;
     if (/^[^a-zA-Z]/.test(msg.content)) return false;
-    let isCorrect = game.easy ? arraySubset(game.characters, msg.content.toLowerCase().split('')) : arrayEqual(game.characters, msg.content.toLowerCase().split(''));
+    let isCorrect =
+        // game.easy ? arraySubset(game.characters, msg.content.toLowerCase().split('')) :
+        arrayEqual(game.characters, msg.content.toLowerCase().split(''));
     let millis = Date.now() - game.start;
     if (isCorrect) {
         msg.reply(`You are **correct**! Time used = \`${Math.floor(millis / 10) / 100}s\``);
