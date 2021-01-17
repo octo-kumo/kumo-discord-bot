@@ -44,7 +44,7 @@ function generateServerEmbed(server, msg, address) {
     embed.addField("Players", `**${server.players.online} / ${server.players.max}**${server.players.sample.length > 0 ? `\n\`\`\`\n${server.players.sample.map(player => player.name).join("\n")}\n\`\`\`` : ''}`);
     embed.setDescription('```\n' + server.description.replace(/\u00a7./g, '').trimEnd() + '\n```');
     embed.setColor(hashStringToColor(address));
-    embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL);
+    embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL({dynamic: true}));
     embed.setThumbnail(server.favicon ? "https://api.minetools.eu/favicon/" + address.replace(':', '/') : "https://res.cloudinary.com/chatboxzy/image/upload/v1598103075/unknown_server.png");
     return embed;
 }

@@ -46,7 +46,6 @@ exports.init = async function () {
     SHIPS = await fetch("https://raw.githubusercontent.com/AzurAPI/azurapi-js-setup/master/ships.json").then(res => res.json());
     CHAPTERS = await fetch("https://raw.githubusercontent.com/AzurAPI/azurapi-js-setup/master/chapters.json").then(res => res.json());
     MEMORIES = await fetch("https://raw.githubusercontent.com/AzurAPI/azurapi-js-setup/master/memories.json").then(res => res.json());
-    console.log("Updated Ship Data");
 }
 exports.handleCommand = async function (args, msg, PREFIX) {
     try {
@@ -61,7 +60,7 @@ exports.handleCommand = async function (args, msg, PREFIX) {
                 message.react('⬅️').then(() => message.react('➡️')).then(() => message.react('❎'));
                 message.createReactionCollector(ship_book_filter).on('collect', r => {
                     if (!r) return;
-                    r.users.keyArray().filter(k => k !== config.id).forEach(k => r.remove(k));
+                    r.users.cache.keyArray().filter(k => k !== config.id).forEach(k => r.users.remove(k));
                     let name = r.emoji.name;
                     if (r.emoji.name === '❎') return message.delete();
                     let book = BOOKS[message.id];
@@ -83,38 +82,20 @@ exports.handleCommand = async function (args, msg, PREFIX) {
                     .then(() => message.react('❎'));
                 message.createReactionCollector(memory_book_filter).on('collect', r => {
                     if (!r) return;
-                    r.users.keyArray().filter(k => k !== config.id).forEach(k => r.remove(k));
+                    r.users.cache.keyArray().filter(k => k !== config.id).forEach(k => r.users.remove(k));
                     let name = r.emoji.name;
                     if (r.emoji.name === '❎') return message.delete();
                     let book = BOOKS[message.id];
                     let langBook = book.pages[book.lang];
                     let oldLang = book.lang;
                     let oldPage = book.page;
-                    console.log('Got reaction "' + name + '"')
-                    switch (name) {
-                        case '⏫':
-                            if (langBook.getChapter(book.page) > 0) book.page = langBook.getPage(langBook.getChapter(book.page) - 1);
-                            break;
-                        case '🔼':
-                            if (book.page > 0) book.page -= 1;
-                            break;
-                        case '🔽':
-                            if (book.page < langBook.pages.length - 1) book.page += 1;
-                            break;
-                        case '⏬':
-                            if (langBook.getChapter(book.page) < langBook.length - 1) book.page = langBook.getPage(langBook.getChapter(book.page) + 1);
-                            console.log(langBook.getChapter(book.page), langBook.length - 1, book.page)
-                            break;
-                        case '🇨🇳':
-                            book.lang = 'cn';
-                            break;
-                        case '🇯🇵':
-                            book.lang = 'jp';
-                            break;
-                        case '🇬🇧':
-                            book.lang = 'en';
-                            break;
-                    }
+                    if (name === '⏫') if (langBook.getChapter(book.page) > 0) book.page = langBook.getPage(langBook.getChapter(book.page) - 1);
+                    else if (name === '🔼') if (book.page > 0) book.page -= 1;
+                    else if (name === '🔽') if (book.page < langBook.pages.length - 1) book.page += 1;
+                    else if (name === '⏬') if (langBook.getChapter(book.page) < langBook.length - 1) book.page = langBook.getPage(langBook.getChapter(book.page) + 1);
+                    else if (name === '🇨🇳') book.lang = 'cn';
+                    else if (name === '🇯🇵') book.lang = 'jp';
+                    else if (name === '🇬🇧') book.lang = 'en';
                     if (oldLang !== book.lang || oldPage !== book.page) {
                         message.edit(book.pages[book.lang].pages[book.page]);
                         console.log('Page turning...');
@@ -129,7 +110,7 @@ exports.handleCommand = async function (args, msg, PREFIX) {
                 message.react('⬅️').then(() => message.react('➡️')).then(() => message.react('❎'));
                 message.createReactionCollector(chapter_book_filter).on('collect', r => {
                     if (!r) return;
-                    r.users.keyArray().filter(k => k !== config.id).forEach(k => r.remove(k));
+                    r.users.cache.keyArray().filter(k => k !== config.id).forEach(k => r.users.remove(k));
                     let name = r.emoji.name;
                     console.log("Emoji Name = " + name);
                     if (r.emoji.name === '❎') return message.delete();
@@ -157,7 +138,7 @@ exports.handleCommand = async function (args, msg, PREFIX) {
                 message.react('⬅️').then(() => message.react('📊')).then(() => message.react('698441024644841543')).then(() => message.react('👕')).then(() => message.react('🖌️')).then(() => message.react('➡️')).then(() => message.react('❎'));
                 message.createReactionCollector(ship_book_filter).on('collect', r => {
                     if (!r) return;
-                    r.users.keyArray().filter(k => k !== config.id).forEach(k => r.remove(k));
+                    r.users.cache.keyArray().filter(k => k !== config.id).forEach(k => r.users.remove(k));
                     let name = r.emoji.name;
                     console.log("Emoji Name = " + name);
                     if (r.emoji.name === '❎') return message.delete();

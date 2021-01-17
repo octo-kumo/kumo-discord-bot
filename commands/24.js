@@ -99,7 +99,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
             embed.addField("Median", `${round(stats.median(user.game24_history) / 1000, 3)}s`, true);
             embed.addField("Mode", `${round(stats.mode(user.game24_history) / 1000, 3)}s`, true);
             embed.addField("σ (STDEV)", `${round(stats.stdev(user.game24_history) / 1000, 3)}s`, true);
-            embed.setFooter("Profile of " + (user_to_show || msg.author).tag, (user_to_show || msg.author).avatarURL);
+            embed.setFooter("Profile of " + (user_to_show || msg.author).tag, (user_to_show || msg.author).avatarURL({dynamic: true}));
             return msg.channel.send(embed);
         });
     } else if (['leaderboard', 'lb'].includes(args[0])) {

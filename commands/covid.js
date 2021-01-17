@@ -88,9 +88,8 @@ const LONG_NAMES = {
 async function generateRegionEmbed(location, region, msg, limit, filter, includeLeaderBoard) {
     const embed = new Discord.MessageEmbed();
     embed.setColor(0x0074D9);
-    if (msg) embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL);
+    if (msg) embed.setFooter("Query by " + msg.author.tag, msg.author.avatarURL({dynamic: true}));
     if (region) {
-        let diff = 0;
         let today = region[region.length - 1];
         let yesterday = region[region.length - 2];
 
@@ -108,7 +107,7 @@ async function generateRegionEmbed(location, region, msg, limit, filter, include
         embed.addField("Dead", `**${numberWithSpace(today.deaths)}** (${(deathIncrease < 0 ? "" : "+") + numberWithSpace(deathIncrease)})`, true);
         embed.addField("Cured Rate", (today.recovered === 0 ? 0 : Math.round(today.recovered * 1000 / today.confirmed) / 10) + "%", true);
         embed.addField("Death Rate", (today.deaths === 0 ? 0 : Math.round(today.deaths * 1000 / today.confirmed) / 10) + "%", true);
-        embed.attachFile(new Discord.MessageAttachment(await drawGraph(location, region, limit, filter), "attachment.png"))
+        embed.attachFiles([new Discord.MessageAttachment(await drawGraph(location, region, limit, filter), "attachment.png")])
         embed.setImage("attachment://attachment.png")
         if (!msg) embed.setDescription("_This message is automatically updated every 1 hour_");
         else embed.setDescription("_Accurate as of_\n**" + moment(today.date, 'YYYY-M-D').format('D MMMM YYYY') + "**");
@@ -135,9 +134,9 @@ function drawGraph(location, region, limit, filter) {
         const view = new vega.View(vega.parse(GRAPH_SPECS), {
             renderer: 'none'
         });
-        view.toCanvas().then(function(canvas) {
+        view.toCanvas().then(function (canvas) {
             resolve(canvas.toBuffer("image/png"));
-        }).catch(function(err) {
+        }).catch(function (err) {
             console.error(err);
             reject(err);
         });

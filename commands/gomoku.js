@@ -43,10 +43,10 @@ exports.handleCommand = function (args, msg, PREFIX) {
                         message.createReactionCollector(filter).on('collect', r => {
                             if (!r) return;
                             console.log(r.emoji.id);
-                            let user = r.users.filter(u => u.id !== config.id).first();
+                            let user = r.users.cache.find(u => u.id !== config.id);
                             let side = r.emoji.name === "⚫" ? "black" : "white";
                             console.log(user.tag + " has joined the game as " + side);
-                            join(user, msg.channel, side, () => r.removeAll());
+                            join(user, msg.channel, side, () => r.remove());
                         });
                     });
                 msg.delete();
@@ -123,7 +123,6 @@ function join(author, channel, side, success) {
         success();
     } catch (err) {
         console.log(err);
-        msg.reply(err);
     }
 }
 
@@ -210,7 +209,7 @@ class Gomoku {
             this.winner = null;
             let move = this.history.pop();
             this.toPlay = move.side;
-            this.gameBoard[y, x] = null;
+            this.gameBoard[move.y][move.x] = null;
             return move.side + "'s move at x: " + move.x + ", y: " + move.y + " has been undone";
         } else throw "<@" + (player === this.players.black ? this.players.white : this.players.black) + "> Please confirm with `!gomoku undo`";
     }
@@ -219,14 +218,12 @@ class Gomoku {
         let winner = this.checkWinHorizontal(this.gameBoard) || this.checkWinVertical(this.gameBoard);
         if (winner) return this.winner = winner;
 
-        let shiftLeft = [];
-        for (let y = 0; y < this.size; y++) shiftLeft[y] = this.gameBoard[y].slice(y);
-        winner = this.checkWinVertical(shiftLeft);
+        let shift = [];
+        for (let y = 0; y < this.size; y++) shift[y] = padArray(this.gameBoard[y], y, null);
+        winner = this.checkWinVertical(shift, this.size * 2 - 1);
         if (winner) return this.winner = winner;
-
-        let shiftRight = [];
-        for (let y = 0; y < this.size; y++) shiftRight[y] = this.gameBoard[y].slice(0, this.size - 1 - y);
-        winner = this.checkWinVertical(shiftRight);
+        for (let y = 0; y < this.size; y++) shift[y] = padArray(this.gameBoard[y], this.size - y - 1, null);
+        winner = this.checkWinVertical(shift, this.size * 2 - 1);
         return this.winner = winner;
     }
 
@@ -241,10 +238,10 @@ class Gomoku {
         return null;
     }
 
-    checkWinVertical(board) {
+    checkWinVertical(board, size) {
         let blackwin = new RegExp(`x{${this.winLength},${this.winLength}}`, "g");
         let whitewin = new RegExp(`o{${this.winLength},${this.winLength}}`, "g");
-        for (let x = 0; x < this.size; x++) {
+        for (let x = 0; x < size || this.size; x++) {
             let line = board.map(row => row[x] || "-").join("");
             if (blackwin.test(line)) return "black";
             if (whitewin.test(line)) return "white";
@@ -323,4 +320,14 @@ async function sendLongMessage(channel, msg, objects) {
         objects.splice(messages.length).forEach(m => m.delete());
     }
     return objects;
+}
+
+function padLeftArray(arr, len) {
+    let array = Array(len);
+    array.splice(len - arr.length, arr.length, arr);
+    return array;
+}
+
+function padArray(array, length, fill) {
+    return length > array.length ? Array(length - array.length).fill(fill).concat(array) : array;
 }
