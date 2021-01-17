@@ -56,7 +56,7 @@ exports.config = {
     offset: 0,
     id: "",
     PRESENCE: {
-        game: {
+        activity: {
             name: 'with the clouds. !help'
         },
         status: 'idle'
@@ -129,7 +129,7 @@ exports.config = {
     TIMETABLE_NON_EXIST: [
         "_Existential Crisis_: **YES**",
         "Are you perhaps accelerated?",
-        "Only **Year 4** classes please!",
+        "Only nush classes please!",
         "Me: What is your class?\nYou: ***Yes***"
     ],
     HELP: {

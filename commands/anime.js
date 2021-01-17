@@ -87,7 +87,7 @@ async function handleSearch(args, msg) {
 }
 
 function sendSearchResult(results) {
-    const embed = new Discord.RichEmbed();
+    const embed = new Discord.MessageEmbed();
     embed.setTitle("Search Results");
     embed.setColor(0x007FFF);
     if (results && results.length > 0) embed.setDescription(results.slice(0, 8).map((result, i) =>
@@ -100,7 +100,7 @@ function sendSearchResult(results) {
 }
 
 function sendAnime(anime) {
-    const embed = new Discord.RichEmbed();
+    const embed = new Discord.MessageEmbed();
     embed.setColor(0x007FFF);
     embed.setTitle(anime.title_japanese + '\n' + anime.title);
     embed.setURL(anime.url);
@@ -132,7 +132,7 @@ function sendAnime(anime) {
 }
 
 function sendManga(manga) {
-    const embed = new Discord.RichEmbed();
+    const embed = new Discord.MessageEmbed();
     embed.setColor(0x007FFF);
     embed.setTitle(manga.title_japanese + '\n' + manga.title);
     embed.setURL(manga.url);

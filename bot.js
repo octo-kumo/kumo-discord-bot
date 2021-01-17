@@ -14,7 +14,6 @@ const waifulabs = require('./commands/waifulabs.js');
 const timetable = require('./commands/timetable.js');
 const anime = require('./commands/anime.js');
 const minesweeper = require('./commands/minesweeper.js');
-const solve24 = require('./commands/solver24.js').solve24;
 const game24 = require('./commands/24.js');
 const scramble = require('./commands/scramble.js');
 
@@ -25,32 +24,30 @@ const PREFIX = process.env.PREFIX || "!";
 const client = new Discord.Client();
 
 // Embed Presets
-const PING_EMBED = new Discord.RichEmbed().setTitle("Ping Results").setColor(0x21f8ff).addField("Latency", 0).addField("API Latency", 0);
-const HELP_EMBED = new Discord.RichEmbed().setTitle("Help").setColor(0x21f8ff).setDescription("```\n" + Object.keys(config.HELP).join(" ") + "\n```").setFooter(`Get more help with \`${PREFIX}help [command]\``);
+const PING_EMBED = new Discord.MessageEmbed().setTitle("Ping Results").setColor(0x21f8ff).addField("Latency", 0).addField("API Latency", 0);
+const HELP_EMBED = new Discord.MessageEmbed().setTitle("Help").setColor(0x21f8ff).setDescription("```\n" + Object.keys(config.HELP).join(" ") + "\n```").setFooter(`Get more help with \`${PREFIX}help [command]\``);
 chainUpStdOut();
 console.log('====== ZY Discord Bot Started! ======');
 
-// coursemology.initiate();
 client.on('ready', () => {
-    console.log("=> Bot Running in " + client.guilds.keyArray().length + " servers!");
-    client.guilds.get('665471208757657620').channels.get('665471209277882400').send("READY!");
+    console.log("=> Bot Running in " + client.guilds.cache.keyArray().length + " servers!");
+    client.guilds.cache.get('665471208757657620').channels.cache.get('665471209277882400').send("READY!");
     client.user.setPresence(config.PRESENCE).then(r => console.log("Presence Set!"));
     config.offset = 8 + new Date().getTimezoneOffset() / 60;
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     config.HOOK2 = new Discord.WebhookClient('676309488021798912', process.env.HKTOKEN2);
     config.id = client.user.id;
+    timetable.init().then(r => console.log("Timetable Init!"));
     azurlane.init().then(r => console.log("Azurlane Init!"));
     bilibili.init().then(r => console.log("Bilibili Init!"));
     // coursemology.init();
     // setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
-    const covidChannel = client.guilds.get('642273802520231936').channels.get('693051246885470209');
-    if (!process.env.LOCAL) {
-        covid.update(covidChannel);
-        setInterval(() => covid.update(covidChannel), 60 * 60 * 1000);
-    }
+    // const covidChannel = client.guilds.cache.get('642273802520231936').channels.get('693051246885470209');
+    // if (!process.env.LOCAL) {
+    //     covid.update(covidChannel);
+    //     setInterval(() => covid.update(covidChannel), 60 * 60 * 1000);
+    // }
 });
-
-const OWO_24_MESSAGE_REGEX = /\*\*Ok <@!?\d+>, your numbers are: `(\d \d \d \d)` \*\*/g;
 
 client.on('message', async msg => {
     let startTime = Date.now();
@@ -66,11 +63,6 @@ client.on('message', async msg => {
             return msg.channel.send(config.SIMPLE_REPLIES[matcher]);
         for (let key of Object.keys(config.CONTAINS_REPLIES))
             if (msg.content.includes(key)) return msg.channel.send(config.CONTAINS_REPLIES[key]);
-    }
-    if (msg.author.id === "289066747443675143" && OWO_24_MESSAGE_REGEX.test(msg.content)) { // owo bot
-        let processed = msg.content.replace(OWO_24_MESSAGE_REGEX, '$1');
-        solve24(processed, client);
-        console.log("Solving for 24 " + processed);
     }
     if (minesweeper.directControl(msg)) return; // ah yes first direct control command
     if (gomoku.directControl(msg)) return;
@@ -100,7 +92,7 @@ client.on('message', async msg => {
 
     // if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
     if (command === "list-emotes" || command === "emotes") {
-        await sendLongMessage(msg.channel, "**Emotes:**\n" + join(msg.guild.emojis.array().map(e => `<:${e.name}:${e.id}> \`:${e.name}:\``), [" ", " ", "\n"]));
+        await sendLongMessage(msg.channel, "**Emotes:**\n" + join(msg.guild.emojis.cache.values().map(e => `<:${e.name}:${e.id}> \`:${e.name}:\``), [" ", " ", "\n"]));
     }
     if (command === "horny") {
         let words = ['no', 'stop', 'dude', 'literally', 'like', 'seriously', 'fuck'];
@@ -136,14 +128,14 @@ client.on('message', async msg => {
         console.log("current hour = " + currentHour);
         if (currentHour < 6 || currentHour > 21) {
             let preset = config.SLEEP_MESSAGES[Math.floor(Math.random() * config.SLEEP_MESSAGES.length)];
-            let embed = new Discord.RichEmbed().setTitle(preset.title.replace("${username}", msg.author.username)).setColor(0x21f8ff);
+            let embed = new Discord.MessageEmbed().setTitle(preset.title.replace("${username}", msg.author.username)).setColor(0x21f8ff);
             embed.setDescription(preset.body.replace("${username}", msg.author.username));
             if (currentHour < 6 && currentHour > 2) embed.setThumbnail(config.SLEEP_LATE[Math.floor(Math.random() * config.SLEEP_LATE.length)]);
             else embed.setThumbnail(config.SLEEP_IMAGES[Math.floor(Math.random() * config.SLEEP_IMAGES.length)]);
             await msg.channel.send(embed);
             console.log("told " + msg.author.username + " to to goto sleep");
         } else {
-            let embed = new Discord.RichEmbed().setTitle("Get some **coffee**!").setColor(0x6f4e37);
+            let embed = new Discord.MessageEmbed().setTitle("Get some **coffee**!").setColor(0x6f4e37);
             embed.setDescription("There is so much to do, better go get a cup of coffee **" + msg.author.username + "**");
             embed.setThumbnail("https://res.cloudinary.com/chatboxzy/image/upload/v1573747645/coffee.png");
             await msg.channel.send(embed);
@@ -160,11 +152,6 @@ client.on('message', async msg => {
 
 
     if (msg.author.id === "456001047756800000" && command === "clear") msg.channel.bulkDelete(parseInt(args[0])).then(messages => msg.reply("Deleted " + messages.keyArray().length + " messages")).catch(console.error);
-    if (msg.author.id === "456001047756800000" && command === "debug") {
-        config.debug = !config.debug;
-        console.log("DEBUG TOGGLED, debug = " + config.debug)
-        await msg.channel.send(`DEBUG: debug output has been turned ${config.debug ? "on" : "off"}!`);
-    }
     if (msg.author.id === "456001047756800000" && command === "restart") {
         console.log("Restarting program due to request from owner...");
         await msg.channel.send("Forcing a **Restart**...");

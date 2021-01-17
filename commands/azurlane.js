@@ -181,7 +181,7 @@ function generateShipsBook(filter) {
     let ships = [];
     for (let ship of SHIPS)
         if (filter(ship)) ships.push(ship);
-    let targetEmbed = new Discord.RichEmbed();
+    let targetEmbed = new Discord.MessageEmbed();
     let pages = [];
     if (ships.length === 0) {
         targetEmbed.setDescription("_No ship matches your query!_");
@@ -191,7 +191,7 @@ function generateShipsBook(filter) {
         targetEmbed.addField(`#${i + 1} **${ships[i].rarity}** _${ships[i].nationality}_`, `**${ships[i].names.code || ships[i].names.en}** (JP: ${ships[i].names.jp || "?"}, CN: ${ships[i].names.cn || "?"})`);
         if (i !== 0 && i % 8 === 0) {
             pages.push(targetEmbed);
-            targetEmbed = new Discord.RichEmbed();
+            targetEmbed = new Discord.MessageEmbed();
         } else if (i === (ships.length - 1)) pages.push(targetEmbed);
     }
     for (let i = 0; i < pages.length; i++) {
@@ -228,7 +228,7 @@ function generateChapterBook(chapterIndex) {
 }
 
 function generateMapPage(chapter, map) {
-    const embed = new Discord.RichEmbed();
+    const embed = new Discord.MessageEmbed();
     embed.setTitle(`**${map.normal.code}** ${map.names.en} (${map.names.jp})`);
     embed.setDescription(map.normal.introduction);
     embed.addField("Unlock Req.", map.normal.unlockRequirements.text, true);
@@ -306,12 +306,12 @@ function generateMemoryBook(name, lang) {
 function generateMemoryPages(memory, lang) {
     let pages = [];
     let anchors = []; //by chapter
-    pages.push(new Discord.RichEmbed().setTitle(memory.names[lang]).setImage(memory.thumbnail).setURL(memory.wikiUrl));
+    pages.push(new Discord.MessageEmbed().setTitle(memory.names[lang]).setImage(memory.thumbnail).setURL(memory.wikiUrl));
     for (let i = 0; i < memory.chapters.length; i++) {
         anchors.push(pages.length);
-        pages.push(new Discord.RichEmbed().setTitle("Chapter " + (i + 1)).setImage(memory.thumbnail).setDescription(memory.chapters[i].names[lang]));
+        pages.push(new Discord.MessageEmbed().setTitle("Chapter " + (i + 1)).setImage(memory.thumbnail).setDescription(memory.chapters[i].names[lang]));
         for (let j = 0; j < memory.chapters[i].lines.length; j++) {
-            pages.push(new Discord.RichEmbed()
+            pages.push(new Discord.MessageEmbed()
                 .setTitle(memory.chapters[i].lines[j].names[lang])
                 .setImage(memory.chapters[i].lines[j].background ? memory.chapters[i].lines[j].background : memory.chapters[i].lines[j].bannerSrc)
                 .setThumbnail(memory.chapters[i].lines[j].background ? memory.chapters[i].lines[j].bannerSrc : null)
@@ -351,7 +351,7 @@ function generateBook(name) {
     pages.push(generateSkillsPage(ship));
     anchors.skins = pages.length;
     for (let i = 0; i < ship.skins.length; i++) {
-        const skinPage = new Discord.RichEmbed();
+        const skinPage = new Discord.MessageEmbed();
         skinPage.setTitle("Skins (" + ship.skins[i].name + ")").setThumbnail(ship.skins[i].chibi).setImage(ship.skins[i].image);
         skinPage.setDescription(ship.skins.map(skin => skin.name === ship.skins[i].name ? `**${skin.name}**` : skin.name).join("\n"));
         for (let key of Object.keys(ship.skins[i].info))
@@ -361,7 +361,7 @@ function generateBook(name) {
     }
     anchors.gallery = pages.length;
     for (let i = 0; i < ship.gallery.length; i++) {
-        const itemPage = new Discord.RichEmbed();
+        const itemPage = new Discord.MessageEmbed();
         itemPage.setTitle("Gallery");
         itemPage.setDescription(ship.gallery[i].description);
         itemPage.setImage(ship.gallery[i].url);
@@ -414,7 +414,7 @@ function createDevLevelField(level, buffs) {
 }
 
 function generateGenInfoPage(ship) {
-    const generalInfo = new Discord.RichEmbed(); // Page 1
+    const generalInfo = new Discord.MessageEmbed(); // Page 1
     generalInfo.setTitle("General Info")
         .addField("Rarity", ship.rarity + " " + ship.stars.stars)
         .addField("ID", ship.id, true)
@@ -431,7 +431,7 @@ function generateGenInfoPage(ship) {
 }
 
 function generateStatsPage(ship, key) {
-    const statsPage = new Discord.RichEmbed();
+    const statsPage = new Discord.MessageEmbed();
     statsPage.setTitle(STATS_NAME_TRANSLATION[key] + " Stats")
     let names = "**";
     let values = "";
@@ -454,7 +454,7 @@ function generateStatsPage(ship, key) {
 }
 
 function generateSkillsPage(ship) {
-    const skills_limits_eq = new Discord.RichEmbed(); // Page 3
+    const skills_limits_eq = new Discord.MessageEmbed(); // Page 3
     skills_limits_eq.setTitle("Equipment Slots / Skills / Limit Breaks");
     skills_limits_eq.addField("> **Equipment Slots**\n" + "(1) " + ship.slots[1].type, ship.slots[1].minEfficiency ? ship.slots[1].minEfficiency + "% → " + ship.slots[1].maxEfficiency + "%" : "None", true)
         .addField("(2) " + ship.slots[2].type, ship.slots[2].minEfficiency + "% → " + ship.slots[2].maxEfficiency + "%", true)

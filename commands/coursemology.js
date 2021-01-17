@@ -458,7 +458,7 @@ function loadAssessment(course, assessment_id) {
 }
 
 function generateAssessmentEmbed(assessment) {
-    let basicInfo = new Discord.RichEmbed();
+    let basicInfo = new Discord.MessageEmbed();
     basicInfo.setTitle(assessment.name);
     basicInfo.setURL(assessment.url);
     basicInfo.setFooter(config.list_presets[assessment.course].name + " • ID: " + assessment.id);
@@ -478,7 +478,7 @@ function generateAssessmentEmbed(assessment) {
 }
 
 function generateUserEmbed(user) {
-    let basicInfo = new Discord.RichEmbed();
+    let basicInfo = new Discord.MessageEmbed();
     basicInfo.setTitle(user.username);
     basicInfo.setURL(user.url);
     basicInfo.setFooter("ID: " + user.id);

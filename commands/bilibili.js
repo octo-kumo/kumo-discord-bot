@@ -8,5 +8,5 @@ exports.handleCommand = async function (args, msg, PREFIX) {
     let image = DEFAULT_PICS[Math.floor(DEFAULT_PICS.length * Math.random())];
     let url = image.data.img;
     if (!url.startsWith("http")) url = "https:" + url;
-    await msg.channel.send(new Discord.RichEmbed().setColor(0x44a0d1).setImage(url));
+    await msg.channel.send(new Discord.MessageEmbed().setColor(0x44a0d1).setImage(url));
 }

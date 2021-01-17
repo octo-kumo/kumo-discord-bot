@@ -24,7 +24,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
                 .then(res => res.json())
                 .then(profile => {
                     if (profile.decoded) {
-                        let embed = new Discord.RichEmbed();
+                        let embed = new Discord.MessageEmbed();
                         embed.setColor(hashStringToColor(profile.decoded.profileId));
                         embed.setAuthor("User Info");
                         embed.setThumbnail(`https://minotar.net/helm/${profile.decoded.profileName}/256.png`);
@@ -37,7 +37,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
 }
 
 function generateServerEmbed(server, msg, address) {
-    let embed = new Discord.RichEmbed();
+    let embed = new Discord.MessageEmbed();
     embed.setTitle(address.toLowerCase());
     embed.addField("Ping", server.latency, true);
     embed.addField("Version", `${server.version.name} (${server.version.protocol})`, true);

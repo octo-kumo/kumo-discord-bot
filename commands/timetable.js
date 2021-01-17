@@ -1,106 +1,107 @@
-const Discord = require('discord.js');
+const fetch = require('node-fetch');
 const config = require('./config.js').config;
-const TIMETABLE = require('../json/timetable.json');
+let timetable;
 
 const WEEKDAYS = [
-    'sun',
-    'mon',
-    'tue',
-    'wed',
-    'thu',
-    'fri',
-    'sat'
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday'
 ];
 
-const CLASSES = [
-    'M20401',
-    'M20402',
-    'M20403',
-    'M20404',
-    'M20405',
-    'M20406',
-    'M20407'
-];
+const CLASS_NAME_REGEX = /^((M21)?[1-6]0)?[1-7]$/i;
 
-function callClasses(classList) {
-    if (classList.length === 7) return "all classes";
-    if (classList.length === 6)
-        for (let i = 0; i < CLASSES.length; i++)
-            if (!classList.includes(CLASSES[i])) return "all except " + CLASSES[i];
-    return classList.join(", ");
-}
-
+exports.init = () => fetch('https://junron.dev/nushmeet/timetable.json').then(res => res.json()).then(json => timetable = json.data);
 exports.handleCommand = (args, msg, PREFIX) => {
-    if (args.length === 0) {
-        msg.channel.send(getLessonsEmbed(getLessonsNow("M20403")));
-    } else if (args.length === 1 && CLASS_NAME_REGEX.test(args[0])) {
-        msg.channel.send(getLessonsEmbed(getLessonsNow(args[0])));
-    } else if (args.length === 1) {
-        if (args[0] === "now") msg.channel.send(getLessonsEmbed(getLessonsNow("M20403")));
-        else if (args[0] === "next") msg.channel.send(getLessonsEmbed(getLessonsNext("M20403")));
-        else msg.channel.send("Only 'now' or 'next' allowed");
-    } else if (args.length === 2) {
-        if (args[0] === "now") msg.channel.send(getLessonsEmbed(getLessonsNow(args[1])));
-        else if (args[0] === "next") msg.channel.send(getLessonsEmbed(getLessonsNext(args[1])));
-        else msg.channel.send("Only 'now' or 'next' allowed");
-    } else msg.channel.send("_Perhaps you lost your magic._");
+    let className = 'M21503', query = 'now', day;
+    for (const arg of args) {
+        if (CLASS_NAME_REGEX.test(arg)) className = fillClassName(arg);
+        else if (['now', 'tmr', 'all'].includes(arg)) query = arg;
+        else if (arg.length > 3 && WEEKDAYS.some(day => day.toLowerCase().startsWith(arg.toLowerCase()))) day = WEEKDAYS.findIndex(day => day.toLowerCase().startsWith(arg.toLowerCase()));
+        else return msg.reply(`\`${PREFIX}timetable [class]? [now/tmr/all]? [weekday]?\`\nAny order is fine`);
+    }
+    if (query === 'now') msg.channel.send(getLessonsNow(className, day));
+    else if (query === 'tmr') msg.channel.send(getLessonsTmr(className));
+    else if (query === 'all') msg.channel.send(getLessonsAll(className, day));
+    else msg.channel.send("Only now/tmr/all allowed");
 };
 
-function getLessonsNow(className) {
+function fillClassName(name) {
+    if (name.length === 1) return "M2150" + name;
+    else if (name.length === 3) return "M21" + name;
+    else return name.toUpperCase();
+}
+
+function getLessonsNow(className, day) {
     let now = new Date(new Date().getTime() + config.offset * 3600 * 1000);
-    let hour = now.getHours();
-    let minute = now.getMinutes();
-    return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], hour, minute);
+    let query = getLessonsExact(className, WEEKDAYS[day === 0 ? day : day || now.getDay()], now.getHours(), now.getMinutes());
+    if (!query) return 'Nothing';
+    else if (typeof query === 'string') return query;
+    if (!query.lesson) return 'Free period' + (query.next === -1 ? '' : '\nNext is **' + query.lessons[query.next].subject.join('/') + '**');
+    let start = parseTime(query.lesson.start_time);
+    let end = parseTime(query.lesson.end_time);
+    return `${className} **${query.lesson.subject.join('/')}**\n${format(start)} → ${format(end)}\n` +
+        `(${express(minutesToTime(diff(start, end)))}) Ends in  ${express(minutesToTime(diff([now.getHours(), now.getMinutes()], end)))}\n` +
+        `Next is **${query.lessons[query.index + 1] ? query.lessons[query.index + 1].subject.join('/') : 'Nothing'}**${day && day !== now.getDay() ? `\n*On ${WEEKDAYS[day]}` : ''}`;
 }
 
-function getLessonsNext(className) {
-    let now = new Date(new Date().getTime() + config.offset * 3600 * 1000);
-    let hour = now.getHours();
-    let minute = now.getMinutes();
-    let lesson = getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], hour, minute);
-    if (hour < 8) return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], 8, 0);
-    if (hour >= 18) return getLessonsExact(className || "M20403", WEEKDAYS[(now.getDay() + 1) % 7], 8, 0);
-    if ((typeof lesson) === "string") return "Nothing";
-    return getLessonsExact(className || "M20403", WEEKDAYS[now.getDay()], lesson[0].end.hour, lesson[0].end.minute);
+function getLessonsOnDay(className, day) {
+    let lessons = timetable[className][WEEKDAYS[day]];
+    return `**Lessons ${className}/${day}**\`\`\`\n${lessons.map((lesson, i) => `${(i + 1).toString().padStart(lessons.length.toString().length, ' ')}. ${lesson.subject.join('/').padStart(8, ' ')} ${format(parseTime(lesson.start_time))} → ${format(parseTime(lesson.end_time))}`).join('\n')}\`\`\``;
 }
 
-function getLessonsEmbed(lessons) {
-    if ((typeof lessons) === "string") return lessons;
-    return new Discord.RichEmbed().setColor(0x009a90).setTitle(lessons.map(l => l.subject).join(" & "))
-        .addField("Start", lessons.map(l => l.start.hour.toString().padStart(2, '0') + ":" + l.start.minute.toString().padStart(2, '0')).filter(onlyUnique).join(", "), true)
-        .addField("End", lessons.map(l => l.end.hour.toString().padStart(2, '0') + ":" + l.end.minute.toString().padStart(2, '0')).filter(onlyUnique).join(", "), true);
+function getLessonsAll(className, day) {
+    return getLessonsOnDay(className, day === 0 ? day : day || new Date(new Date().getTime() + config.offset * 3600 * 1000).getDay());
 }
 
-function onlyUnique(value, index, self) {
-    return self.indexOf(value) === index;
+function getLessonsTmr(className) {
+    let day = new Date(new Date().getTime() + config.offset * 3600 * 1000).getDay();
+    if (day === 0 || day === 6 || day === 5) day = 1;
+    return getLessonsOnDay(className, day);
 }
-
-const CLASS_NAME_REGEX = /^((M20)?4)?0[1-7]$/i;
 
 function getLessonsExact(className, day, hour, min) {
     if (typeof className === "number") className = className.toString();
-    if (!CLASS_NAME_REGEX.test(className)) return config.TIMETABLE_NON_EXIST[Math.random() * TIMETABLE_NON_EXIST.length];
+    if (!CLASS_NAME_REGEX.test(className)) return config.TIMETABLE_NON_EXIST[Math.random() * config.TIMETABLE_NON_EXIST.length];
     if (hour >= 22 || hour <= 5) return "Sleep Period";
-    if (day === "sun" || day === "sat") return "Weekends";
-    for (let c of TIMETABLE) {
-        if (c.name.toUpperCase().endsWith(className.toUpperCase())) {
-            let lessons = [];
-            for (let lesson of c.lessons) {
-                lesson.start = getHourAndMinute(lesson.timeStart);
-                lesson.end = getHourAndMinute(lesson.timeEnd);
-                if (lesson.day === day && (lesson.start.hour * 60 + lesson.start.minute) <= (hour * 60 + min) && (lesson.end.hour * 60 + lesson.end.minute) > (hour * 60 + min)) lessons.push(lesson);
-            }
-            if (lessons.length === 0)
-                return "Free Period";
-            else return lessons;
-        }
-    }
-    return "No Such Class";
-}
-
-function getHourAndMinute(str) {
+    if (day === "Sunday" || day === "Saturday") return "Weekends";
+    let lessons = timetable[className][day];
+    if (!lessons) return null;
+    let tester = hour * 100 + min;
+    let index = lessons.findIndex(lesson => lesson.startTime <= tester && lesson.endTime > tester);
+    let next = lessons.findIndex(lesson => lesson.startTime > tester);
     return {
-        hour: parseInt(str.substr(0, str.length - 2)),
-        minute: parseInt(str.substr(str.length - 2))
+        lessons,
+        lesson: lessons[index],
+        index,
+        next
     };
 }
+
+
+function minutesToTime(min) {
+    return [Math.floor(min / 60), min % 60];
+}
+
+function parseTime(number) {
+    return [Math.floor(number / 100), number % 100]
+}
+
+function format(time) {
+    return time[0].toString().padStart(2, '0') + ":" + time[1].toString().padStart(2, '0');
+}
+
+function express(time) {
+    return (time[0] > 0 ? time[0] + "h " : '') + time[1] + "m";
+}
+
+function diff(timeA, timeB) {
+    return Math.abs((timeA[0] - timeB[0]) * 60 + timeA[1] - timeB[1]);
+}
+
+
+// 8:04
+// 7:48

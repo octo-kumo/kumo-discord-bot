@@ -24,7 +24,7 @@ function sendBook(channel, book) {
         message.react('⬅️').then(() => message.react('➡️')).then(() => message.react('❎'));
         message.createReactionCollector(book_filter).on('collect', r => {
             if (!r) return;
-            r.users.keyArray().filter(k => k !== config.id).forEach(k => r.remove(k));
+            r.users.cache.keyArray().filter(k => k !== config.id).forEach(k => r.users.remove(k));
             let name = r.emoji.name;
             if (r.emoji.name === '❎') return message.delete();
             let book = BOOKS[message.id];
@@ -44,11 +44,11 @@ function generateBook(girls) {
     let pages = [];
     for (let i = 0; i < 10; i++) {
         const image = girls[i].image;
-        let attachment = new Discord.Attachment(Buffer.from(image, 'base64'), `image.png`);
-        let imageEmbed = new Discord.RichEmbed();
+        let attachment = new Discord.MessageAttachment(Buffer.from(image, 'base64'), `image.png`);
+        let imageEmbed = new Discord.MessageEmbed();
         imageEmbed.setDescription('Waifu #' + (i + 1) + "\n```json\n" + JSON.stringify(girls[i].seeds) + "\n```")
             .setThumbnail(`attachment://image.png`);
-        imageEmbed.attachFile(attachment);
+        imageEmbed.attachFiles([attachment]);
         pages.push(imageEmbed);
     }
     return {

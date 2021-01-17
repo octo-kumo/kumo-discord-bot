@@ -143,7 +143,7 @@ exports.daily = function (args, msg, PREFIX) {
 
 exports.baltop = function (args, msg, PREFIX) {
     db.User.find({appeared_in: msg.guild.id}).limit(15).sort("-credit").exec((err, users) => {
-        let embed = new Discord.RichEmbed();
+        let embed = new Discord.MessageEmbed();
         embed.setTitle("Balance Leaderboard");
         embed.setColor(0x00FFFF);
         embed.setDescription(users.map((user, i) => `\`#${i + 1}\` <@${user.id}>: **$${user.credit}**`).join("\n"));

@@ -188,7 +188,7 @@ function getVideo(id) {
 function list(msg) {
     let queue = queues[msg.guild.id];
     if (!queue) return msg.channel.send("_No Song No Life_");
-    let embed = new Discord.RichEmbed();
+    let embed = new Discord.MessageEmbed();
     embed.setTitle("Queue");
     embed.setColor(0x99ccff);
     let finalText = [];
@@ -280,7 +280,7 @@ function search(query) {
 
 function genVideoEmbed(video, playingTime) {
     console.log("genVideoEmbed()");
-    const embed = new Discord.RichEmbed();
+    const embed = new Discord.MessageEmbed();
     embed.setTitle(video.title);
     embed.setDescription(video.description);
     embed.addField("Duration", (playingTime ? getTimeStamp(playingTime) + "/" : "") + video.timestamp, true);

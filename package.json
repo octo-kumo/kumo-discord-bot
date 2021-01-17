@@ -21,7 +21,7 @@
   "dependencies": {
     "24game-solver": "^0.2.5",
     "canvas": "^2.6.1",
-    "discord.js": "^11.6.4",
+    "discord.js": "^12.5.1",
     "jsdom": "^15.2.1",
     "minecraft-api": "0.0.3",
     "moment": "^2.24.0",

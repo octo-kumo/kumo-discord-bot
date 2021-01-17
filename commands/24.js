@@ -87,7 +87,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
                 user.save();
             }
             if (user.game24_total_play_count === 0) return msg.reply((user_to_show ? "This person" : "You") + " have not played any 24 games!");
-            let embed = new Discord.RichEmbed();
+            let embed = new Discord.MessageEmbed();
             embed.setColor(0x00FFFF);
             embed.setTitle("24 Game Profile");
             embed.addField("Accuracy", `${round(user.game24_history.length * 100 / user.game24_total_play_count, 3)}%`, true);
@@ -112,7 +112,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
         if (!key) key = 'game24_average';
         if (key === "game24_total_play_count") {
             db.User.find({appeared_in: msg.guild.id}).limit(15).sort("-game24_total_play_count").exec((err, users) => {
-                let embed = new Discord.RichEmbed();
+                let embed = new Discord.MessageEmbed();
                 embed.setTitle("24 Game Leaderboard");
                 embed.setColor(0x00FFFF);
                 embed.setDescription(users.map((user, i) => `\`#${i + 1}\` <@${user.id}>: **x${user[key]}**`).join("\n"));
@@ -120,7 +120,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
             });
         } else {
             db.User.find({appeared_in: msg.guild.id}).limit(15).sort(key).exec((err, users) => {
-                let embed = new Discord.RichEmbed();
+                let embed = new Discord.MessageEmbed();
                 embed.setTitle("24 Game Leaderboard");
                 embed.setColor(0x00FFFF);
                 embed.setDescription(users.map((user, i) => `\`#${i + 1}\` <@${user.id}>: **${round(user[key] / 1000, 3)}s**`).join("\n"));
