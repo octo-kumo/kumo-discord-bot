@@ -72,9 +72,8 @@ function getLessonsExact(className, day, hour, min) {
     let lessons = timetable[className][day];
     if (!lessons) return null;
     let tester = hour * 100 + min;
-    let index = lessons.findIndex(lesson => lesson.startTime <= tester && lesson.endTime > tester);
-    let next = lessons.findIndex(lesson => lesson.startTime > tester);
-    console.log(day, tester, ";", index, next);
+    let index = lessons.findIndex(lesson => lesson.start_time <= tester && lesson.end_time > tester);
+    let next = lessons.findIndex(lesson => lesson.start_time > tester);
     return {
         lessons,
         lesson: lessons[index],
