@@ -20,9 +20,9 @@ exports.handleCommand = (args, msg, PREFIX) => {
     let className = 'M21503', query = 'now', day;
     for (const arg of args) {
         if (CLASS_NAME_REGEX.test(arg)) className = fillClassName(arg);
-        else if (['now', 'tmr', 'all'].includes(arg)) query = arg;
+        else if (['now', 'tmr', 'all', 'left'].includes(arg)) query = arg;
         else if (arg.length > 3 && WEEKDAYS.some(day => day.toLowerCase().startsWith(arg.toLowerCase()))) day = WEEKDAYS.findIndex(day => day.toLowerCase().startsWith(arg.toLowerCase()));
-        else return msg.reply(`\`${PREFIX}timetable [class]? [now/tmr/all]? [weekday]?\`\nAny order is fine`);
+        else return msg.reply(`\`${PREFIX}timetable [class]? [now/tmr/all/left]? [weekday]?\`\nAny order is fine`);
     }
     if (query === 'now') msg.channel.send(getLessonsNow(className, day));
     else if (query === 'tmr') msg.channel.send(getLessonsTmr(className));
