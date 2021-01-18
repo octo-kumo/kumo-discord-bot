@@ -2,37 +2,33 @@ const minecraft = require('minecraft-api');
 const Discord = require('discord.js');
 const fetch = require('node-fetch');
 
+const MINECRAFT_NAME = /[a-zA-Z_]{3,16}/g;
 exports.handleCommand = function (args, msg, PREFIX) {
-    if (args.length < 1) return msg.reply(`Correct usage: \n\`${PREFIX}minecraft user? [user-name]\` check profile\n\`${PREFIX}minecraft server [ip]\` check server status`)
-    switch (args[0]) {
-        case 'server':
-            args.shift();
-            fetch("https://api.minetools.eu/ping/" + args.join(' ').replace('\:', '/'))
-                .then(res => res.json())
-                .then((response) => {
-                    msg.channel.send(generateServerEmbed(response, msg, args.join(' ')));
-                }).catch((error) => {
-                msg.reply("Is the server dead?");
-                console.error(error);
+    if (args.length < 1) return msg.reply(`Correct usage: \n\`${PREFIX}minecraft user? [user-name]\` check profile\n\`${PREFIX}minecraft server? [ip]\` check server status`)
+    if (args[0] === 'server' || !MINECRAFT_NAME.test(args[0])) {
+        args.shift();
+        fetch("https://api.minetools.eu/ping/" + args.join(' ').replace('\:', '/')).then(res => res.json()).then((response) => {
+            msg.channel.send(generateServerEmbed(response, msg, args.join(' ')));
+        }).catch((error) => {
+            msg.reply("Is the server dead?");
+            console.error(error);
+        });
+    } else {
+        if (args[0] === 'user') args.shift();
+        minecraft.uuidForName(args.join(''))
+            .then(uuid => fetch("https://api.minetools.eu/profile/" + uuid))
+            .then(res => res.json())
+            .then(profile => {
+                if (profile.decoded) {
+                    let embed = new Discord.MessageEmbed();
+                    embed.setColor(hashStringToColor(profile.decoded.profileId));
+                    embed.setAuthor("User Info");
+                    embed.setThumbnail(`https://minotar.net/helm/${profile.decoded.profileName}/256.png`);
+                    embed.addField("Name", profile.decoded.profileName);
+                    embed.addField("UUID", '`' + profile.decoded.profileId + '`');
+                    msg.channel.send(embed);
+                } else msg.reply("Who is that?");
             });
-            break;
-        case 'user':
-            args.shift();
-        default:
-            minecraft.uuidForName(args.join(' '))
-                .then(uuid => fetch("https://api.minetools.eu/profile/" + uuid))
-                .then(res => res.json())
-                .then(profile => {
-                    if (profile.decoded) {
-                        let embed = new Discord.MessageEmbed();
-                        embed.setColor(hashStringToColor(profile.decoded.profileId));
-                        embed.setAuthor("User Info");
-                        embed.setThumbnail(`https://minotar.net/helm/${profile.decoded.profileName}/256.png`);
-                        embed.addField("Name", profile.decoded.profileName);
-                        embed.addField("UUID", '`' + profile.decoded.profileId + '`');
-                        msg.channel.send(embed);
-                    } else msg.reply("Who is that?");
-                });
     }
 }
 
