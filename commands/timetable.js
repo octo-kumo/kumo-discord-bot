@@ -51,7 +51,7 @@ function getLessonsNow(className, day) {
 
 function getLessonsOnDay(className, day) {
     let lessons = timetable[className][WEEKDAYS[day]];
-    return `**Lessons ${className}/${day}**\`\`\`\n${lessons.map((lesson, i) => `${(i + 1).toString().padStart(lessons.length.toString().length, ' ')}. ${lesson.subject.join('/').padStart(8, ' ')} ${format(parseTime(lesson.start_time))} → ${format(parseTime(lesson.end_time))}`).join('\n')}\`\`\``;
+    return `**Lessons ${className}/${WEEKDAYS[day]}**\`\`\`\n${lessons.map((lesson, i) => `${(i + 1).toString().padStart(lessons.length.toString().length, ' ')}. ${lesson.subject.join('/').padStart(8, ' ')} ${format(parseTime(lesson.start_time))} → ${format(parseTime(lesson.end_time))}`).join('\n')}\`\`\``;
 }
 
 function getLessonsAll(className, day) {
@@ -61,6 +61,7 @@ function getLessonsAll(className, day) {
 function getLessonsTmr(className) {
     let day = moment().tz("Asia/Singapore").day();
     if (day === 0 || day === 6 || day === 5) day = 1;
+    else day++;
     return getLessonsOnDay(className, day);
 }
 
