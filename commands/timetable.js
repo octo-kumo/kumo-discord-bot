@@ -73,6 +73,7 @@ function getLessonsExact(className, day, hour, min) {
     let tester = hour * 100 + min;
     let index = lessons.findIndex(lesson => lesson.startTime <= tester && lesson.endTime > tester);
     let next = lessons.findIndex(lesson => lesson.startTime > tester);
+    console.log(tester, ";", index, next);
     return {
         lessons,
         lesson: lessons[index],
