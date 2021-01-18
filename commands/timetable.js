@@ -27,7 +27,8 @@ exports.handleCommand = (args, msg, PREFIX) => {
     if (query === 'now') msg.channel.send(getLessonsNow(className, day));
     else if (query === 'tmr') msg.channel.send(getLessonsTmr(className));
     else if (query === 'all') msg.channel.send(getLessonsAll(className, day));
-    else msg.channel.send("Only now/tmr/all allowed");
+    else if (query === 'left') msg.channel.send(getLessonsRemaining(className));
+    else msg.channel.send("Only now/tmr/all/left allowed");
 };
 
 function fillClassName(name) {
@@ -45,24 +46,38 @@ function getLessonsNow(className, day) {
     let start = parseTime(query.lesson.start_time);
     let end = parseTime(query.lesson.end_time);
     return `${className} **${query.lesson.subject.join('/')}**\n${format(start)} → ${format(end)}\n` +
-        `(${express(minutesToTime(diff(start, end)))}) Ends in  ${express(minutesToTime(diff([now.hour(), now.minute()], end)))}\n` +
+        `(${express(minutesToTime(diff(start, end)))}) Ends in ${express(minutesToTime(diff([now.hour(), now.minute()], end)))}\n` +
         `Next is **${query.lessons[query.index + 1] ? query.lessons[query.index + 1].subject.join('/') : 'Nothing'}**${day && day !== now.day() ? `\n*On ${WEEKDAYS[day]}` : ''}`;
 }
 
-function getLessonsOnDay(className, day) {
+function getLessonsOnDay(className, day, indicator) {
+    let now = moment().tz("Asia/Singapore");
     let lessons = timetable[className][WEEKDAYS[day]];
-    return `**Lessons ${className}/${WEEKDAYS[day]}**\`\`\`\n${lessons.map((lesson, i) => `${(i + 1).toString().padStart(lessons.length.toString().length, ' ')}. ${lesson.subject.join('/').padStart(8, ' ')} ${format(parseTime(lesson.start_time))} → ${format(parseTime(lesson.end_time))}`).join('\n')}\`\`\``;
+    let tester = now.hour() * 100 + now.minute();
+    let max = Math.max(5, Math.max.apply(null, lessons.map(lesson => lesson.subject.join('/').length)));
+    return `**Lessons ${className}/${WEEKDAYS[day]}**\`\`\`\n${lessons.map((lesson, i) => `${(i + 1).toString().padStart(lessons.length.toString().length, ' ')}. ${lesson.subject.join('/').padStart(max, ' ')} ${format(parseTime(lesson.start_time))} → ${format(parseTime(lesson.end_time))}` +
+        (indicator && lesson.start_time <= tester && lesson.end_time > tester ? ' ← ' + express(minutesToTime(diff([now.hour(), now.minute()], parseTime(lesson.end_time)))) : '')).join('\n')}\`\`\``;
+}
+
+function getLessonsRemaining(className) {
+    let now = moment().tz("Asia/Singapore");
+    let tester = now.hour() * 100 + now.minute();
+    let lessons = timetable[className][WEEKDAYS[now.day()]].filter(lesson => lesson.end_time > tester);
+    if (lessons.length === 0) return "Nothing lmao";
+    let max = Math.max(5, Math.max.apply(null, lessons.map(lesson => lesson.subject.join('/').length)));
+    return `**Lessons Remaining ${className}/${WEEKDAYS[day]}**\`\`\`\n${lessons.map((lesson, i) => `${lesson.subject.join('/').padStart(max, ' ')} ${format(parseTime(lesson.start_time))} → ${format(parseTime(lesson.end_time))}` +
+        (i === 0 ? ' ← ' + express(minutesToTime(diff([now.hour(), now.minute()], parseTime(lesson.end_time)))) : '')).join('\n')}\`\`\``;
 }
 
 function getLessonsAll(className, day) {
-    return getLessonsOnDay(className, day === 0 ? day : day || moment().tz("Asia/Singapore").day());
+    return getLessonsOnDay(className, day === 0 ? day : day || moment().tz("Asia/Singapore").day(), true);
 }
 
 function getLessonsTmr(className) {
     let day = moment().tz("Asia/Singapore").day();
     if (day === 0 || day === 6 || day === 5) day = 1;
     else day++;
-    return getLessonsOnDay(className, day);
+    return getLessonsOnDay(className, day, false);
 }
 
 function getLessonsExact(className, day, hour, min) {
