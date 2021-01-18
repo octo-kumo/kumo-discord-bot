@@ -1,5 +1,6 @@
 const fetch = require('node-fetch');
 const config = require('./config.js').config;
+const moment = require('moment-timezone');
 let timetable;
 
 const WEEKDAYS = [
@@ -36,16 +37,16 @@ function fillClassName(name) {
 }
 
 function getLessonsNow(className, day) {
-    let now = new Date(new Date().getTime() + config.offset * 3600 * 1000);
-    let query = getLessonsExact(className, WEEKDAYS[day === 0 ? day : day || now.getDay()], now.getHours(), now.getMinutes());
+    let now = moment().tz("Asia/Singapore");
+    let query = getLessonsExact(className, WEEKDAYS[day === 0 ? day : day || now.day()], now.hour(), now.minute());
     if (!query) return 'Nothing';
     else if (typeof query === 'string') return query;
     if (!query.lesson) return 'Free period' + (query.next === -1 ? '' : '\nNext is **' + query.lessons[query.next].subject.join('/') + '**');
     let start = parseTime(query.lesson.start_time);
     let end = parseTime(query.lesson.end_time);
     return `${className} **${query.lesson.subject.join('/')}**\n${format(start)} → ${format(end)}\n` +
-        `(${express(minutesToTime(diff(start, end)))}) Ends in  ${express(minutesToTime(diff([now.getHours(), now.getMinutes()], end)))}\n` +
-        `Next is **${query.lessons[query.index + 1] ? query.lessons[query.index + 1].subject.join('/') : 'Nothing'}**${day && day !== now.getDay() ? `\n*On ${WEEKDAYS[day]}` : ''}`;
+        `(${express(minutesToTime(diff(start, end)))}) Ends in  ${express(minutesToTime(diff([now.hour(), now.minute()], end)))}\n` +
+        `Next is **${query.lessons[query.index + 1] ? query.lessons[query.index + 1].subject.join('/') : 'Nothing'}**${day && day !== now.day() ? `\n*On ${WEEKDAYS[day]}` : ''}`;
 }
 
 function getLessonsOnDay(className, day) {
@@ -54,11 +55,11 @@ function getLessonsOnDay(className, day) {
 }
 
 function getLessonsAll(className, day) {
-    return getLessonsOnDay(className, day === 0 ? day : day || new Date(new Date().getTime() + config.offset * 3600 * 1000).getDay());
+    return getLessonsOnDay(className, day === 0 ? day : day || moment().tz("Asia/Singapore").day());
 }
 
 function getLessonsTmr(className) {
-    let day = new Date(new Date().getTime() + config.offset * 3600 * 1000).getDay();
+    let day = moment().tz("Asia/Singapore").day();
     if (day === 0 || day === 6 || day === 5) day = 1;
     return getLessonsOnDay(className, day);
 }
@@ -73,7 +74,7 @@ function getLessonsExact(className, day, hour, min) {
     let tester = hour * 100 + min;
     let index = lessons.findIndex(lesson => lesson.startTime <= tester && lesson.endTime > tester);
     let next = lessons.findIndex(lesson => lesson.startTime > tester);
-    console.log(tester, ";", index, next);
+    console.log(day, tester, ";", index, next);
     return {
         lessons,
         lesson: lessons[index],
