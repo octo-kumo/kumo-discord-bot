@@ -28,7 +28,7 @@ exports.handleCommand = (args, msg, PREFIX) => {
     else if (query === 'tmr') msg.channel.send(getLessonsTmr(className));
     else if (query === 'all') msg.channel.send(getLessonsAll(className, day));
     else if (query === 'left') msg.channel.send(getLessonsRemaining(className));
-    else msg.channel.send("Only now/tmr/all/left allowed");
+    else msg.channel.send("Welp you pro");
 };
 
 function fillClassName(name) {
@@ -65,7 +65,7 @@ function getLessonsRemaining(className) {
     let lessons = timetable[className][WEEKDAYS[now.day()]].filter(lesson => lesson.end_time > tester);
     if (lessons.length === 0) return "Nothing lmao";
     let max = Math.max(5, Math.max.apply(null, lessons.map(lesson => lesson.subject.join('/').length)));
-    return `**Lessons Remaining ${className}/${WEEKDAYS[day]}**\`\`\`\n${lessons.map((lesson, i) => `${lesson.subject.join('/').padStart(max, ' ')} ${format(parseTime(lesson.start_time))} → ${format(parseTime(lesson.end_time))}` +
+    return `**Lessons Remaining ${className}/${WEEKDAYS[now.day()]}**\`\`\`\n${lessons.map((lesson, i) => `${lesson.subject.join('/').padStart(max, ' ')} ${format(parseTime(lesson.start_time))} → ${format(parseTime(lesson.end_time))}` +
         (i === 0 ? ' ← ' + express(minutesToTime(diff([now.hour(), now.minute()], parseTime(lesson.end_time)))) : '')).join('\n')}\`\`\``;
 }
 
