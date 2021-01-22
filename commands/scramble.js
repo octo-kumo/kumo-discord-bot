@@ -1,5 +1,7 @@
-const WORDS = require('fs').readFileSync(require('path').join(__dirname, '..', 'json', 'words_csw.txt'), 'utf8').toLowerCase().split('\n');
-const WORDS_COMMON = require('fs').readFileSync(require('path').join(__dirname, '..', 'json', 'words_10k.txt'), 'utf8').toLowerCase().split('\n');
+const fs = require('fs');
+const path = require('path');
+const WORDS = fs.readFileSync(path.join(__dirname, '..', 'json', 'words_csw.txt'), 'utf8').split('\n');
+const WORDS_COMMON = fs.readFileSync(path.join(__dirname, '..', 'json', 'words_10k.txt'), 'utf8').split('\n');
 const WORDS_NORMAL = WORDS.filter(w => w.length > 1);
 const GAMES = {};
 
