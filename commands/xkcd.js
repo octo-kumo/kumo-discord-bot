@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const srcset = require('srcset');
 const JSDOM = require("jsdom").JSDOM;
 const Discord = require('discord.js');
 exports.handleCommand = async function (args, msg, PREFIX) {
@@ -10,11 +11,12 @@ exports.handleCommand = async function (args, msg, PREFIX) {
             .setColor(0x44a0d1)
             .setURL(url)
             .setTitle(doc.head.querySelector("[property='og:title'][content]").content)
-            .setImage('https:' + (img.getAttribute('srcset') ? img.getAttribute('srcset') : img.getAttribute('src')))
+            .setImage('https:' + (img.getAttribute('srcset') ? srcset.parse(img.getAttribute('srcset')).sort((a, b) => b.density ? a.density ? b.density - a.density : -1 : 1)[0].url : img.getAttribute('src')))
             .setDescription(img.getAttribute('title'))
-            .setFooter('All credits to https://xkcd.com • ' + url.replace(/^https:\/\/xkcd.com\/([^/]+)\/$/, '$1'))
+            .setFooter('Credits to xkcd • ' + url.replace(/^https:\/\/xkcd.com\/([^/]+)\/$/, '$1'))
         );
     } catch (e) {
         await msg.channel.send("Failed to get comics");
+        console.log(e);
     }
 }
