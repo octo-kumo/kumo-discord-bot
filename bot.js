@@ -1,21 +1,22 @@
 // Required dependencies
 const Discord = require('discord.js');
-const config = require('./commands/config.js').config;
-// const coursemology = require('./coursemology.js');
-const eco = require('./commands/eco.js');
-const bilibili = require('./commands/bilibili.js');
-const covid = require('./commands/covid.js');
-const azurlane = require('./commands/azurlane.js');
-const gomoku = require('./commands/gomoku.js');
-const minecraft = require('./commands/minecraft.js');
-const music = require('./commands/music.js');
-const inspire = require('./commands/inspire.js');
-const waifulabs = require('./commands/waifulabs.js');
-const timetable = require('./commands/timetable.js');
-const anime = require('./commands/anime.js');
-const minesweeper = require('./commands/minesweeper.js');
-const game24 = require('./commands/24.js');
-const scramble = require('./commands/scramble.js');
+const config = require('./commands/config').config;
+// const coursemology = require('./coursemology');
+const eco = require('./commands/eco');
+const bilibili = require('./commands/bilibili');
+const covid = require('./commands/covid');
+const azurlane = require('./commands/azurlane');
+const gomoku = require('./commands/gomoku');
+const minecraft = require('./commands/minecraft');
+const music = require('./commands/music');
+const inspire = require('./commands/inspire');
+const waifulabs = require('./commands/waifulabs');
+const timetable = require('./commands/timetable');
+const anime = require('./commands/anime');
+const minesweeper = require('./commands/minesweeper');
+const game24 = require('./commands/24');
+const scramble = require('./commands/scramble');
+const xkcd = require('./commands/xkcd');
 
 const db = require('./db');
 
@@ -121,6 +122,7 @@ client.on('message', async msg => {
     }
     if (command === "24") game24.handleCommand(args, msg, PREFIX);
     if (command === "s" || command === "scramble") scramble.handleCommand(args, msg, PREFIX);
+    if (command === "x" || command === "xkcd") xkcd.handleCommand(args, msg, PREFIX);
     if (command === "waifulabs") await waifulabs.newBatch(msg);
     if (command === "timetable" || command === "tt") timetable.handleCommand(args, msg, PREFIX);
     if (command === "sleep") {
