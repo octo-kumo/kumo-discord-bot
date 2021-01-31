@@ -33,7 +33,7 @@
     "request": "^2.88.2",
     "srcset": "^3.0.0",
     "stats-lite": "^2.2.0",
-    "vega": "^5.14.0",
+    "vega": "^5.17.3",
     "yt-search": "^2.2.0",
     "ytdl-core": "^3.2.2"
   }
