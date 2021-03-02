@@ -6,13 +6,14 @@ const MINECRAFT_NAME = /^[a-zA-Z_]{3,16}$/g;
 exports.handleCommand = function (args, msg, PREFIX) {
     if (args.length < 1) return msg.reply(`Correct usage: \n\`${PREFIX}minecraft user? [user-name]\` check profile\n\`${PREFIX}minecraft server? [ip]\` check server status`)
     if (args[0] === 'server' || !MINECRAFT_NAME.test(args[0])) {
-        args.shift();
-        fetch("https://api.minetools.eu/ping/" + args.join(' ').replace('\:', '/')).then(res => res.json()).then((response) => {
-            msg.channel.send(generateServerEmbed(response, msg, args.join(' ')));
-        }).catch((error) => {
-            msg.reply("Is the server dead?");
-            console.error(error);
-        });
+        if (args[0] === 'server') args.shift();
+        fetch("https://api.minetools.eu/ping/" + args.join(' ').replace('\:', '/'))
+            .then(res => res.json())
+            .then((response) => msg.channel.send(generateServerEmbed(response, msg, args.join(' '))))
+            .catch((error) => {
+                msg.reply("Is the server dead?");
+                console.error(error);
+            });
     } else {
         if (args[0] === 'user') args.shift();
         minecraft.uuidForName(args.join(''))
