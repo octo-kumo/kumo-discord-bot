@@ -437,9 +437,9 @@ function generateStatsPage(ship, key) {
 function generateSkillsPage(ship) {
     const skills_limits_eq = new Discord.MessageEmbed(); // Page 3
     skills_limits_eq.setTitle("Equipment Slots / Skills / Limit Breaks");
-    skills_limits_eq.addField("> **Equipment Slots**\n" + "(1) " + ship.slots[1].type, ship.slots[1].minEfficiency ? ship.slots[1].minEfficiency + "% → " + ship.slots[1].maxEfficiency + "%" : "None", true)
-        .addField("(2) " + ship.slots[2].type, ship.slots[2].minEfficiency + "% → " + ship.slots[2].maxEfficiency + "%", true)
-        .addField("(3) " + ship.slots[3].type, ship.slots[3].minEfficiency + "% → " + ship.slots[3].maxEfficiency + "%", true);
+    skills_limits_eq.addField("> **Equipment Slots**\n" + "(1) " + ship.slots[0].type, ship.slots[0].minEfficiency ? ship.slots[0].minEfficiency + "% → " + ship.slots[0].maxEfficiency + "%" : "None", true)
+        .addField("(2) " + ship.slots[1].type, ship.slots[1].minEfficiency + "% → " + ship.slots[1].maxEfficiency + "%", true)
+        .addField("(3) " + ship.slots[2].type, ship.slots[2].minEfficiency + "% → " + ship.slots[2].maxEfficiency + "%", true);
     for (let i = 0; i < ship.skills.length; i++) {
         let skill = ship.skills[i];
         let skill_field = creatSkillField(skill);

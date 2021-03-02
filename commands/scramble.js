@@ -19,7 +19,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
         let list = easy ? WORDS_COMMON : WORDS_NORMAL;
         if (limit !== -1) list = list.filter(elem => elem.length === limit);
         if (list.length === 0) return msg.reply("No words found for you!");
-        let word = list[Math.floor(list.length * Math.random())];
+        let word = list[Math.floor(list.length * Math.random())].trim();
         let game = GAMES[msg.author.id] = {
             characters: (easy ? easyShuffle : shuffleArray)(word.split('')),
             word: word,
@@ -43,7 +43,7 @@ exports.handleCommand = function (args, msg, PREFIX) {
         if (!isNaN(args[0])) minL = parseInt(args.shift());
         let input = args.join('').toLowerCase().split('');
         minL = Math.min(input.length, minL);
-        let targetWord = WORDS.filter(w => easy ? w.length >= minL : w.length === input.length)[showAll ? 'filter' : 'find'](word => arraySubset(input, word.split('')));
+        let targetWord = WORDS.filter(w => easy ? w.trim().length >= minL : w.trim().length === input.length)[showAll ? 'filter' : 'find'](word => arraySubset(input, word.trim().split('')));
         if (showAll) return msg.reply(`Found ${targetWord.length} words\n\`\`\`\n${targetWord.join(', ')}\n\`\`\``);
         else return msg.reply(`Possible solution would be \`${targetWord}\``);
     }

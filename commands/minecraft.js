@@ -2,7 +2,7 @@ const minecraft = require('minecraft-api');
 const Discord = require('discord.js');
 const fetch = require('node-fetch');
 
-const MINECRAFT_NAME = /[a-zA-Z_]{3,16}/g;
+const MINECRAFT_NAME = /^[a-zA-Z_]{3,16}$/g;
 exports.handleCommand = function (args, msg, PREFIX) {
     if (args.length < 1) return msg.reply(`Correct usage: \n\`${PREFIX}minecraft user? [user-name]\` check profile\n\`${PREFIX}minecraft server? [ip]\` check server status`)
     if (args[0] === 'server' || !MINECRAFT_NAME.test(args[0])) {

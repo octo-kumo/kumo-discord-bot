@@ -6,6 +6,7 @@ const eco = require('./commands/eco');
 const bilibili = require('./commands/bilibili');
 const covid = require('./commands/covid');
 const azurlane = require('./commands/azurlane');
+const genshin = require('./commands/genshin');
 const gomoku = require('./commands/gomoku');
 const minecraft = require('./commands/minecraft');
 const music = require('./commands/music');
@@ -38,6 +39,7 @@ client.on('ready', () => {
     config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
     config.HOOK2 = new Discord.WebhookClient('676309488021798912', process.env.HKTOKEN2);
     config.id = client.user.id;
+    genshin.init().then(r => console.log("Genshin Init!\n" + JSON.stringify(r)))
     timetable.init().then(r => console.log("Timetable Init!"));
     azurlane.init().then(r => console.log("Azurlane Init!"));
     bilibili.init().then(r => console.log("Bilibili Init!"));
@@ -110,12 +112,13 @@ client.on('message', async msg => {
     if (command === "covid" || command === "coronavirus" || command === "corona" || command === "c") await covid.handleCommand(args, msg, PREFIX);
     if (command === "inspire") await inspire.handleCommand(args, msg, PREFIX);
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") await azurlane.handleCommand(args, msg, PREFIX);
+    if (command === "genshin" || command === "gs" || command === "lisa" || command === "g") await genshin.handleCommand(args, msg, PREFIX);
     if (command === "music" || command === "am" || command === "m" || command === "song") await music.handleCommand(args, msg, PREFIX);
     if (command.startsWith("!")) {
         console.log("Double !!: end command = " + command.substring(1));
         await music.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
     }
-    if (command === "gomoku" || command === "g" || command === "tictactoe" || command === "ttt") gomoku.handleCommand(args, msg, PREFIX);
+    if (command === "gomoku" || command === "tictactoe" || command === "ttt") gomoku.handleCommand(args, msg, PREFIX);
     if (command.startsWith("?")) {
         console.log("Chain !?: end command = " + command.substring(1));
         gomoku.handleCommand([command.substring(1)].concat(args), msg, PREFIX);
