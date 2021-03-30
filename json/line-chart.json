@@ -94,7 +94,6 @@
             "scale": "x",
             "title": "Date",
             "formatType": "time",
-            "labelAngle": -70,
             "labelPadding": 10,
             "titleColor": "white",
             "labelColor": "lightgrey",
