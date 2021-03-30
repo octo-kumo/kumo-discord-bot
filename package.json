@@ -19,8 +19,8 @@
     },
     "homepage": "https://github.com/LE0ZY/kumo-discord-bot#readme",
     "dependencies": {
-        "canvas": "^2.7.0",
         "24game-solver": "^0.2.5",
+        "canvas": "^2.7.0",
         "discord.js": "^12.5.1",
         "jsdom": "^15.2.1",
         "minecraft-api": "^0.0.2",
