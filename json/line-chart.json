@@ -59,7 +59,7 @@
     "scales": [
         {
             "name": "x",
-            "type": "point",
+            "type": "time",
             "range": "width",
             "domain": {
                 "data": "table",
@@ -93,6 +93,7 @@
             "orient": "bottom",
             "scale": "x",
             "title": "Date",
+            "formatType": "time",
             "labelAngle": -70,
             "labelPadding": 10,
             "titleColor": "white",

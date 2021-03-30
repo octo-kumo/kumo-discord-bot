@@ -149,27 +149,27 @@ function convertToData(region, limit, filter) {
         let day = region[i];
         if (day.confirmed === 0) continue;
         if (!filter.includes("total")) newDataArray.push({
-            date: day.date.substring(5),
+            date: new Date(day.date),//.substring(5),
             value: day.confirmed,
             c: "Total"
         });
         if (!filter.includes("active")) newDataArray.push({
-            date: day.date.substring(5),
+            date: new Date(day.date),//.substring(5),
             value: day.confirmed - day.deaths - day.recovered,
             c: "Active"
         });
         if (!filter.includes("deaths")) newDataArray.push({
-            date: day.date.substring(5),
+            date: new Date(day.date),//.substring(5),
             value: day.deaths,
             c: "Deaths"
         });
         if (!filter.includes("cured")) newDataArray.push({
-            date: day.date.substring(5),
+            date: new Date(day.date),//.substring(5),
             value: day.recovered,
             c: "Cured"
         });
         if (!filter.includes("new")) newDataArray.push({
-            date: day.date.substring(5),
+            date: new Date(day.date),//.substring(5),
             value: i === 0 ? 0 : (day.confirmed - region[i - 1].confirmed),
             c: "New"
         });
