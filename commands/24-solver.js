@@ -12,17 +12,7 @@
     }
 }(this, function () {
     'use strict';
-    var Calc = undefined;
-    try {
-        Calc = require('expression-calculator');
-    } catch (e) {
-        if ('undefined' !== typeof (global) && global.Calc) {
-            Calc = global.Calc
-        } else if ('undefined' !== typeof (window) && window.Calc) {
-            Calc = window.Calc;
-        }
-    }
-
+    const Calc = require('expression-calculator');
     var tempRPN = [
         [
             {type: Calc.TOKEN_NUM},
@@ -104,11 +94,11 @@
         var i, j, k;
         for (i = 0; i < 4; i++) {
             for (j = 0; j < 4; j++) {
-                if (j == i) {
+                if (j === i) {
                     continue;
                 }
                 for (k = 0; k < 4; k++) {
-                    if (k == i || k == j) {
+                    if (k === i || k === j) {
                         continue;
                     }
                     enumOpers(n[i], n[j], n[k], n[6 - i - j - k], goal, f);

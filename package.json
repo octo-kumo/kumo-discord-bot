@@ -21,6 +21,7 @@
     "dependencies": {
         "canvas": "^2.7.0",
         "discord.js": "^12.5.1",
+        "expression-calculator": "^0.0.5",
         "jsdom": "^15.2.1",
         "minecraft-api": "^0.0.2",
         "moment": "^2.24.0",
