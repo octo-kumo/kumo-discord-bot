@@ -1,4 +1,4 @@
-const solve24game = require('24game-solver');
+const solve24game = require('./24-solver');
 const Discord = require('discord.js');
 const stats = require("stats-lite");
 const db = require("../db");
