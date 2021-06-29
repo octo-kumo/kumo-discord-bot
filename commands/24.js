@@ -77,6 +77,11 @@ exports.handleCommand = function (args, msg, PREFIX) {
         else if (showAll) {
             msg.reply('Found ' + solution.length + ' solutions.\n```\n' + solution.join('\n') + '\n```');
         } else msg.reply('Found ' + solution.length + ', one solution is `' + solution[0] + '`');
+    } else if (['solvable', 'pos'].includes(args[0])) {
+        args.shift();
+        let solution = solve24game.apply(null, args);
+        if (solution.length === 0) msg.reply('It is **impossible**!');
+        else msg.reply('It is **possible**!');
     } else if (['profile'].includes(args[0])) {
         let user_to_show = null;
         if (msg.mentions.users.size !== 0) user_to_show = msg.mentions.users.first();
