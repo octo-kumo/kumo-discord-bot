@@ -48,6 +48,7 @@ exports.handleCommand = async (args, msg, prefix) => {
             }
             break;
         case "i":
+        case "info":
             if (args.length === 0) return msg.reply("_Labs aren't showing..._");
             let sendAssessment = (assessment) => {
                 console.log("Sending assessment...");
