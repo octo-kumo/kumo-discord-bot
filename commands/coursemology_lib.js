@@ -155,7 +155,7 @@ function update(ids, courses) {
         let new_items = [];
         for (let key of Object.keys(nl.items)) {
             if (!ol.items[key]) new_items.push(...nl.items[key]);
-            new_items.push(...(nl.items[key].filter(e => !ol.items[key].find(e1 => e1.id === e.id))));
+            new_items.push(...(nl.items[key].filter(e => !(ol.items[key] && ol.items[key].find(e1 => e1.id === e.id)))));
         }
         courses[id] = nl;
         return {

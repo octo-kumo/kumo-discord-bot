@@ -23,7 +23,7 @@ function checkUpdates() {
         });
         if (result.new_notice.length > 0) config.COURSEMOLOGY_HOOK.send({
             "username": "Notifications",
-            "embeds": result.new_notice.sort((a, b) => b.time - a.time).map(i => newNoticeEmbed(i))
+            "embeds": result.new_notice.sort((a, b) => a.time - b.time).map(i => newNoticeEmbed(i))
         })
     }));
 }
@@ -97,11 +97,12 @@ function generateAssessmentEmbed(assessment) {
 
 function newItemEmbed(item) {
     let basicInfo = new Discord.MessageEmbed();
-    basicInfo.setTitle(item.title);
-    basicInfo.setURL(item.url);
-    basicInfo.setAuthor(item.type);
+    basicInfo.setAuthor(item.title, null, item.url);
     basicInfo.setColor(0x00ffff);
-    if (item.endAt) basicInfo.setTimestamp(+moment(item.endAt, "DD MMM HH:mm"))
+    if (item.endAt) {
+        basicInfo.setTimestamp(+moment(item.endAt, "DD MMM HH:mm"));
+        basicInfo.setFooter("Due");
+    }
     return basicInfo;
 }
 
