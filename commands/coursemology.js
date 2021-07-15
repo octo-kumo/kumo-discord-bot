@@ -33,7 +33,7 @@ exports.handleCommand = async (args, msg, prefix) => {
     let json = false;
     if (json = args.includes("--json")) args.splice(args.indexOf('--json'), 1);
     console.log("coursemology sub-system; command:", args[0], ", args:", "\"" + args.slice(1).join("\", \"") + "\"");
-    let command = args.shift();
+    let command = args[0];
     switch (command) {
         case "l":
             for (const course of Object.values(COURSES)) {
@@ -47,9 +47,7 @@ exports.handleCommand = async (args, msg, prefix) => {
                 msg.channel.send(embed);
             }
             break;
-        case "i":
-        case "info":
-            if (args.length === 0) return msg.reply("_Labs aren't showing..._");
+        default:
             let sendAssessment = (assessment) => {
                 console.log("Sending assessment...");
                 let json_text = JSON.stringify(assessment, null, 4);
@@ -61,13 +59,11 @@ exports.handleCommand = async (args, msg, prefix) => {
                     } else msg.channel.send('```json\n' + json_text + '\n```');
                 } else msg.channel.send(generateAssessmentEmbed(assessment));
             }
-            if (isNaN(args[0])) args = [args.join(" ")];
-            if (args.length === 1) args = [config.DEFAULT_COURSE, args[0]];
-            if (isNaN(args[1]) || args.length > 2) args = [args[0], args.slice(1).join(' ')];
+            args = args.join(" ");
             for (const course of Object.values(COURSES)) {
                 for (const items of Object.values(course.items)) {
                     for (const item of items) {
-                        if (item.title.toUpperCase().includes(args[1].toUpperCase()) || item.id === args[1]) {
+                        if (item.title.toUpperCase().includes(args.toUpperCase()) || item.id === args) {
                             sendAssessment(await parseAssessment(course.id, item.id));
                             return;
                         }
@@ -75,9 +71,6 @@ exports.handleCommand = async (args, msg, prefix) => {
                 }
             }
             msg.channel.send("Not found");
-            break;
-        default:
-            return exports.handleCommand(['info', command].concat(args).concat(json ? ['--json'] : []), msg, prefix);
             break;
     }
 }
