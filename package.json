@@ -6,6 +6,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "node bot.js",
+        "course": "node test_coursemology.js",
         "local": "node local.js"
     },
     "repository": {
@@ -33,6 +34,7 @@
         "request": "^2.88.2",
         "srcset": "^3.0.0",
         "stats-lite": "^2.2.0",
+        "turndown": "^7.1.1",
         "vega": "^5.14.0",
         "yt-search": "^2.2.0",
         "ytdl-core": "^3.2.2"

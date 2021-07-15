@@ -62,6 +62,7 @@ exports.config = {
         status: 'idle'
     },
     HOOK: null,
+    COURSEMOLOGY_HOOK: null,
     USERS_CACHE: {},
     DEFAULT_COURSE: "1811",
     NUMBER_OF_USER_PER_PAGE: 8,

@@ -1,39 +1,53 @@
+const moment = require("moment");
+
 const Discord = require('discord.js');
-const request = require('request');
-const JSDOM = require('jsdom').JSDOM;
+const {
+    parseAssessment,
+    init,
+    update,
+} = require('./coursemology_lib');
 const config = require('./config.js').config;
-const fetch = require('node-fetch');
 
-let COURSES = {};
-let ALL_ASSESSMENTS = [];
-
-let USERS = {};
-
-const headers = {
-    "Cookie": "remember_user_token=" + process.env.CMTOKEN,
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"
-};
+const ids = [2080];
+const COURSES = {};
 
 exports.init = async () => {
-    console.log("Coursemology Init...");
-    USERS = await loadUsersList(config.DEFAULT_COURSE);
-    await exports.update(config.DEFAULT_COURSE);
-    console.log("Coursemology Init Done");
+    init(ids, COURSES).then(() => setInterval(checkUpdates, 1000 * 60)).then(() => checkUpdates());
 };
 
-exports.handleCommand = (args, msg, prefix) => {
+function checkUpdates() {
+    update(ids, COURSES).then(results => results.forEach(result => {
+        if (result.new_items.length > 0) config.COURSEMOLOGY_HOOK.send({
+            "username": "New Assessments",
+            "embeds": result.new_items.map(i => newItemEmbed(i))
+        });
+        if (result.new_notice.length > 0) config.COURSEMOLOGY_HOOK.send({
+            "username": "Notifications",
+            "embeds": result.new_notice.sort((a, b) => b.time - a.time).map(i => newNoticeEmbed(i))
+        })
+    }));
+}
+
+exports.handleCommand = async (args, msg, prefix) => {
     if (args.length === 0) return msg.reply("_Coursemology autograding is lagging..._");
     let json = false;
     if (json = args.includes("--json")) args.splice(args.indexOf('--json'), 1);
     console.log("coursemology sub-system; command:", args[0], ", args:", "\"" + args.slice(1).join("\", \"") + "\"");
     let command = args.shift();
     switch (command) {
-        case "lab":
         case "l":
-        case "info":
+            for (const course of Object.values(COURSES)) {
+                let embed = new Discord.MessageEmbed();
+                embed.setAuthor(course.name);
+                embed.setColor(0x00ffff);
+                embed.addFields(Object.keys(course.items).map(type => ({
+                    name: type,
+                    value: course.items[type].map(item => `[${item.title}](${item.url})`).join("\n") || "*None*"
+                })));
+                msg.channel.send(embed);
+            }
+            break;
         case "i":
-        case "assessment":
-        case "a":
             if (args.length === 0) return msg.reply("_Labs aren't showing..._");
             let sendAssessment = (assessment) => {
                 console.log("Sending assessment...");
@@ -49,55 +63,17 @@ exports.handleCommand = (args, msg, prefix) => {
             if (isNaN(args[0])) args = [args.join(" ")];
             if (args.length === 1) args = [config.DEFAULT_COURSE, args[0]];
             if (isNaN(args[1]) || args.length > 2) args = [args[0], args.slice(1).join(' ')];
-            for (let assessment of ALL_ASSESSMENTS) {
-                if (assessment.course === args[0] && (assessment.name.toUpperCase().includes(args[1].toUpperCase()) || assessment.id === args[1])) {
-                    sendAssessment(assessment);
-                    console.log("Found local cache for " + assessment.name);
-                    return;
-                }
-            }
-            console.log("No local cache");
-            loadAssessment(args[0], args[1]).then(a => {
-                ALL_ASSESSMENTS.push(a);
-                sendAssessment(a);
-            }).catch(err => {
-                msg.channel.send("_Was it ever there?_ ||(Hint: use numbers)||");
-                console.log(err.stack)
-            });
-            break;
-        case 'u':
-        case 'user':
-        case 'userinfo':
-        case 'stalk':
-        case 's':
-            if (args.length === 0) return msg.reply("_How in the world would I know 'nobody'?_");
-            let found = [];
-            for (let user of USERS) {
-                wordLoop:
-                    for (let word of user.username.replace(/[^a-zA-Z\s]+/g, ' ').trim().split(/\s+/g)) {
-                        for (let arg of args) {
-                            if (word.toUpperCase().includes(arg.toUpperCase())) {
-                                found.push(user);
-                                break wordLoop;
-                            }
+            for (const course of Object.values(COURSES)) {
+                for (const items of Object.values(course.items)) {
+                    for (const item of items) {
+                        if (item.title.toUpperCase().includes(args[1].toUpperCase()) || item.id === args[1]) {
+                            sendAssessment(await parseAssessment(course.id, item.id));
+                            return;
                         }
                     }
-            }
-            if (found.length === 0) return msg.channel.send("_Maybe that person exists,_ ***in a different place, in a different time.***")
-            loadUser(found[0].course, found[0].id).then(user => {
-                if (json) {
-                    let json_text = JSON.stringify(user, null, 4);
-                    if (json_text.length > 2000 - 13) {
-                        json_text = JSON.stringify(user);
-                        if (json_text.length > 2000 - 13) msg.channel.send('_It is too long for discord to accept_');
-                        else msg.channel.send('```json\n' + json_text + '\n```');
-                    } else msg.channel.send('```json\n' + json_text + '\n```');
-                } else if (found.length === 1) {
-                    msg.channel.send(generateUserEmbed(user));
-                } else {
-                    msg.channel.send('_There are more (' + found.length + '), but only 1 is shown_', generateUserEmbed(user));
                 }
-            });
+            }
+            msg.channel.send("Not found");
             break;
         default:
             return exports.handleCommand(['info', command].concat(args).concat(json ? ['--json'] : []), msg, prefix);
@@ -105,363 +81,11 @@ exports.handleCommand = (args, msg, prefix) => {
     }
 }
 
-exports.update = async (course) => {
-    try {
-        await updateActivities(course);
-        await updateLabs(course);
-    } catch (err) {
-        console.log("<@!456001047756800000> Change Coursemology TOKEN!\n" + err.stack)
-    }
-}
-
-async function updateActivities(course) {
-    let assessments = COURSES[course];
-    if (!assessments) COURSES[course] = assessments = {
-        course: course,
-        LABS: [],
-        ASSIGNMENTS: [],
-        PROJECTS: [],
-        ACTIVITIES: []
-    };
-    let ACTIVITIES = assessments.ACTIVITIES;
-    const NEW_ACTIVITIES = await loadActivities(course);
-    if (ACTIVITIES.length === 0) {
-        ACTIVITIES = NEW_ACTIVITIES;
-        console.log("ACTIVITIES init: " + ACTIVITIES.length);
-    } else {
-        let diff = [];
-        for (let i = 0; i < NEW_ACTIVITIES.length; i++) {
-            if (ACTIVITIES[0] && NEW_ACTIVITIES[i].id === ACTIVITIES[0].id) break; // Done
-            diff.push(NEW_ACTIVITIES[i]);
-        }
-        if (diff.length > 0) {
-            let embeds = [];
-            for (let i = diff.length - 1; i >= 0; i--) {
-                let notification = diff[i];
-                console.log("New Activity: " + notification.content);
-                embeds.push({
-                    color: 0x53bad1,
-                    title: notification.content,
-                    fields: [{
-                        name: "Links",
-                        value: notification.links.map(link => `[${link.text}](${link.url})`).join(", ")
-                    }],
-                    footer: {
-                        text: notification.timestamp
-                    }
-                });
-            }
-            config.HOOK.send({
-                embeds: embeds
-            });
-            ACTIVITIES = NEW_ACTIVITIES;
-        }
-    }
-    COURSES[course].ACTIVITIES = ACTIVITIES;
-}
-
-//ORDER = OLDEST (index 0) => NEWEST (index n)
-async function updateLabs(course) {
-    let assessments = COURSES[course];
-    if (!assessments) COURSES[course] = assessments = {
-        course: course,
-        LABS: [],
-        ASSIGNMENTS: [],
-        PROJECTS: [],
-        ACTIVITIES: []
-    };
-    let LABS = assessments.LABS;
-    let ASSIGNMENTS = assessments.ASSIGNMENTS;
-    let PROJECTS = assessments.PROJECTS;
-    await eliminateUnreleasedAssessments(LABS);
-    await eliminateUnreleasedAssessments(ASSIGNMENTS);
-    await eliminateUnreleasedAssessments(PROJECTS);
-
-    const preset = config.list_presets[course];
-    const NEW_LABS = await loadAssessmentsList(course, preset.labs.cat, preset.labs.tab);
-    const NEW_ASSIGNMENTS = await loadAssessmentsList(course, preset.assignments.cat, preset.assignments.tab);
-    const NEW_PROJECTS = await loadAssessmentsList(course, preset.projects.cat, preset.projects.tab);
-    if (LABS.length === 0 && ASSIGNMENTS.length === 0 && PROJECTS.length === 0) { // Init
-        let download = async (NEW) => {
-            let list = [];
-            process.stdout.write('|');
-            for (let i = 0; i < NEW.length; i++) {
-                list.push(await loadAssessment(NEW[i].course, NEW[i].id));
-                process.stdout.write('.');
-            }
-            process.stdout.write('| ');
-            return list;
-        };
-        LABS = await download(NEW_LABS);
-        console.log("LABS init: " + LABS.length);
-        ASSIGNMENTS = await download(NEW_ASSIGNMENTS);
-        console.log("ASSIGNMENTS init: " + ASSIGNMENTS.length);
-        PROJECTS = await download(NEW_PROJECTS);
-        console.log("PROJECTS init: " + PROJECTS.length);
-        ALL_ASSESSMENTS = ALL_ASSESSMENTS.concat(LABS.concat(ASSIGNMENTS).concat(PROJECTS));
-    } else {
-        let diff = [];
-        let new_array = NEW_LABS;
-        let old_array = LABS;
-        let checkAndUpdate = async (NEW, OLD) => {
-            for (let i = OLD.length; i < NEW.length; i++) {
-                let assessment = await loadAssessment(NEW[i].course, NEW[i].id);
-                OLD.push(assessment);
-                diff.push(assessment);
-                ALL_ASSESSMENTS.push(assessment);
-            }
-        };
-        await checkAndUpdate(NEW_LABS, LABS);
-        await checkAndUpdate(NEW_ASSIGNMENTS, ASSIGNMENTS);
-        await checkAndUpdate(NEW_PROJECTS, PROJECTS);
-        if (diff.length > 0) config.HOOK.send('@everyone **New Assessment(s)!**', {
-            embeds: diff.map(generateAssessmentEmbed)
-        });
-    }
-    COURSES[course].LABS = LABS;
-    COURSES[course].ASSIGNMENTS = ASSIGNMENTS;
-    COURSES[course].PROJECTS = PROJECTS;
-}
-
-function loadActivities(course) {
-    course = encodeURIComponent(course);
-    return new Promise((resolve, reject) => {
-        request({
-            url: `https://nushigh.coursemology.org/courses/${course}`,
-            headers: headers
-        }, (error, response, body) => {
-            const doc = new JSDOM(body).window.document;
-            const notifications = [];
-            for (let notific of doc.querySelectorAll(".message-holder .notification")) {
-                let time = notific.getElementsByClassName("timestamp")[0];
-                notific.removeChild(time);
-                notifications.push({
-                    id: notific.id,
-                    timestamp: time.textContent,
-                    content: notific.textContent,
-                    links: Array.from(notific.getElementsByTagName("a")).map(a => {
-                        return {
-                            text: a.textContent,
-                            url: "https://nushigh.coursemology.org" + a.href
-                        };
-                    })
-                });
-            }
-            resolve(notifications);
-        }).on('response', response => {
-            if (config.debug) console.log('response received ' + response.statusCode);
-        }).on('data', data => {
-            if (config.debug) console.log('data chunk received ' + data.length);
-        }).on('error', error => {
-            if (config.debug) console.log('error ' + error.message);
-            reject(error);
-        });
-    });
-}
-
-function loadUsersList(course) {
-    course = encodeURIComponent(course);
-    return new Promise((resolve, reject) => {
-        request({
-            url: `https://nushigh.coursemology.org/courses/${course}/users`,
-            headers: headers
-        }, (error, response, body) => {
-            const doc = new JSDOM(body).window.document;
-            let users = [];
-            for (let user of doc.getElementsByClassName("course_user")) {
-                users.push({
-                    id: user.id,
-                    course: course,
-                    icon: user.getElementsByTagName("img")[0].src,
-                    username: user.getElementsByClassName("user-name")[0].textContent.trim()
-                });
-            }
-            resolve(users);
-        }).on('response', response => {
-            if (config.debug) console.log('response received ' + response.statusCode);
-        }).on('data', data => {
-            if (config.debug) console.log('data chunk received ' + data.length);
-        }).on('error', error => {
-            if (config.debug) console.log('error ' + error.message);
-            reject(error);
-        });
-    });
-}
-
-function loadUser(course, user_id) {
-    course = encodeURIComponent(course);
-    if (isNaN(user_id) && user_id.startsWith("course_user_")) user_id = user_id.substring(12);
-    return new Promise((resolve, reject) => {
-        request({
-            url: `https://nushigh.coursemology.org/courses/${course}/users/${user_id}`,
-            headers: headers
-        }, (error, response, body) => {
-            const doc = new JSDOM(body).window.document;
-            let achievements = [];
-            for (let achievement of doc.getElementsByClassName("achievement")) {
-                achievements.push({
-                    id: achievement.id,
-                    icon: achievement.getElementsByTagName("img")[0].src,
-                    name: achievement.lastElementChild.lastElementChild.textContent
-                });
-            }
-            let user = {
-                url: `https://nushigh.coursemology.org/courses/${course}/users/${user_id}`,
-                id: user_id,
-                course: course,
-                icon: doc.querySelector(".profile-box img").src,
-                username: doc.querySelector("h2:nth-child(1)").textContent,
-                email: doc.querySelector("p:nth-child(2)").textContent,
-                role: doc.querySelector("p:nth-child(3)").textContent.replace("Role:", '').trim(),
-                achievements: achievements
-            };
-            resolve(user);
-        }).on('response', response => {
-            if (config.debug) console.log('response received ' + response.statusCode);
-        }).on('data', data => {
-            if (config.debug) console.log('data chunk received ' + data.length);
-        }).on('error', error => {
-            if (config.debug) console.log('error ' + error.message);
-            reject(error);
-        });
-    });
-}
-
-function loadAssessmentsList(course, category, tab) {
-    return new Promise((resolve, reject) => {
-        course = encodeURIComponent(course);
-        if (!category) category = config.list_presets[course].labs.cat;
-        if (!tab) tab = config.list_presets[course].labs.tab;
-        category = encodeURIComponent(category);
-        tab = encodeURIComponent(tab);
-        request({
-            url: `https://nushigh.coursemology.org/courses/${course}/assessments?category=${category}&tab=${tab}`,
-            headers: headers
-        }, (error, response, body) => {
-            const doc = new JSDOM(body).window.document;
-            let children = doc.querySelector(".assessments-list tbody").children;
-            let assessments = [];
-            for (let child of children) {
-                let achievements = [];
-                if (child.querySelector(".table-requirement-for"))
-                    for (let ach of child.querySelector(".table-requirement-for").children) achievements.push(ach.href.replace(/.+\/\d+\/achievements\/(\d+)/g, '$1'));
-                assessments.push({
-                    id: child.id,
-                    name: child.firstElementChild.textContent,
-                    active: child.classList.contains("currently-active"),
-                    achievements: achievements,
-                    baseExp: child.querySelector(".table-base-exp") ? parseInt(child.querySelector(".table-base-exp").textContent) : undefined,
-                    timeBonusExp: child.querySelector(".table-time-bonus-exp") ? parseInt(child.querySelector(".table-time-bonus-exp").textContent) : undefined,
-                    startAt: child.querySelector(".table-start-at") ? child.querySelector(".table-start-at").textContent.trim() : undefined,
-                    endAt: child.querySelector(".table-end-at") ? child.querySelector(".table-end-at").textContent.trim() : undefined,
-                    bonusCutOff: child.querySelector(".table-bonus-cut-off") ? child.querySelector(".table-bonus-cut-off").textContent.trim() : undefined,
-                    course: course,
-                    category: category,
-                    tab: tab
-                });
-            }
-            resolve(assessments);
-        }).on('response', response => {
-            if (config.debug) console.log('response received ' + response.statusCode);
-        }).on('data', data => {
-            if (config.debug) console.log('data chunk received ' + data.length);
-        }).on('error', error => {
-            if (config.debug) console.log('error ' + error.message);
-            reject(error);
-        });
-    });
-}
-
-function loadAssessment(course, assessment_id) {
-    course = encodeURIComponent(course);
-    if (isNaN(assessment_id) && assessment_id.startsWith("assessment_")) assessment_id = assessment_id.substring(11);
-    return new Promise((resolve, reject) => {
-        request({
-            url: `https://nushigh.coursemology.org/courses/${course}/assessments/${assessment_id}`,
-            headers: headers
-        }, async (error, response, body) => {
-            try {
-                const doc = new JSDOM(body).window.document;
-                const data = doc.getElementById("assessment_" + assessment_id);
-                let info = {};
-                let fields = [];
-                let table = data.getElementsByTagName("table")[0];
-                for (let row of table.lastElementChild.children) {
-                    let data = row.lastElementChild.textContent.trim();
-                    if (!isNaN(data)) data = parseInt(data);
-                    info[camelize(row.firstElementChild.textContent)] = data;
-                    fields.push({
-                        value: data ? data : "-",
-                        name: row.firstElementChild.textContent.trim()
-                    });
-                }
-                // Files/Achievements
-                let i = Array.from(data.children).indexOf(table) + 1;
-                let mode = "";
-                let achievements = [];
-                let files = [];
-                for (; i < data.children.length; i++) {
-                    let child = data.children[i];
-                    if (child.tagName === "H3") {
-                        if (child.textContent === "Finish to Unlock") mode = "achievement";
-                        if (child.textContent === "Files") mode = "files";
-                    } else if (mode === "files") {
-                        files.push({
-                            name: child.firstElementChild.textContent.trim(),
-                            url: "https://nushigh.coursemology.org" + child.firstElementChild.href
-                        });
-                    } else if (mode === "achievement") {
-                        achievements.push({
-                            id: child.id,
-                            url: "https://nushigh.coursemology.org" + child.firstElementChild.href,
-                            name: child.firstElementChild.textContent,
-                            description: child.lastChild.textContent.replace(/[\(\)]/g, '').trim()
-                        });
-                    }
-                }
-                let json = null;
-                if (doc.querySelector(".page-header .btn-info") && doc.querySelector(".page-header .btn-info").textContent !== "Attempt") json = await (fetch("https://nushigh.coursemology.org" + doc.querySelector(".page-header .btn-info").href + "?format=json", {
-                    headers: headers,
-                    method: 'GET'
-                }).then(res => res.json()));
-                const assessment = {
-                    url: `https://nushigh.coursemology.org/courses/${course}/assessments/${assessment_id}`,
-                    id: assessment_id,
-                    course: course,
-                    category: json ? json.assessment.categoryId : null,
-                    tab: json ? json.assessment.tabId : null,
-                    name: json ? json.assessment.title : doc.querySelector(".page-header").textContent,
-                    autograded: json ? json.assessment.autograded : null,
-                    // description: deepToString(new JSDOM(json.assessment.description).window.document.firstElementChild).trim(),
-                    markdown: json ? deepToString(new JSDOM(json.assessment.description).window.document.firstElementChild, true).trim() : null,
-                    questions: json ? json.questions.length : 0,
-                    // info: info,
-                    fields: fields,
-                    achievements: achievements,
-                    files: files,
-                    unreleased: (!json)
-                };
-                resolve(assessment);
-            } catch (error) {
-                console.log('error ' + error.message);
-                reject(error);
-            }
-        }).on('response', response => {
-            if (config.debug) console.log('response received ' + response.statusCode);
-        }).on('data', data => {
-            if (config.debug) console.log('data chunk received ' + data.length);
-        }).on('error', error => {
-            if (config.debug) console.log('error ' + error.message);
-            reject(error);
-        });
-    });
-}
-
 function generateAssessmentEmbed(assessment) {
     let basicInfo = new Discord.MessageEmbed();
     basicInfo.setTitle(assessment.name);
     basicInfo.setURL(assessment.url);
-    basicInfo.setFooter(config.list_presets[assessment.course].name + " • ID: " + assessment.id);
+    basicInfo.setFooter(COURSES[assessment.course].name + " • ID: " + assessment.id);
     basicInfo.setColor(0x00ffff);
     for (let field of assessment.fields) basicInfo.addField(field.name, field.value, true);
     basicInfo.addField("Auto Graded", assessment.autograded ? "Yes" : "Manual", true);
@@ -477,54 +101,20 @@ function generateAssessmentEmbed(assessment) {
     return basicInfo;
 }
 
-function generateUserEmbed(user) {
+function newItemEmbed(item) {
     let basicInfo = new Discord.MessageEmbed();
-    basicInfo.setTitle(user.username);
-    basicInfo.setURL(user.url);
-    basicInfo.setFooter("ID: " + user.id);
+    basicInfo.setTitle(item.title);
+    basicInfo.setURL(item.url);
+    basicInfo.setAuthor(item.type);
     basicInfo.setColor(0x00ffff);
-    let thumbnail = user.icon.includes('svg') ? "https://res.cloudinary.com/chatboxzy/image/upload/v1581647335/avatar.png" : user.icon;
-    basicInfo.setThumbnail(thumbnail);
-    basicInfo.addField("Email", user.email, true);
-    basicInfo.addField("Role", user.role, true);
-    basicInfo.addField("Achievements", user.achievements.length > 0 ? user.achievements.map(a => a.name).join(", ") : "_None_");
+    if (item.endAt) basicInfo.setTimestamp(+moment(item.endAt, "DD MMM HH:mm"))
     return basicInfo;
 }
 
-function camelize(str) {
-    return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, (match, i) => {
-        if (+match === 0) return "";
-        return i == 0 ? match.toLowerCase() : match.toUpperCase();
-    });
+function newNoticeEmbed(item) {
+    let basicInfo = new Discord.MessageEmbed();
+    basicInfo.setDescription(item.text);
+    basicInfo.setColor(0x00ffff);
+    basicInfo.setTimestamp(item.time);
+    return basicInfo;
 }
-
-const BLOCK_TAGS = ['ADDRESS', 'ARTICLE', 'ASIDE', 'BLOCKQUOTE', 'CANVAS', 'DD', 'DIV', 'DL', 'DT', 'FIELDSET', 'FIGCAPTION', 'FIGURE', 'FOOTER', 'FORM', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HEADER', 'HR', 'LI', 'MAIN', 'NAV', 'NOSCRIPT', 'OL', 'P', 'PRE', 'SECTION', 'TABLE', 'TFOOT', 'UL', 'VIDEO'];
-
-const BOLD_TAGS = ['B', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HEADER', 'MAIN'];
-const ITALIC_TAGS = ['EM', 'SUB', 'SUP', 'A'];
-
-function deepToString(element, markdown) {
-    if (!element) return "";
-    let str;
-    if (element.childNodes.length > 1) {
-        str = [];
-        for (let node of element.childNodes) str.push(deepToString(node, markdown));
-        return str.join("");
-    } else if (element.childNodes.length === 1 && element.childNodes[0].nodeName === "#text") {
-        str = deepToString(element.childNodes[0], markdown);
-        if (markdown && BOLD_TAGS.includes(element.tagName)) str = "**" + str + "**";
-        else if (markdown && ITALIC_TAGS.includes(element.tagName)) str = "_" + str + "_";
-        if (markdown && element.tagName === "A") str = `[${str}](${element.href})`;
-        if (markdown && element.tagName === "LI") str = " • " + str;
-        if (BLOCK_TAGS.includes(element.tagName)) str = str + "\n";
-    } else {
-        if (element.textContent.trim().length === 0) str = "";
-        else str = element.textContent.replace(/^\n+|\n+$/g, ' ').replace(/(\s){2,}/g, '$1');
-    }
-    return str;
-}
-
-const eliminateUnreleasedAssessments = async (list) => {
-    for (let ass = 0; ass < list.length; ass++)
-        if (list[ass].unreleased) list[ass] = await loadAssessment(list[ass].course, list[ass].id);
-};

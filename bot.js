@@ -1,7 +1,7 @@
 // Required dependencies
 const Discord = require('discord.js');
 const config = require('./commands/config').config;
-// const coursemology = require('./coursemology');
+const coursemology = require('./commands/coursemology');
 const eco = require('./commands/eco');
 const bilibili = require('./commands/bilibili');
 const covid = require('./commands/covid');
@@ -36,14 +36,13 @@ client.on('ready', () => {
     client.guilds.cache.get('665471208757657620').channels.cache.get('665471209277882400').send("READY!");
     client.user.setPresence(config.PRESENCE).then(r => console.log("Presence Set!"));
     config.offset = 8 + new Date().getTimezoneOffset() / 60;
-    config.HOOK = new Discord.WebhookClient('644427303719403521', process.env.HKTOKEN);
-    config.HOOK2 = new Discord.WebhookClient('676309488021798912', process.env.HKTOKEN2);
+    config.COURSEMOLOGY_HOOK = new Discord.WebhookClient('865115834007289856', process.env.COURSEMOLOGY_HOOK);
     config.id = client.user.id;
     genshin.init().then(r => console.log("Genshin Init!\n" + JSON.stringify(r)))
     timetable.init().then(r => console.log("Timetable Init!"));
     azurlane.init().then(r => console.log("Azurlane Init!"));
     bilibili.init().then(r => console.log("Bilibili Init!"));
-    // coursemology.init();
+    coursemology.init().then(r => console.log("Coursemology Init!"));
     // setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
     // const covidChannel = client.guilds.cache.get('642273802520231936').channels.get('693051246885470209');
     // if (!process.env.LOCAL) {
@@ -93,7 +92,7 @@ client.on('message', async msg => {
         await m.edit(PING_EMBED);
     }
 
-    // if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
+    if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
     if (command === "list-emotes" || command === "emotes") {
         await sendLongMessage(msg.channel, "**Emotes:**\n" + join(msg.guild.emojis.cache.values().map(e => `<:${e.name}:${e.id}> \`:${e.name}:\``), [" ", " ", "\n"]));
     }
