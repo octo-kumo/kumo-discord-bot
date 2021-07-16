@@ -100,7 +100,7 @@ function newItemEmbed(item) {
     basicInfo.setAuthor(item.title, null, item.url);
     basicInfo.setColor(0x00ffff);
     if (item.endAt) {
-        basicInfo.setTimestamp(+moment(item.endAt, "DD MMM HH:mm"));
+        basicInfo.setTimestamp(+moment(item.endAt, "DD MMM HH:mm") - 8 * 60 * 60 * 1000);
         basicInfo.setFooter("Due");
     }
     return basicInfo;
@@ -110,6 +110,6 @@ function newNoticeEmbed(item) {
     let basicInfo = new Discord.MessageEmbed();
     basicInfo.setDescription(item.text);
     basicInfo.setColor(0x00ffff);
-    basicInfo.setTimestamp(item.time);
+    basicInfo.setTimestamp(item.time - 8 * 60 * 60 * 1000);
     return basicInfo;
 }
