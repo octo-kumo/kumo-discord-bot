@@ -26,12 +26,12 @@ function checkUpdates() {
             "username": "Notifications",
             "embeds": result.new_notice.sort((a, b) => a.time - b.time).map(i => newNoticeEmbed(i))
         });
+        let now = moment() - 8 * 60 * 60 * 1000;
         ids.forEach(id => {
             let course = COURSES[id];
             let needRemind = [];
             for (const items of Object.values(course.items)) {
                 for (const item of items) {
-                    let now = moment();
                     if (Math.abs(24 * 60 * 60 * 1000 - (item.endAt - now)) < 2000 * 60) {
                         if (LAST_REMINDER[item.id] && Math.abs(LAST_REMINDER[item.id] - now) < 4000 * 60) continue;
                         LAST_REMINDER[item.id] = now;
@@ -43,8 +43,22 @@ function checkUpdates() {
                 "username": "Reminder",
                 "embeds": needRemind.sort((a, b) => a.time - b.time).map(i => newRemindEmbed(i))
             });
-        })
+        });
+        if (config.COURSEMOLOGY_CHANNEL) config.COURSEMOLOGY_CHANNEL.messages.fetch().then(messages => remindDueDate(messages.filter(e => e.author.id === config.id && e.embeds.length > 0 && e.embeds[0].author.name === "Assessment Reminder").first(), config.COURSEMOLOGY_CHANNEL));
     }));
+}
+
+async function remindDueDate(msg, channel) {
+    let needRemind = [];
+    let now = moment();
+    ids.forEach(id => Object.keys(COURSES[id].items).forEach(name => needRemind.push({
+        name,
+        items: COURSES[id].items[name].filter(item => item.endAt > now)
+    })));
+    if (needRemind.some(items => items.items.length > 0)) {
+        if (msg) return await msg.edit(itemsEmbed(needRemind));
+        else return await channel.send(itemsEmbed(needRemind));
+    }
 }
 
 exports.handleCommand = async (args, msg, prefix) => {
@@ -140,4 +154,34 @@ function newRemindEmbed(item) {
     basicInfo.setDescription("Due in 1 day")
     basicInfo.setTimestamp(item.endAt);
     return basicInfo;
+}
+
+function itemsEmbed(items) {
+    let basicInfo = new Discord.MessageEmbed();
+    basicInfo.setAuthor("Assessment Reminder");
+    basicInfo.setColor(0x00ffff);
+    let now = moment() - 8 * 60 * 60 * 1000;
+    basicInfo.setDescription(
+        items.map(l => l.items.length === 0 ? '' : `**${l.name}**\n${l.items.sort((a, b) => a.endAt - b.endAt).map(i => `[${i.title}](${i.url}): **${formatDiff(i.endAt - now)}**`).join("\n")}`).join("\n")
+    );
+    basicInfo.setTimestamp(+now);
+    return basicInfo;
+}
+
+let minDuration = [1000, 60 * 1000, 60 * 60 * 1000, 24 * 60 * 60 * 1000];
+let durationName = ['sec', 'min', 'hour', 'day'];
+
+function formatDiff(amount) {
+    for (let i = 0; i < durationName.length; i++) {
+        if (minDuration[i] < amount && (!minDuration[i + 1] || minDuration[i + 1] > amount)) {
+            let amm = Math.floor(amount / minDuration[i]);
+            let text = amm + " " + durationName[i] + (amm > 1 ? 's' : '');
+            if (i !== 0) {
+                amm = Math.floor((amount % minDuration[i]) / minDuration[i - 1]);
+                text = text + " " + amm + " " + durationName[i - 1] + (amm > 1 ? 's' : '');
+            }
+            return text;
+        }
+    }
+    return amount + " ms";
 }

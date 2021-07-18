@@ -63,6 +63,7 @@ exports.config = {
     },
     HOOK: null,
     COURSEMOLOGY_HOOK: null,
+    COURSEMOLOGY_CHANNEL: null,
     USERS_CACHE: {},
     DEFAULT_COURSE: "1811",
     NUMBER_OF_USER_PER_PAGE: 8,
