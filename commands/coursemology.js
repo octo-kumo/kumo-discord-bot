@@ -10,6 +10,7 @@ const config = require('./config.js').config;
 
 const ids = [2080];
 const COURSES = {};
+const LAST_REMINDER = {};
 
 exports.init = async () => {
     init(ids, COURSES).then(() => setInterval(checkUpdates, 1000 * 60)).then(() => checkUpdates());
@@ -24,6 +25,25 @@ function checkUpdates() {
         if (result.new_notice.length > 0) config.COURSEMOLOGY_HOOK.send({
             "username": "Notifications",
             "embeds": result.new_notice.sort((a, b) => a.time - b.time).map(i => newNoticeEmbed(i))
+        });
+        ids.forEach(id => {
+            let course = COURSES[id];
+            let needRemind = [];
+            for (const items of Object.values(course.items)) {
+                for (const item of items) {
+                    let now = moment();
+                    item.endAt = now.add(1, "day")
+                    if (Math.abs(24 * 60 * 60 * 1000 - (item.endAt - now)) < 2000 * 60) {
+                        if (LAST_REMINDER[item.id] && Math.abs(LAST_REMINDER[item.id] - now) < 4000 * 60) continue;
+                        LAST_REMINDER[item.id] = now;
+                        needRemind.push(item);
+                    }
+                }
+            }
+            if (needRemind.length > 0) config.COURSEMOLOGY_HOOK.send({
+                "username": "Reminder",
+                "embeds": needRemind.sort((a, b) => a.time - b.time).map(i => newRemindEmbed(i))
+            });
         })
     }));
 }
@@ -100,7 +120,7 @@ function newItemEmbed(item) {
     basicInfo.setAuthor(item.title, null, item.url);
     basicInfo.setColor(0x00ffff);
     if (item.endAt) {
-        basicInfo.setTimestamp(+moment(item.endAt, "DD MMM HH:mm") - 8 * 60 * 60 * 1000);
+        basicInfo.setTimestamp(item.endAt);
         basicInfo.setFooter("Due");
     }
     return basicInfo;
@@ -110,6 +130,15 @@ function newNoticeEmbed(item) {
     let basicInfo = new Discord.MessageEmbed();
     basicInfo.setDescription(item.text);
     basicInfo.setColor(0x00ffff);
-    basicInfo.setTimestamp(item.time - 8 * 60 * 60 * 1000);
+    basicInfo.setTimestamp(item.time);
+    return basicInfo;
+}
+
+function newRemindEmbed(item) {
+    let basicInfo = new Discord.MessageEmbed();
+    basicInfo.setAuthor(item.title, null, item.url);
+    basicInfo.setColor(0x00ffff);
+    basicInfo.setDescription("Due in 1 day")
+    basicInfo.setTimestamp(item.endAt);
     return basicInfo;
 }

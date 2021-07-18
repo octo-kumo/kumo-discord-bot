@@ -81,7 +81,11 @@ async function getListing(name, course, category, tab) {
     let items = Array.from(body.querySelectorAll("table>tbody tr")).map(row => {
         let item = {id: row.id, type: name};
         Array.from(row.children).forEach((e, i) => {
-            if (heads[i]) item[heads[i]] = e.textContent.trim();
+            if (heads[i]) {
+                let data = e.textContent.trim();
+                if (moment(data).isValid()) data = moment(data).year(moment().year()) - 8 * 60 * 60 * 1000;
+                item[heads[i]] = data;
+            }
             if (i === 0) item.url = "https://nushigh.coursemology.org" + e.firstElementChild.href;
         })
         return item;
@@ -118,7 +122,7 @@ async function parseCourse(course) {
         return {
             id: l.id,
             text: turndown.turndown(l.innerHTML).replace(/\/courses/g, 'https://nushigh.coursemology.org/courses'),
-            time: +moment(time.textContent, "MMMM D, YYYY HH:mm")
+            time: +moment(time.textContent, "MMMM D, YYYY HH:mm") - 8 * 60 * 60 * 1000
         };
     });
     let mapping = Array.from(doc.getElementById("course-navigation-sidebar").querySelectorAll("li>a")).map(l => {
