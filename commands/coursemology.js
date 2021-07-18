@@ -20,13 +20,15 @@ function checkUpdates() {
     update(ids, COURSES).then(results => results.forEach(result => {
         if (result.new_items.length > 0) config.COURSEMOLOGY_HOOK.send({
             "username": "New Assessments",
+            "avatarURL": "https://cdn.discordapp.com/avatars/865115834007289856/450af31e5eaf291d3e58e700f6e26ba5.webp",
             "embeds": result.new_items.map(i => newItemEmbed(i))
         });
         if (result.new_notice.length > 0) config.COURSEMOLOGY_HOOK.send({
             "username": "Notifications",
+            "avatarURL": "https://cdn.discordapp.com/avatars/865115834007289856/450af31e5eaf291d3e58e700f6e26ba5.webp",
             "embeds": result.new_notice.sort((a, b) => a.time - b.time).map(i => newNoticeEmbed(i))
         });
-        let now = moment() - 8 * 60 * 60 * 1000;
+        let now = moment();
         ids.forEach(id => {
             let course = COURSES[id];
             let needRemind = [];
@@ -41,6 +43,7 @@ function checkUpdates() {
             }
             if (needRemind.length > 0) config.COURSEMOLOGY_HOOK.send({
                 "username": "Reminder",
+                "avatarURL": "https://cdn.discordapp.com/avatars/865115834007289856/450af31e5eaf291d3e58e700f6e26ba5.webp",
                 "embeds": needRemind.sort((a, b) => a.time - b.time).map(i => newRemindEmbed(i))
             });
         });
@@ -160,7 +163,7 @@ function itemsEmbed(items) {
     let basicInfo = new Discord.MessageEmbed();
     basicInfo.setAuthor("Assessment Reminder");
     basicInfo.setColor(0x00ffff);
-    let now = moment() - 8 * 60 * 60 * 1000;
+    let now = moment();
     basicInfo.setDescription(
         items.map(l => l.items.length === 0 ? '' : `**${l.name}**\n${l.items.sort((a, b) => a.endAt - b.endAt).map(i => `[${i.title}](${i.url}): **${formatDiff(i.endAt - now)}**`).join("\n")}`).join("\n")
     );
