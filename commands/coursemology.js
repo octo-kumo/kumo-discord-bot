@@ -32,7 +32,6 @@ function checkUpdates() {
             for (const items of Object.values(course.items)) {
                 for (const item of items) {
                     let now = moment();
-                    item.endAt = now.add(1, "day")
                     if (Math.abs(24 * 60 * 60 * 1000 - (item.endAt - now)) < 2000 * 60) {
                         if (LAST_REMINDER[item.id] && Math.abs(LAST_REMINDER[item.id] - now) < 4000 * 60) continue;
                         LAST_REMINDER[item.id] = now;
