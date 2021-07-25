@@ -37,7 +37,7 @@ client.on('ready', () => {
     client.user.setPresence(config.PRESENCE).then(r => console.log("Presence Set!"));
     config.offset = 8 + new Date().getTimezoneOffset() / 60;
     // config.COURSEMOLOGY_HOOK = new Discord.WebhookClient('865115834007289856', process.env.COURSEMOLOGY_HOOK);
-    config.COURSEMOLOGY_HOOK = new Discord.WebhookClient('865137754508361748', process.env.COURSEMOLOGY_HOOK);
+    config.COURSEMOLOGY_HOOK = new Discord.WebhookClient('868475613005090846', process.env.COURSEMOLOGY_HOOK);
     client.channels.fetch('831675267495886888').then(channel => config.COURSEMOLOGY_CHANNEL = channel);
     config.id = client.user.id;
     genshin.init().then(r => console.log("Genshin Init!\n" + JSON.stringify(r)))
