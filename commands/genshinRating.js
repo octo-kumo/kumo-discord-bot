@@ -6,6 +6,6 @@ exports.init = async function (channel) {
 
 async function update(channel) {
     let data = await gplay.app({appId: 'com.miHoYo.GenshinImpact'});
-    let pack = [data.score, data.ratings, data.reviews, ...Object.entries(data.histogram).sort((a, b) => a[0].localeCompare(b[0])).map(a => a[1])];
+    let pack = [data.score, data.ratings, data.reviews, ...Object.entries(data.histogram).sort((a, b) => a[0].localeCompare(b[0])).map(a => a[1]), data.maxInstalls];
     channel.send(JSON.stringify(pack));
 }
