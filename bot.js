@@ -18,6 +18,7 @@ const minesweeper = require('./commands/minesweeper');
 const game24 = require('./commands/24');
 const scramble = require('./commands/scramble');
 const xkcd = require('./commands/xkcd');
+const gRating = require('./commands/genshinRating');
 
 const db = require('./db');
 
@@ -45,6 +46,8 @@ client.on('ready', () => {
     azurlane.init().then(r => console.log("Azurlane Init!"));
     bilibili.init().then(r => console.log("Bilibili Init!"));
     coursemology.init().then(r => console.log("Coursemology Init!"));
+    client.channels.fetch('892795902186639460')
+        .then(channel => gRating.init(channel)).then(r => console.log("GENSHIN RATING Init!"));
     // setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
     // const covidChannel = client.guilds.cache.get('642273802520231936').channels.get('693051246885470209');
     // if (!process.env.LOCAL) {
