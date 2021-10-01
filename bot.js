@@ -58,7 +58,6 @@ client.on('ready', () => {
 
 client.on('message', async msg => {
     let startTime = Date.now();
-    console.log(`=> Message "${msg.content.replace('\n', '\\n').substring(0, 80) + (msg.content.length > 80 ? "..." : "")}" received from ${msg.author.tag}.`);
     if (msg.channel.type !== "text") return;
     if (!msg.guild && msg.author.id !== "456001047756800000") return; // Direct message from myself only
     if (msg.author.id === config.id) return; // Dont respond to bot's own messages

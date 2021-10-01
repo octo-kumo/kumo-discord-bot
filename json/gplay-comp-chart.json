@@ -1,0 +1,168 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "background": "white",
+  "padding": 5,
+  "width": 1280,
+  "height": 720,
+  "title": {
+    "text": "Genshin Google Play Rating Composition",
+    "subtitle": "Drawn by Kumo (云)",
+    "fontSize": 24,
+    "subtitleFontSize": 16,
+    "frame": "group"
+  },
+  "style": "cell",
+  "data": [
+    {"name": "source_0", "values": []},
+    {
+      "name": "data_0",
+      "source": "source_0",
+      "transform": [
+        {"type": "formula", "expr": "toDate(datum[\"d\"])", "as": "d"},
+        {
+          "type": "aggregate",
+          "groupby": ["d", "g"],
+          "ops": ["sum", "sum"],
+          "fields": ["c", "g"],
+          "as": ["sum_c", "sum_g"]
+        },
+        {
+          "type": "impute",
+          "field": "sum_c",
+          "groupby": ["g"],
+          "key": "d",
+          "method": "value",
+          "value": 0
+        },
+        {
+          "type": "stack",
+          "groupby": ["d"],
+          "field": "sum_c",
+          "sort": {"field": ["sum_g"], "order": ["ascending"]},
+          "as": ["sum_c_start", "sum_c_end"],
+          "offset": "zero"
+        }
+      ]
+    }
+  ],
+  "marks": [
+    {
+      "name": "pathgroup",
+      "type": "group",
+      "from": {
+        "facet": {
+          "name": "faceted_path_main",
+          "data": "data_0",
+          "groupby": ["g"]
+        }
+      },
+      "encode": {
+        "update": {
+          "width": {"field": {"group": "width"}},
+          "height": {"field": {"group": "height"}}
+        }
+      },
+      "marks": [
+        {
+          "name": "marks",
+          "type": "area",
+          "style": ["area"],
+          "sort": {"field": "datum[\"d\"]"},
+          "from": {"data": "faceted_path_main"},
+          "encode": {
+            "update": {
+              "orient": {"value": "vertical"},
+              "fill": {"scale": "color", "field": "g"},
+              "description": {
+                "signal": "\"d: \" + (timeFormat(datum[\"d\"], '%b %d, %Y')) + \"; Sum of c: \" + (format(datum[\"sum_c\"], \"\")) + \"; g: \" + (isValid(datum[\"g\"]) ? datum[\"g\"] : \"\"+datum[\"g\"]) + \"; Sum of g: \" + (isValid(datum[\"sum_g\"]) ? datum[\"sum_g\"] : \"\"+datum[\"sum_g\"])"
+              },
+              "x": {"scale": "x", "field": "d"},
+              "y": {"scale": "y", "field": "sum_c_end"},
+              "y2": {"scale": "y", "field": "sum_c_start"},
+              "defined": {
+                "signal": "isValid(datum[\"d\"]) && isFinite(+datum[\"d\"]) && isValid(datum[\"sum_c\"]) && isFinite(+datum[\"sum_c\"])"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "x",
+      "type": "time",
+      "domain": {"data": "data_0", "field": "d"},
+      "range": [0, {"signal": "width"}]
+    },
+    {
+      "name": "y",
+      "type": "linear",
+      "domain": {"data": "data_0", "fields": ["sum_c_start", "sum_c_end"]},
+      "range": [{"signal": "height"}, 0],
+      "nice": true,
+      "zero": true
+    },
+    {
+      "name": "color",
+      "type": "ordinal",
+      "domain": ["1*", "2*", "3*", "4*", "5*"],
+      "range": ["#ff6f31", "#ff9f02", "#ffcf02", "#9ace6a", "#57bb8a"]
+    }
+  ],
+  "axes": [
+    {
+      "scale": "x",
+      "orient": "bottom",
+      "gridScale": "y",
+      "grid": true,
+      "tickCount": {"signal": "ceil(width/40)"},
+      "domain": false,
+      "labels": false,
+      "aria": false,
+      "maxExtent": 0,
+      "minExtent": 0,
+      "ticks": false,
+      "zindex": 0
+    },
+    {
+      "scale": "y",
+      "orient": "left",
+      "gridScale": "x",
+      "grid": true,
+      "tickCount": {"signal": "ceil(height/40)"},
+      "domain": false,
+      "labels": false,
+      "aria": false,
+      "maxExtent": 0,
+      "minExtent": 0,
+      "ticks": false,
+      "zindex": 0
+    },
+    {
+      "scale": "x",
+      "orient": "bottom",
+      "grid": false,
+      "title": "Date Time",
+      "labelFontSize": 12,
+      "titleFontSize": 18,
+      "labelFlush": true,
+      "labelOverlap": true,
+      "tickCount": {"signal": "ceil(width/40)"},
+      "zindex": 0
+    },
+    {
+      "scale": "y",
+      "orient": "left",
+      "grid": false,
+      "title": "Rating Count",
+      "labelFontSize": 12,
+      "titleFontSize": 18,
+      "labelOverlap": true,
+      "tickCount": {"signal": "ceil(height/40)"},
+      "zindex": 0
+    }
+  ],
+  "legends": [{"fill": "color", "symbolType": "circle", "title": "g"}],
+  "config": {}
+}

@@ -1,0 +1,117 @@
+{
+    "$schema": "https://vega.github.io/schema/vega/v5.json",
+    "background": "white",
+    "padding": 5,
+    "width": 1280,
+    "height": 720,
+    "title": {
+        "text": "谷歌PLAY原神评分",
+        "subtitle": "图·云",
+        "fontSize": 24,
+        "subtitleFontSize": 16,
+        "frame": "group"
+    },
+    "style": "cell",
+    "data": [
+        {"name": "source_0", "values": []},
+        {
+            "name": "data_0",
+            "source": "source_0",
+            "transform": [
+                {"type": "formula", "expr": "toDate(datum[\"d\"])", "as": "d"}
+            ]
+        }
+    ],
+    "marks": [
+        {
+            "name": "marks",
+            "type": "line",
+            "style": ["line"],
+            "sort": {"field": "datum[\"d\"]"},
+            "from": {"data": "data_0"},
+            "encode": {
+                "update": {
+                    "stroke": {"value": "#57bb8a"},
+                    "description": {
+                        "signal": "\"d: \" + (timeFormat(datum[\"d\"], '%b %d, %Y')) + \"; c: \" + (format(datum[\"c\"], \"\"))"
+                    },
+                    "x": {"scale": "x", "field": "d"},
+                    "y": {"scale": "y", "field": "c"},
+                    "defined": {
+                        "signal": "isValid(datum[\"d\"]) && isFinite(+datum[\"d\"]) && isValid(datum[\"c\"]) && isFinite(+datum[\"c\"])"
+                    }
+                }
+            }
+        }
+    ],
+    "scales": [
+        {
+            "name": "x",
+            "type": "time",
+            "domain": {"data": "data_0", "field": "d"},
+            "range": [0, {"signal": "width"}]
+        },
+        {
+            "name": "y",
+            "type": "linear",
+            "domain": {"data": "data_0", "field": "c"},
+            "range": [{"signal": "height"}, 0],
+            "nice": true,
+            "zero": false
+        }
+    ],
+    "axes": [
+        {
+            "scale": "x",
+            "orient": "bottom",
+            "gridScale": "y",
+            "grid": true,
+            "tickCount": {"signal": "ceil(width/40)"},
+            "domain": false,
+            "labels": false,
+            "aria": false,
+            "maxExtent": 0,
+            "minExtent": 0,
+            "ticks": false,
+            "zindex": 0
+        },
+        {
+            "scale": "y",
+            "orient": "left",
+            "gridScale": "x",
+            "grid": true,
+            "tickCount": {"signal": "ceil(height/40)"},
+            "domain": false,
+            "labels": false,
+            "aria": false,
+            "maxExtent": 0,
+            "minExtent": 0,
+            "ticks": false,
+            "zindex": 0
+        },
+        {
+            "scale": "x",
+            "orient": "bottom",
+            "grid": false,
+            "title": "日期",
+            "labelFontSize": 12,
+            "titleFontSize": 18,
+            "labelFlush": true,
+            "labelOverlap": true,
+            "tickCount": {"signal": "ceil(width/40)"},
+            "zindex": 0
+        },
+        {
+            "scale": "y",
+            "orient": "left",
+            "grid": false,
+            "title": "评分",
+            "labelFontSize": 12,
+            "titleFontSize": 18,
+            "labelOverlap": true,
+            "tickCount": {"signal": "ceil(height/40)"},
+            "zindex": 0
+        }
+    ],
+    "config": {}
+}
