@@ -1,7 +1,7 @@
 const gplay = require('google-play-scraper');
 exports.init = async function (channel) {
     await update(channel);
-    setInterval(() => update(channel), 60000);
+    setInterval(() => update(channel), 3600000);
 }
 
 async function update(channel) {
