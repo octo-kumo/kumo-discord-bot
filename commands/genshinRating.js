@@ -57,12 +57,23 @@ function extractRating(DATA) {
     return final;
 }
 
+function extractRatingCount(DATA) {
+    let final = [];
+    DATA.forEach(p => {
+        final.push({c: p.data[1], d: p.date});
+    })
+    return final;
+}
+
+
 exports.draw = async function () {
     await drawComp();
     await drawRating();
+    await drawTotal();
     await drawComp(true);
     await drawRating(true);
-    console.log("Fetched");
+    await drawTotal(true);
+    console.log("Done");
 }
 
 function drawComp(zh) {
@@ -87,6 +98,22 @@ function drawRating(zh) {
     const view = new vega.View(vega.parse(GRAPH_SPECS), {});
     return view.toCanvas().then(async function (canvas) {
         fs.writeFileSync(`rating${zh ? ".zh" : ""}.png`, await canvas.toBuffer("image/png"));
+    }).catch(function (err) {
+        console.error(err);
+    });
+}
+
+function drawTotal(zh) {
+    const GRAPH_SPECS = require(`../json/gplay-rating-chart${zh ? ".zh" : ""}.json`);
+    GRAPH_SPECS.data[0].values = extractRatingCount(DATA);
+    GRAPH_SPECS.axes[3].title = zh ? "评分数" : "Rating Count";
+    GRAPH_SPECS.title.text = zh ? "谷歌PLAY原神评分数量" : "Genshin Google Play Rating Count";
+    GRAPH_SPECS.width = 1920;
+    GRAPH_SPECS.height = 1080;
+    fs.writeFileSync("test.json", JSON.stringify(GRAPH_SPECS));
+    const view = new vega.View(vega.parse(GRAPH_SPECS), {});
+    return view.toCanvas().then(async function (canvas) {
+        fs.writeFileSync(`rating_count${zh ? ".zh" : ""}.png`, await canvas.toBuffer("image/png"));
     }).catch(function (err) {
         console.error(err);
     });
