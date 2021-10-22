@@ -116,6 +116,7 @@ client.on('message', async msg => {
     if (command === "inspire") await inspire.handleCommand(args, msg, PREFIX);
     if (command === "azurlane" || command === "al" || command === "azur" || command === "az") await azurlane.handleCommand(args, msg, PREFIX);
     if (command === "genshin" || command === "gs" || command === "lisa" || command === "g") await genshin.handleCommand(args, msg, PREFIX);
+    if (command === "gtip") await genshin.gTip(args, msg, PREFIX);
     if (command === "music" || command === "am" || command === "m" || command === "song") await music.handleCommand(args, msg, PREFIX);
     if (command.startsWith("!")) {
         console.log("Double !!: end command = " + command.substring(1));

@@ -4,6 +4,7 @@ const config = require('./config.js').config;
 const API_URL = "https://api.genshin.dev";
 const TYPES = ["artifacts", "characters", "domains", "elements", "materials", "nations", "weapons"];
 const LIST = {};
+const TIPS = {config: null, text: null};
 const book_filter = (reaction, user) =>
     (['⬅️', '📊', '👕', '🖌️', '➡️', '❎'].includes(reaction.emoji.name) || "698441024644841543" === reaction.emoji.id) && user.id !== config.id;
 const ship_book_anchors = {
@@ -20,13 +21,21 @@ const COLOR = {
     "5": 0xFDC637
 };
 exports.init = () => {
-    return Promise.all(TYPES.map(type => get(type, '').then(res => LIST[type] = res)));
+    return Promise.all([
+        fetch('https://raw.githubusercontent.com/Dimbreath/GenshinData/master/ExcelBinOutput/LoadingTipsExcelConfigData.json').then(res => res.json()).then(j => {
+            TIPS.config = j
+        }),
+        fetch('https://raw.githubusercontent.com/Dimbreath/GenshinData/master/TextMap/TextMapEN.json').then(res => res.json()).then(j => {
+            TIPS.text = j
+        }),
+        ...TYPES.map(type => get(type, '').then(res => LIST[type] = res))]);
 }
 
 function get(type, name) {
     return fetch(`${API_URL}/${type}/${name}`).then(res => res.json());
 }
 
+const TIP_CONFIG = fetch()
 exports.handleCommand = async (args, msg, prefix) => {
     console.log("running genshin sub-module... args =", args);
     try {
@@ -79,6 +88,22 @@ exports.handleCommand = async (args, msg, prefix) => {
         console.log(err);
     }
 };
+exports.gTip = (args, msg, prefix) => {
+    let c;
+    if (args.length > 0) {
+        c = TIPS.config.find(c => c.Id.toString() === args[0]);
+        if (!c) return msg.reply("Not found");
+    } else {
+        let n = Math.floor(Math.random() * TIPS.config.length);
+        c = TIPS.config[n];
+    }
+    return msg.channel.send(
+        new Discord.MessageEmbed().setTitle(TIPS.text[c.TipsTitleTextMapHash])
+            .setDescription(TIPS.text[c.TipsDescTextMapHash].replace(/\\n/g, '\n'))
+            .setColor(0x66d4de)
+            .setFooter("ID " + c.Id)
+    );
+}
 
 function characterBook(name, data) {
     let pages = [];
