@@ -1,7 +1,10 @@
 const gplay = require('google-play-scraper');
+
+const WIDTH = 1920 * 2;
+const HEIGHT = 1080 * 2;
 exports.init = async function (channel) {
-    await update(channel);
-    setInterval(() => update(channel), 3600000);
+    // await update(channel);
+    // setInterval(() => update(channel), 3600000);
 }
 
 async function update(channel) {
@@ -79,8 +82,8 @@ exports.draw = async function () {
 function drawComp(zh) {
     const GRAPH_SPECS = require(`../json/gplay-comp-chart${zh ? ".zh" : ""}.json`);
     GRAPH_SPECS.data[0].values = extractCount(DATA);
-    GRAPH_SPECS.width = 1920;
-    GRAPH_SPECS.height = 1080;
+    GRAPH_SPECS.width = WIDTH;
+    GRAPH_SPECS.height = HEIGHT;
     const view = new vega.View(vega.parse(GRAPH_SPECS), {});
     return view.toCanvas().then(async function (canvas) {
         fs.writeFileSync(`composition${zh ? ".zh" : ""}.png`, await canvas.toBuffer("image/png"));
@@ -92,8 +95,8 @@ function drawComp(zh) {
 function drawRating(zh) {
     const GRAPH_SPECS = require(`../json/gplay-rating-chart${zh ? ".zh" : ""}.json`);
     GRAPH_SPECS.data[0].values = extractRating(DATA);
-    GRAPH_SPECS.width = 1920;
-    GRAPH_SPECS.height = 1080;
+    GRAPH_SPECS.width = WIDTH;
+    GRAPH_SPECS.height = HEIGHT;
     fs.writeFileSync("test.json", JSON.stringify(GRAPH_SPECS));
     const view = new vega.View(vega.parse(GRAPH_SPECS), {});
     return view.toCanvas().then(async function (canvas) {
@@ -108,8 +111,8 @@ function drawTotal(zh) {
     GRAPH_SPECS.data[0].values = extractRatingCount(DATA);
     GRAPH_SPECS.axes[3].title = zh ? "评分数" : "Rating Count";
     GRAPH_SPECS.title.text = zh ? "谷歌PLAY原神评分数量" : "Genshin Google Play Rating Count";
-    GRAPH_SPECS.width = 1920;
-    GRAPH_SPECS.height = 1080;
+    GRAPH_SPECS.width = WIDTH;
+    GRAPH_SPECS.height = HEIGHT;
     fs.writeFileSync("test.json", JSON.stringify(GRAPH_SPECS));
     const view = new vega.View(vega.parse(GRAPH_SPECS), {});
     return view.toCanvas().then(async function (canvas) {
