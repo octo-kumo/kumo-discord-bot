@@ -1,7 +1,7 @@
 // Required dependencies
 const Discord = require('discord.js');
 const config = require('./commands/config').config;
-const coursemology = require('./commands/coursemology');
+// const coursemology = require('./commands/coursemology');
 const eco = require('./commands/eco');
 const bilibili = require('./commands/bilibili');
 const covid = require('./commands/covid');
@@ -38,14 +38,14 @@ client.on('ready', () => {
     client.user.setPresence(config.PRESENCE).then(r => console.log("Presence Set!"));
     config.offset = 8 + new Date().getTimezoneOffset() / 60;
     // config.COURSEMOLOGY_HOOK = new Discord.WebhookClient('865115834007289856', process.env.COURSEMOLOGY_HOOK);
-    config.COURSEMOLOGY_HOOK = new Discord.WebhookClient('868475613005090846', process.env.COURSEMOLOGY_HOOK);
-    client.channels.fetch('831675267495886888').then(channel => config.COURSEMOLOGY_CHANNEL = channel);
+    // config.COURSEMOLOGY_HOOK = new Discord.WebhookClient('868475613005090846', process.env.COURSEMOLOGY_HOOK);
+    // client.channels.fetch('831675267495886888').then(channel => config.COURSEMOLOGY_CHANNEL = channel);
     config.id = client.user.id;
     genshin.init().then(r => console.log("Genshin Init!\n" + JSON.stringify(r)))
     timetable.init().then(r => console.log("Timetable Init!"));
     azurlane.init().then(r => console.log("Azurlane Init!"));
     bilibili.init().then(r => console.log("Bilibili Init!"));
-    coursemology.init().then(r => console.log("Coursemology Init!"));
+    // coursemology.init().then(r => console.log("Coursemology Init!"));
     client.channels.fetch('892795902186639460')
         .then(channel => gRating.init(channel)).then(r => console.log("GENSHIN RATING Init!"));
     // setInterval(() => coursemology.update(config.DEFAULT_COURSE), 20000);
@@ -96,7 +96,7 @@ client.on('message', async msg => {
         await m.edit(PING_EMBED);
     }
 
-    if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
+    // if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
     if (command === "list-emotes" || command === "emotes") {
         await sendLongMessage(msg.channel, "**Emotes:**\n" + join(msg.guild.emojis.cache.values().map(e => `<:${e.name}:${e.id}> \`:${e.name}:\``), [" ", " ", "\n"]));
     }
