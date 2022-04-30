@@ -35,7 +35,6 @@ function get(type, name) {
     return fetch(`${API_URL}/${type}/${name}`).then(res => res.json());
 }
 
-const TIP_CONFIG = fetch()
 exports.handleCommand = async (args, msg, prefix) => {
     console.log("running genshin sub-module... args =", args);
     try {
