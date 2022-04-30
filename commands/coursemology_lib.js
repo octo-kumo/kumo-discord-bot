@@ -1,12 +1,30 @@
 const JSDOM = require('jsdom').JSDOM;
 const fetch = require('node-fetch');
+const FormData = require('form-data');
 const turndown = require('turndown')();
 const moment = require('moment');
 const headers = {
-    "Cookie": "remember_user_token=" + process.env.CMTOKEN,
+    "Cookie": "remember_user_token=",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"
 };
 const linkR = /^\/courses\/(?<course>\d+)\/assessments\?category=(?<cat>\d+)&tab=(?<tab>\d+)$/;
+
+async function login() {
+    const doc = new JSDOM(await fetch('https://nushigh.coursemology.org/users/sign_in').then(res => res.buffer())).window.document
+    const token = doc.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    const formData = new FormData();
+    formData.append('authenticity_token', token);
+    formData.append('user[email]', 'h1710169@nushigh.edu.sg');
+    formData.append('user[password]', process.env.CMPASS);
+    formData.append('user[remember_me]', '1');
+    formData.append('commit', 'Sign In');
+
+    const res = await fetch('https://nushigh.coursemology.org/users/sign_in', {
+        method: "POST",
+        body: formData
+    })
+    headers.Cookie = res.headers.get('set-cookie').split(';')[0]
+}
 
 async function parseAssessment(course, id) {
     course = encodeURIComponent(course);
@@ -51,8 +69,7 @@ async function parseAssessment(course, id) {
     }
     let json = null;
     if (doc.querySelector(".page-header .btn-info") && doc.querySelector(".page-header .btn-info").textContent !== "Attempt") json = await (fetch("https://nushigh.coursemology.org" + doc.querySelector(".page-header .btn-info").href + "?format=json", {
-        headers: headers,
-        method: 'GET'
+        headers
     }).then(res => res.json()));
     return {
         url: `https://nushigh.coursemology.org/courses/${course}/assessments/${id}`,
@@ -66,9 +83,9 @@ async function parseAssessment(course, id) {
         markdown: json ? turndown.turndown(json.assessment.description) : null,
         questions: json ? json.questions.length : 0,
         // info: info,
-        fields: fields,
-        achievements: achievements,
-        files: files,
+        fields,
+        achievements,
+        files,
         unreleased: (!json)
     }
 }
@@ -127,7 +144,7 @@ async function parseCourse(course) {
     });
     let mapping = Array.from(doc.getElementById("course-navigation-sidebar").querySelectorAll("li>a")).map(l => {
         let name = l.childNodes[1].textContent;
-        if (["Tutorials", "Assignments"].includes(name)) {
+        if (["Tutorials", "Assignments", "Assessments"].includes(name)) {
             let results = linkR.exec(l.href);
             return {
                 name,
@@ -178,6 +195,7 @@ function camelize(str) {
 }
 
 module.exports = {
+    login,
     parseAssessment,
     parseCourse,
     init,

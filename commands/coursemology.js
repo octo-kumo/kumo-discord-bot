@@ -4,30 +4,31 @@ const Discord = require('discord.js');
 const {
     parseAssessment,
     init,
-    update,
+    update, login,
 } = require('./coursemology_lib');
 const config = require('./config.js').config;
 
-const ids = [2080];
+const ids = [2162];
 const COURSES = {};
 const LAST_REMINDER = {};
 
 exports.init = async () => {
-    init(ids, COURSES).then(() => setInterval(checkUpdates, 1000 * 60)).then(() => checkUpdates());
+    await login()
+    await init(ids, COURSES).then(() => setInterval(checkUpdates, 1000 * 60)).then(() => checkUpdates());
 };
 
 function checkUpdates() {
     update(ids, COURSES).then(results => results.forEach(result => {
-        if (result.new_items.length > 0) config.COURSEMOLOGY_HOOK.send({
-            "username": "New Assessments",
-            "avatarURL": "https://cdn.discordapp.com/avatars/865115834007289856/450af31e5eaf291d3e58e700f6e26ba5.webp",
-            "embeds": result.new_items.map(i => newItemEmbed(i))
-        });
-        if (result.new_notice.length > 0) config.COURSEMOLOGY_HOOK.send({
-            "username": "Notifications",
-            "avatarURL": "https://cdn.discordapp.com/avatars/865115834007289856/450af31e5eaf291d3e58e700f6e26ba5.webp",
-            "embeds": result.new_notice.sort((a, b) => a.time - b.time).map(i => newNoticeEmbed(i))
-        });
+        // if (result.new_items.length > 0) config.COURSEMOLOGY_HOOK.send({
+        //     "username": "New Assessments",
+        //     "avatarURL": "https://cdn.discordapp.com/avatars/865115834007289856/450af31e5eaf291d3e58e700f6e26ba5.webp",
+        //     "embeds": result.new_items.map(i => newItemEmbed(i))
+        // });
+        // if (result.new_notice.length > 0) config.COURSEMOLOGY_HOOK.send({
+        //     "username": "Notifications",
+        //     "avatarURL": "https://cdn.discordapp.com/avatars/865115834007289856/450af31e5eaf291d3e58e700f6e26ba5.webp",
+        //     "embeds": result.new_notice.sort((a, b) => a.time - b.time).map(i => newNoticeEmbed(i))
+        // });
         let now = moment();
         ids.forEach(id => {
             let course = COURSES[id];
@@ -41,11 +42,11 @@ function checkUpdates() {
                     }
                 }
             }
-            if (needRemind.length > 0) config.COURSEMOLOGY_HOOK.send({
-                "username": "Reminder",
-                "avatarURL": "https://cdn.discordapp.com/avatars/865115834007289856/450af31e5eaf291d3e58e700f6e26ba5.webp",
-                "embeds": needRemind.sort((a, b) => a.time - b.time).map(i => newRemindEmbed(i))
-            });
+            // if (needRemind.length > 0) config.COURSEMOLOGY_HOOK.send({
+            //     "username": "Reminder",
+            //     "avatarURL": "https://cdn.discordapp.com/avatars/865115834007289856/450af31e5eaf291d3e58e700f6e26ba5.webp",
+            //     "embeds": needRemind.sort((a, b) => a.time - b.time).map(i => newRemindEmbed(i))
+            // });
         });
         if (config.COURSEMOLOGY_CHANNEL) config.COURSEMOLOGY_CHANNEL.messages.fetch().then(messages => remindDueDate(messages.filter(e => e.author.id === config.id && e.embeds.length > 0 && e.embeds[0].author.name === "Assessment Reminder").first(), config.COURSEMOLOGY_CHANNEL));
     }));
@@ -99,7 +100,7 @@ exports.handleCommand = async (args, msg, prefix) => {
             for (const course of Object.values(COURSES)) {
                 for (const items of Object.values(course.items)) {
                     for (const item of items) {
-                        if (item.title.toUpperCase().includes(args.toUpperCase()) || item.id === args) {
+                        if (String(item.title).toUpperCase().includes(args.toUpperCase()) || item.id === args) {
                             sendAssessment(await parseAssessment(course.id, item.id));
                             return;
                         }

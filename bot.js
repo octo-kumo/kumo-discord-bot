@@ -41,7 +41,7 @@ client.on('ready', () => {
     config.COURSEMOLOGY_HOOK = new Discord.WebhookClient('868475613005090846', process.env.COURSEMOLOGY_HOOK);
     client.channels.fetch('831675267495886888').then(channel => config.COURSEMOLOGY_CHANNEL = channel);
     config.id = client.user.id;
-    genshin.init().then(r => console.log("Genshin Init!\n" + JSON.stringify(r)))
+    genshin.init().then(r => console.log("Genshin Init!"))
     timetable.init().then(r => console.log("Timetable Init!"));
     azurlane.init().then(r => console.log("Azurlane Init!"));
     bilibili.init().then(r => console.log("Bilibili Init!"));
@@ -96,7 +96,7 @@ client.on('message', async msg => {
         await m.edit(PING_EMBED);
     }
 
-    if (command === "coursemology" || command === "cm") coursemology.handleCommand(args, msg);
+    if (command === "coursemology" || command === "cm") await coursemology.handleCommand(args, msg);
     if (command === "list-emotes" || command === "emotes") {
         await sendLongMessage(msg.channel, "**Emotes:**\n" + join(msg.guild.emojis.cache.values().map(e => `<:${e.name}:${e.id}> \`:${e.name}:\``), [" ", " ", "\n"]));
     }
