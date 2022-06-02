@@ -397,16 +397,17 @@ function createDevLevelField(level, buffs) {
 function generateGenInfoPage(ship) {
     const generalInfo = new Discord.MessageEmbed(); // Page 1
     generalInfo.setTitle("General Info")
-        .addField("Rarity", ship.rarity + " " + ship.stars.stars)
+        .addField("Rarity", ship.rarity + " " + '★'.repeat(ship.stars))
         .addField("ID", ship.id, true)
         .addField("Nation", ship.nationality, true)
         .addField("Class", ship.class, true)
         .addField("Type", ship.hullType, true);
-    if (ship.misc.artist) generalInfo.addField("Artist", `[${ship.misc.artist.name}](${ship.misc.artist.url})`, true);
-    if (ship.misc.web) generalInfo.addField("Web", `[${ship.misc.web.name}](${ship.misc.web.url})`, true);
-    if (ship.misc.pixiv) generalInfo.addField("Pixiv", `[${ship.misc.pixiv.name}](${ship.misc.pixiv.url})`, true);
-    if (ship.misc.twitter) generalInfo.addField("Twitter", `[${ship.misc.twitter.name}](${ship.misc.twitter.url})`, true);
-    if (ship.misc.voice) generalInfo.addField("Voice Actress", `[${ship.misc.voice.name}](${ship.misc.voice.url})`, true);
+    if (ship.misc.artist) {
+        generalInfo.addField("Artist",
+            Object.keys(ship.misc.artist.urls).map(key => `[${key === 'Wiki' ? ship.misc.artist.name : key}](${ship.misc.artist.urls[key]})`)
+                .join(' · '), true);
+    }
+    if (ship.misc.voice) generalInfo.addField("VA", `[${ship.misc.voice.name}](${ship.misc.voice.url})`, true);
     generalInfo.addField("Construction Time / Obtained From", ship.construction.constructionTime);
     return generalInfo;
 }
