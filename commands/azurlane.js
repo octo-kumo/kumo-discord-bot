@@ -387,10 +387,7 @@ function creatLimitField(index, limit) {
 function createDevLevelField(level, buffs) {
     return {
         name: "Lv " + level,
-        value: buffs.map(buff => {
-            if (typeof buff === "object") return Object.keys(buff).map(sbuff => STATS_EMOJI_TRANSLATION[sbuff] + " " + buff[sbuff]).join(", ")
-            else return buff;
-        }).join("\n")
+        value: buffs?.join("\n")
     };
 }
 
